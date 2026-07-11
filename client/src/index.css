@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+*{
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
