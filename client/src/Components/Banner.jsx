@@ -33,7 +33,7 @@ function Banner() {
       id: 4,
       img: img4,
       subtitle: 'More Professional Services',
-      title: 'Other Services',
+      title: 'Other Servic',
       title2: 'One Platform, Many Solutions!',
     }
   ]
