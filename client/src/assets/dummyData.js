@@ -46,6 +46,42 @@ import profile from '../assets/profile-pic.png';
         comment: "Excellent plumbing service!",
         date: "2026-07-10",
       },
+       {
+        _id: "comment005",
+        userId: "user001",
+        comment: "Excellent plumbing service!",
+        date: "2026-07-10",
+      },
+       {
+        _id: "comment005",
+        userId: "user001",
+        comment: "Excellent plumbing service!",
+        date: "2026-07-10",
+      },
+       {
+        _id: "comment005",
+        userId: "user001",
+        comment: "Excellent plumbing service!",
+        date: "2026-07-10",
+      },
+       {
+        _id: "comment005",
+        userId: "user001",
+        comment: "Excellent plumbing service!",
+        date: "2026-07-10",
+      },
+       {
+        _id: "comment005",
+        userId: "user001",
+        comment: "Excellent plumbing service!",
+        date: "2026-07-10",
+      },
+       {
+        _id: "comment005",
+        userId: "user001",
+        comment: "Excellent plumbing service!",
+        date: "2026-07-10",
+      },
     ],
   },
   {
@@ -258,3 +294,87 @@ import profile from '../assets/profile-pic.png';
 ];
 
 export default servicesDummyData;
+
+const bookingDummyData = [
+  {
+    _id: "booking001",
+    workerId: "worker003",
+    serviceId: "service003",
+    customerId: "user001",
+    date: "2026-12-02",
+    status: "In Progress"
+  },
+  {
+    _id: "booking002",
+    workerId: "worker002",
+    serviceId: "service002",
+    customerId: "user002",
+    date: "2026-12-05",
+    status: "Confirmed"
+  },
+  {
+    _id: "booking003",
+    workerId: "worker006",
+    serviceId: "service006",
+    customerId: "user003",
+    date: "2026-12-08",
+    status: "Completed"
+  },
+  {
+    _id: "booking004",
+    workerId: "worker001",
+    serviceId: "service001",
+    customerId: "user004",
+    date: "2026-12-10",
+    status: "Cancelled"
+  },
+  {
+    _id: "booking005",
+    workerId: "worker005",
+    serviceId: "service005",
+    customerId: "user005",
+    date: "2026-12-12",
+    status: "Pending"
+  },
+  {
+    _id: "booking006",
+    workerId: "worker004",
+    serviceId: "service004",
+    customerId: "user006",
+    date: "2026-12-15",
+    status: "Confirmed"
+  },
+  {
+    _id: "booking007",
+    workerId: "worker007",
+    serviceId: "service007",
+    customerId: "user007",
+    date: "2026-12-18",
+    status: "Completed"
+  },
+  {
+    _id: "booking008",
+    workerId: "worker008",
+    serviceId: "service008",
+    customerId: "user008",
+    date: "2026-12-20",
+    status: "Pending"
+  },
+  {
+    _id: "booking009",
+    workerId: "worker009",
+    serviceId: "service009",
+    customerId: "user009",
+    date: "2026-12-22",
+    status: "Confirmed"
+  },
+  {
+    _id: "booking010",
+    workerId: "worker010",
+    serviceId: "service010",
+    customerId: "user010",
+    date: "2026-12-25",
+    status: "Completed"
+  }
+];
+export { bookingDummyData };

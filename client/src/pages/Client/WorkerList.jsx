@@ -4,6 +4,7 @@ import serviseDummyData from "../../assets/dummyData";
 import Footer from "../../Components/Footer";
 import { useNavigate } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
+import { FaLocationArrow } from "react-icons/fa";
 
 function WorkerList() {
   const [title, setTitle] = useState("");
@@ -34,20 +35,30 @@ function WorkerList() {
       <div className="min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white">
 
         {/* Header */}
-        <div className="px-4 sm:px-6 md:px-10 lg:px-20 pt-8">
-          <h1 className="text-2xl sm:text-3xl font-bold">
-            Worker List
-          </h1>
+        <div className="flex items-center justify-between">
+          <div className="px-4 sm:px-6 md:px-10 lg:px-20 pt-8">
+            <h1 className="text-2xl sm:text-3xl font-bold">
+              Worker List
+            </h1>
 
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 my-2">
-            Home / Worker List
-          </p>
+            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 my-2">
+              Home / Worker List
+            </p>
+          </div>
+          <div className="px-4 flex justify-center items-center gap-3 sm:px-6 md:px-10 lg:px-20 pt-8">
+            <div onClick={() => navigate("/customer/workerReservation")} className="bg-blue-600 flex items-center gap-3 dark:bg-purple-600 hover:dark:bg-purple-700 hover:bg-blue-700 text-white py-3 px-4 rounded-sm transition duration-300 cursor-pointer">
+              <span><FaLocationArrow /></span>
+              <button >
+                My Reservations
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Filter Section */}
         <div className="px-4 sm:px-6 md:px-10 lg:px-20 py-5 dark:bg-gray-800 bg-gray-200 mx-20 mb-5">
           <h2 className='text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200 flex items-center gap-2'>
-            <p className="text-3xl"><CiSearch /></p> 
+            <p className="text-3xl"><CiSearch /></p>
             <p>Filter Workers</p>
           </h2>
 
