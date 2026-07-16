@@ -14,7 +14,7 @@ import {
 } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
 import ToggleBtn from '../customer/ToggleBtn';
-import { MdLibraryAdd, MdOutlineWork, MdDashboard } from "react-icons/md";
+import {  MdOutlineWork } from "react-icons/md";
 import logo from '../../assets/logo.png';
 
 function AdminSideBar() {
