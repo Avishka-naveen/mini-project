@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import NavBar from "../../Components/NavBar";
+import NavBar from "../../Components/customer/NavBar";
 import serviseDummyData from "../../assets/dummyData";
-import Footer from "../../Components/Footer";
+import Footer from "../../Components/customer/Footer";
 import { useNavigate } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
 import { FaLocationArrow } from "react-icons/fa";

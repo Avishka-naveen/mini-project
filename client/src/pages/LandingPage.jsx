@@ -1,13 +1,13 @@
 import React, { useContext } from 'react';
 import { ThemeContext } from '../Context/ThemContext';
 import { useNavigate } from 'react-router-dom';
-import NavBar from '../Components/NavBar';
-import Banner from '../Components/Banner';
+import NavBar from '../Components/customer/NavBar';
+import Banner from '../Components/customer/Banner';
 import { BanknoteArrowDown } from 'lucide-react';
-import SubBanner from '../Components/SubBanner';
-import Footer from '../Components/Footer';
-import Services from '../Components/Services';
-import About from '../Components/About';
+import SubBanner from '../Components/customer/SubBanner';
+import Footer from '../Components/customer/Footer';
+import Services from '../Components/customer/Services';
+import About from '../Components/customer/About';
 
 
 function LandingPage() {

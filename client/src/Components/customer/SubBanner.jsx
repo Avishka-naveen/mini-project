@@ -1,5 +1,5 @@
 import React from 'react'
-import subbannerPhoto from '../assets/subbannerphoto.png'
+import subbannerPhoto from '../../assets/subbannerphoto.png'
 
 function SubBanner() {
     return (

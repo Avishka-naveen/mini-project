@@ -1,7 +1,7 @@
 import React from 'react'
-import Aimg1 from '../assets/skilled_professionals.jpg'
-import Aimg2 from '../assets/secure_platform.jpg'
-import Aimg3 from '../assets/convenient_hiring.png'
+import Aimg1 from '../../assets/skilled_professionals.jpg'
+import Aimg2 from '../../assets/secure_platform.jpg'
+import Aimg3 from '../../assets/convenient_hiring.png'
 
 function About() {
 

@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import img1 from '../assets/air_condion_technetian.jpg'
-import img2 from '../assets/carpenter.jpg'
-import img3 from '../assets/cleaner.jpg'
-import img4 from '../assets/painter.jpg'
-import img5 from '../assets/plumber.jpg'
-import img6 from '../assets/skilled_professionals.jpg'
+import img1 from '../../assets/air_condion_technetian.jpg'
+import img2 from '../../assets/carpenter.jpg'
+import img3 from '../../assets/cleaner.jpg'
+import img4 from '../../assets/painter.jpg'
+import img5 from '../../assets/plumber.jpg'
+import img6 from '../../assets/skilled_professionals.jpg'
 
 const gallary = [
     { id: 1, img: img1, title: "Air Conditioning Technician" },

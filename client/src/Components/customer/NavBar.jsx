@@ -1,5 +1,5 @@
 import React from 'react'
-import logo from '../assets/logo.png'
+import logo from '../../assets/logo.png'
 import { FaUserCircle } from "react-icons/fa";
 import { useLocation, useNavigate } from 'react-router-dom';
 import ToggleBtn from './ToggleBtn';

@@ -1,9 +1,9 @@
 import React from 'react'
 import Slider from "react-slick";
-import img1 from '../assets/bannercarpenter.png'
-import img2 from '../assets/bannerelect.png'
-import img3 from '../assets/bannerPlumber.png'
-import img4 from '../assets/other_worker.png'
+import img1 from '../../assets/bannercarpenter.png'
+import img2 from '../../assets/bannerelect.png'
+import img3 from '../../assets/bannerPlumber.png'
+import img4 from '../../assets/other_worker.png'
 
 function Banner() {
 

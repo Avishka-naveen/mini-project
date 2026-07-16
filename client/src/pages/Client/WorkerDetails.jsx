@@ -1,6 +1,6 @@
 
-import NavBar from '../../Components/NavBar'
-import Footer from '../../Components/Footer'
+import NavBar from '../../Components/customer/NavBar'
+import Footer from '../../Components/customer/Footer'
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import serviseDummyData from "../../assets/dummyData";

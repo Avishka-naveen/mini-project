@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import city_img from '../../assets/city2.jpg';
 import { useNavigate } from 'react-router-dom';
-import ToggleBtn from '../../Components/ToggleBtn';
+// import ToggleBtn from '../../Components/customer/ToggleBtn';
 
+//import ToggleBtn from '../../Components/customer/';
 
 function VerifyOtp() {
   const navigate = useNavigate();

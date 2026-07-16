@@ -1,6 +1,6 @@
 import React, { useContext, useRef, useCallback } from "react";
 import { flushSync } from "react-dom";
-import { ThemeContext } from "../Context/ThemContext";
+import { ThemeContext } from "../../Context/ThemContext";
 
 import { Moon, Sun } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

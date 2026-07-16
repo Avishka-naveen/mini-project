@@ -378,3 +378,73 @@ const bookingDummyData = [
   }
 ];
 export { bookingDummyData };
+
+const serviceDummyData = [
+  {
+    service_id: "service001",
+    workerId: "worker001",
+    price: 5000,
+    location: "Colombo",
+    description: "Professional plumbing service for home and office repairs.",
+    phone: "0771234567",
+    service_name: "Plumbing Service",
+    skill: "Plumber,plumber2"
+  },
+
+  {
+    service_id: "service002",
+    workerId: "worker002",
+    price: 3500,
+    location: "Negombo",
+    description: "Electrical installation and repair services with experienced workers.",
+    phone: "0719876543",
+    service_name: "Electrical Repair",
+    skill: "Electrician"
+  },
+
+  {
+    service_id: "service003",
+    workerId: "worker003",
+    price: 4500,
+    location: "Chilaw",
+    description: "Custom furniture making and wood repair services.",
+    phone: "0754567890",
+    service_name: "Carpenter Service",
+    skill: "Carpenter"
+  },
+
+  {
+    service_id: "service004",
+    workerId: "worker004",
+    price: 6000,
+    location: "Kandy",
+    description: "Professional house painting service with quality materials.",
+    phone: "0765554433",
+    service_name: "House Painting",
+    skill: "Painter"
+  },
+
+  {
+    service_id: "service005",
+    workerId: "worker005",
+    price: 3000,
+    location: "Gampaha",
+    description: "Complete home and office cleaning service.",
+    phone: "0782223344",
+    service_name: "Cleaning Service",
+    skill: "Cleaner"
+  },
+
+  {
+    service_id: "service006",
+    workerId: "worker006",
+    price: 7500,
+    location: "Colombo",
+    description: "Air conditioner installation, repair and maintenance.",
+    phone: "0701112233",
+    service_name: "AC Repair Service",
+    skill: "Air Conditioning Technician"
+  }
+];
+
+export {serviceDummyData};
