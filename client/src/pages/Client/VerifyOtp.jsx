@@ -1,177 +1,312 @@
 import React, { useState, useRef } from 'react';
-import city_img from '../../assets/city2.jpg';
+import { FaEnvelope, FaLock, FaCheckCircle, FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-// import ToggleBtn from '../../Components/customer/ToggleBtn';
 
-//import ToggleBtn from '../../Components/customer/';
+import sitman_img from '../../assets/sitman.png';
+import ToggleBtn from '../../Components/customer/ToggleBtn';
 
 function VerifyOtp() {
   const navigate = useNavigate();
-  const inputRefs = useRef([]);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Handle OTP input change
-  const handleChange = (index, value) => {
-    // Only allow single digit
-    if (!/^\d*$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(0, 1);
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1].focus();
-    }
-  };
-
-  // Handle backspace
-  const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      inputRefs.current[index - 1].focus();
-    }
-  };
-
-  // Handle paste
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const paste = e.clipboardData.getData('text').slice(0, 6);
-    const digits = paste.split('').filter(char => /^\d$/.test(char));
-
-    const newOtp = [...otp];
-    digits.forEach((digit, index) => {
-      if (index < 6) {
-        newOtp[index] = digit;
-      }
-    });
-    setOtp(newOtp);
-
-    // Focus last filled field
-    const lastIndex = Math.min(digits.length, 5);
-    if (inputRefs.current[lastIndex]) {
-      inputRefs.current[lastIndex].focus();
-    }
-  };
+  const [step1, setStep1] = useState(true);
+  const [step2, setStep2] = useState(false);
+  const [step3, setStep3] = useState(false);
 
 
+const handleBack = () => {
+  if (step2) {
+    setStep2(false);
+    setStep1(true);
+  }else if(step3){
+    setStep3(false);
+    setStep2(true)
 
-
-
+  }
+};
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-[#1e1e1e]">
-      {/* Left Side - Image */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-      
-        <img
-          src={city_img}
-          alt="Verification"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/100 via-black/60 to-transparent flex flex-col justify-center p-12">
-        <div className='text-white text-5xl font-bold'>Join <span className="text-blue-600 text-7xl dark:text-purple-600">Quick Hire</span> and bring your services to life.</div>
-          <h2 className="text-white text-3xl font-bold">Verify Your Account</h2>
-          <p className="text-white/80 text-sm mt-2 max-w-sm">
-            Enter the 6-digit verification code sent to your email to complete your registration.
-          </p>
-          <div className="flex items-center gap-4 mt-4">
-            <span className="bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-              🔒 Secure
-            </span>
-            <span className="bg-green-500/30 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-              ⚡ Quick
-            </span>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-4">
+<ToggleBtn/>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden">
 
-      {/* Right Side - OTP Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8">
-        <div className='fixed top-5 right-5'>
-          <ToggleBtn />
-        </div>
-        <div className="w-full max-w-md">
-          {/* Logo/Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-4">
-              <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              Verify OTP
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Please enter the 6-digit verification code sent to your email
-            </p>
-          </div>
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2">
 
-          {/* OTP Input Fields */}
-          <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">
-              Enter 6-digit code
-            </label>
-            <div
-              className="flex justify-between gap-2 sm:gap-3"
-              onPaste={handlePaste}
-            >
-              {Array(6).fill(0).map((_, index) => (
-                <input
-                  key={index}
-                  ref={(el) => (inputRefs.current[index] = el)}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={otp[index]}
-                  onChange={(e) => handleChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-bold 
-                           border-2 border-gray-300 dark:border-gray-600 
-                           rounded-xl focus:border-blue-500 dark:focus:border-purple-500 
-                           focus:ring-2 focus:ring-blue-200 dark:focus:ring-purple-200
-                           bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-                           outline-none transition duration-200"
-                  autoFocus={index === 0}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Verify Button */}
-          <button
-            
-            disabled={isLoading || otp.join('').length < 6}
-            className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700
-                     text-white font-semibold rounded-xl transition duration-300
-                     shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Verifying...
-              </div>
-            ) : (
-              'Verify OTP'
-            )}
-          </button>
-
-          {/* Footer Links */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Didn't receive the code?
-              <button
+          {/* Left Column - Image */}
+          <div className="hidden lg:flex bg-gradient-to-br from-blue-600 to-purple-900 dark:from-purple-200 dark:to-blue-900 items-center justify-center p-8">
+            <div className="text-center">
+              <img
+                src={sitman_img}
+                alt="Sitman Illustration"
+                className="w-80 h-auto mx-auto mb-6 drop-shadow-2xl"
+              />
+              <h2 className="text-3xl font-bold text-white mb-2">
+                {step1 && 'Verify Your Email! 📧'}
                 
-                className="ml-1 text-blue-600 dark:text-purple-400 font-semibold hover:underline"
-              >
-                Resend OTP
-              </button>
-            </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-              The code will expire in 10 minutes
-            </p>
+                {step2 && 'Confirm Your Identity 🔐'}
+                {step3  && 'Reset Your Password 🔑'} 
+              </h2>
+              <p className="text-white/80 text-sm max-w-xs mx-auto">
+                {step1 && 'Enter your email to receive a verification code.'}
+                {step2 && 'Enter the 6-digit code sent to your email.'}
+                {step3 && 'Create a strong new password for your account.'}
+              </p>
+              <div className="flex justify-center gap-4 mt-6">
+                <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs">
+                  {step1 && '📧 Step 1/3'}
+                  {step2 && '🔐 Step 2/3'}
+                  {step3 && '🔑 Step 3/3'}
+                </span>
+                <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs">
+                  🔒 Secure
+                </span>
+                <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs">
+                  ⚡ Quick
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Form */}
+          <div className="p-6 sm:p-8 lg:p-10">
+
+            {/* Back Button */}
+            {
+              !step1 && (
+                <button
+              onClick={handleBack}
+              className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mb-6"
+            >
+              <FaArrowLeft /> Back
+            </button>
+              )
+            }
+
+            {/* Step Indicator */}
+            <div className="flex justify-center gap-2 mb-6">
+              <div className={`w-3 h-3 rounded-full `}></div>
+              <div className={`w-3 h-3 rounded-full `}></div>
+              <div className={`w-3 h-3 rounded-full `}></div>
+            </div>
+
+            {/* Step 1 Content */}
+            {
+              step1 && (
+                <div className="text-center">
+                  {/* Icon */}
+                  <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FaEnvelope className="text-3xl text-blue-600 dark:text-blue-400" />
+                  </div>
+
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2">
+                    Verify Your Email 📧
+                  </h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                    Enter your email address to receive a 6-digit verification code.
+                  </p>
+
+                  <form className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="email"
+
+                          placeholder="you@example.com"
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
+                             bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                             outline-none transition duration-200"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      onClick={() => {
+                        setStep1(false)
+                        setStep2(true)
+                      }
+                      }
+                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700
+                         text-white font-semibold rounded-lg transition duration-300
+                         shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      send
+                    </button>
+                  </form>
+                </div>
+              )
+            }
+            {/* <--------------end */}
+            {/* stepp 2 */}
+            {
+              step2 && (
+                <div className="text-center">
+                  {/* Icon */}
+                  <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-4xl">📧</span>
+                  </div>
+
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2">
+                    Verify OTP 🔐
+                  </h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                    Enter the 6-digit verification code sent to
+                  </p>
+                  <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-6">
+                    this email
+                  </p>
+
+                  <form className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 text-center">
+                        Enter 6-digit code
+                      </label>
+                      <div className="flex justify-between gap-2" >
+                        {Array(6).fill(0).map((_, index) => (
+                          <input
+                            key={index}
+
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+
+                            onChange={(e) => handleOtpChange(index, e.target.value)}
+                            onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                            className="w-12 h-14 text-center text-xl font-bold
+                           border-2 border-gray-300 dark:border-gray-600
+                           rounded-lg focus:border-blue-500 dark:focus:border-purple-500
+                           focus:ring-2 focus:ring-blue-200 dark:focus:ring-purple-200
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                           outline-none transition duration-200"
+                            autoFocus={index === 0}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-500 dark:text-gray-400">
+                        ⏱️ Code expires in 5:00
+                      </span>
+                      <button
+                        type="button"
+
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        Resend OTP
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setStep1(false);
+                        setStep2(false);
+                        setStep3(true);
+                      }}
+
+                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700
+                     text-white font-semibold rounded-lg transition duration-300
+                     shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      verify
+                    </button>
+                  </form>
+                </div>
+              )
+            }
+            {/* step 2 is end */}
+            {/* step 3 */}
+            {
+              step3 && (
+                <div className="text-center">
+                  {/* Icon */}
+                  <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FaCheckCircle className="text-3xl text-green-600 dark:text-green-400" />
+                  </div>
+
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2">
+                    Reset Password 🔑
+                  </h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                    Create a new password for your account.
+                  </p>
+
+                  <form  className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">
+                        New Password
+                      </label>
+                      <div className="relative">
+                        <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <input
+                          type='password'
+                        placeholder="••••••••"
+                          className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
+                         bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                         focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                         outline-none transition duration-200"
+                          required
+                          minLength="6"
+                        />
+                        <button
+                          type="button"
+                        
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                           <FaEyeSlash />  <FaEye />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">
+                        Confirm New Password
+                      </label>
+                      <div className="relative">
+                        <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <input
+                          type= 'password'
+                    
+                          
+                          placeholder="••••••••"
+                          className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
+                         bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                         focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                         outline-none transition duration-200"
+                          required
+                          minLength="6"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                          <FaEyeSlash /> <FaEye />
+                        </button>
+                      </div>
+                      
+                        <p className="text-red-500 text-xs mt-1 text-left">Passwords do not match</p>
+                      
+                    </div>
+
+                    <button
+                      type="submit"
+                     
+                      className="w-full py-3 bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700
+                     text-white font-semibold rounded-lg transition duration-300
+                     shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                    reset
+                    </button>
+                  </form>
+                </div>
+              )
+            }
+
           </div>
         </div>
       </div>
