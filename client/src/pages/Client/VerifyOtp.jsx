@@ -23,8 +23,9 @@ const handleBack = () => {
   }
 };
   return (
+    
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-4">
-<ToggleBtn/>
+
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden">
 
         {/* Two Column Layout */}
@@ -136,6 +137,9 @@ const handleBack = () => {
                     >
                       send
                     </button>
+                    <button className="w-full py-3 bg-green-600 hover:bg-green-700 dark:bg-green-800 dark:hover:bg-green-900
+                         text-white font-semibold rounded-lg transition duration-300
+                         shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">Back To Loging</button>
                   </form>
                 </div>
               )
