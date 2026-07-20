@@ -105,3 +105,38 @@ export const login = async (req, res) => {
         return res.json({ success: false, massage: error.massage });
     }
 }
+
+//----------------get current customer data--------------//
+
+export const getCurrentCustomerData=async(req,res)=>{
+    const customerId=req.customerId;
+
+    try {
+        const customer=await CustomerModel.findById(customerId).select('customerName  customerEmail customerPhone');
+        if(!customer){
+             return res.json({success:false,message:"no user found"});
+        }
+        return res.json({success:true,message:'user Found',customer});
+    } catch (error) {
+        return res.json({success:false,message:error.massage});
+    }
+
+}
+
+export const logout=async(req,res)=>{
+       try {
+        res.clearCookie('token',{
+            httpOnly:true,
+            secure:process.env.NODE_ENV==='production',
+            sameSite:process.env.NODE_ENV==='production'?'none':'strict',
+            maxAge:7*24*60*60*1000
+
+        });
+        return res.json({success:true,massage:'logged out successfully'});
+        
+    } catch (error) {
+        return res.json({success:false,massage:error.massage});
+        
+    }
+
+}

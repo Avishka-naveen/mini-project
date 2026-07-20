@@ -7,10 +7,11 @@ import axios from 'axios'
 import sitman_img from '../../assets/sitman.png';
 import { useContext } from 'react';
 import { AppContext } from '../../Context/Appcontext';
+import { useEffect } from 'react';
 
 function Register() {
   const navigate = useNavigate();
-  const { backendUrl,isLogged,setIsLogged } = useContext(AppContext);
+  const { backendUrl,isLogged,setIsLogged,setcurrentCustomerData,fetchCustomerData } = useContext(AppContext);
 
   const [isSignIn, setIsSignIn] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -99,6 +100,7 @@ function Register() {
       axios.defaults.withCredentials = true;
 
       let response;
+      let customerData;
 
       response = await axios.post(backendUrl + '/api/customer/login', {
         customerEmail: loginData.email,
@@ -111,8 +113,12 @@ function Register() {
           password: ''
         });
         setIsLogged(true);
+         localStorage.setItem('isLogged', 'true');
         toast.success(response.data.message);
-        navigate('/customer/workerList')
+        fetchCustomerData();
+        navigate('/customer/workerList');
+        
+
       } else {
         toast.error(response.data.message);
 

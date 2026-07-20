@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import logo from '../../assets/logo.png'
 import { FaUserCircle } from "react-icons/fa";
 import { useLocation, useNavigate } from 'react-router-dom';
 import ToggleBtn from './ToggleBtn';
 import ProfileCard from './ProfileCard';
 import { useState } from 'react';
+import { AppContext } from '../../Context/Appcontext';
 
 
 
@@ -13,11 +14,14 @@ function NavBar() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const { currentCustomerData } = useContext(AppContext);
+    // console.log(currentCustomerData);
+
     const hiddenUserIcon = location.pathname === '/register' || location.pathname === '/';
     const hiddenSignInButton = location.pathname === '/';
     const hiddenLinks = location.pathname === '/';
 
-    const [openProfileCard, setOpenProfileCard] =useState(false);
+    const [openProfileCard, setOpenProfileCard] = useState(false);
 
     const scrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
@@ -62,10 +66,18 @@ function NavBar() {
                 {!hiddenUserIcon && (
                     <div className="relative inline-block">
                         {/* User Icon */}
-                        <div className="flex items-center gap-2 " onClick={()=>setOpenProfileCard(!openProfileCard)}>
-                            <FaUserCircle className="w-12 h-12 cursor-pointer" />
-                            <p>
-                                Hi <span className="text-blue-600 dark:text-purple-600">Developer</span>!
+                        <div className="flex items-center gap-2 cursor-pointer " onClick={() => setOpenProfileCard(!openProfileCard)}>
+                          
+                            {!openProfileCard && currentCustomerData?.customerName && (
+                                <div className='uppercase bg-gradient-to-br from-blue-500 to-purple-600 dark:from-purple-600 dark:to-blue-700 rounded-full w-13 h-13 flex items-center justify-center font-light text-2xl gap-1 text-white'>
+                                    <h1>
+                                        {currentCustomerData.customerName.split(' ')[0][0]}
+                                        {currentCustomerData.customerName.split(' ')[1]?.[0]}
+                                    </h1>
+                                </div>
+                            )}
+                            <p className='flex items-center gap-1'>
+                                Hi <span className="text-blue-600 hidden sm:block capitalize dark:text-purple-600">{currentCustomerData.customerName}</span>!
                             </p>
                         </div>
 
@@ -74,8 +86,8 @@ function NavBar() {
                         {
                             openProfileCard && <ProfileCard />
                         }
-                       
-                        
+
+
                     </div>
                 )}
 
