@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import CustomerModel from '../DB_Models/CustomerModel.js';
+import transporter from '../config/nodeMail.js';
+import { callresetPwTemplate } from '../EmailTemplate/resetPasswordOtp.js';
 
 //--------------user registration controller------------//
 
@@ -108,35 +110,112 @@ export const login = async (req, res) => {
 
 //----------------get current customer data--------------//
 
-export const getCurrentCustomerData=async(req,res)=>{
-    const customerId=req.customerId;
+export const getCurrentCustomerData = async (req, res) => {
+    const customerId = req.customerId;
 
     try {
-        const customer=await CustomerModel.findById(customerId).select('customerName  customerEmail customerPhone');
-        if(!customer){
-             return res.json({success:false,message:"no user found"});
+        const customer = await CustomerModel.findById(customerId).select('customerName  customerEmail customerPhone');
+        if (!customer) {
+            return res.json({ success: false, message: "no user found" });
         }
-        return res.json({success:true,message:'user Found',customer});
+        return res.json({ success: true, message: 'user Found', customer });
     } catch (error) {
-        return res.json({success:false,message:error.massage});
+        return res.json({ success: false, message: error.massage });
     }
 
 }
 
-export const logout=async(req,res)=>{
-       try {
-        res.clearCookie('token',{
-            httpOnly:true,
-            secure:process.env.NODE_ENV==='production',
-            sameSite:process.env.NODE_ENV==='production'?'none':'strict',
-            maxAge:7*24*60*60*1000
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
 
         });
-        return res.json({success:true,massage:'logged out successfully'});
+        return res.json({ success: true, massage: 'logged out successfully' });
+
+    } catch (error) {
+        return res.json({ success: false, massage: error.massage });
+
+    }
+
+}
+//----------------send forgot password otp--------------//
+
+export const sendForgotPwOtp = async (req, res) => {
+
+    const { customerEmail } = req.body;
+
+    if (!customerEmail) {
+        return res.json({ success: false, message: 'Email required' });
+    }
+
+    try {
+
+        const customer = await CustomerModel.findOne({ customerEmail });
+
+        if (!customer) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        customer.resetotp = otp;
+        customer.resetotpExpireAt = Date.now() + 10 * 60 * 1000;
+        await customer.save();
+
+        // call email template function
+        const emailTemplate = callresetPwTemplate(otp, customer.customerName);
+
+        //send mail
+        await transporter.sendMail({
+            from: "Quick Hire Support",
+            to: customer.customerEmail,
+            subject: 'Password Reset OTP',
+            html: emailTemplate
+        });
+
+
+        return res.json({ success: true, message: 'OTP sent to your email' });
+
+    } catch (error) {
+
+        return res.json({ success: false, message: error.message });
+    }
+}
+
+//------------verify forgot password otp------------------//
+export const verifyForgotPWOtp = async(req, res) => {
+
+    const {resetotp,customerEmail} = req.body;
+   
+
+    if(!resetotp || !customerEmail){
+        return res.json({success:false,message:'Missing Details'});
+    }
+    try {
+        const customer=await CustomerModel.findOne({customerEmail});
+        if(!customer){
+            return res.json({success:false,message:'no user found'});
+        }
+
+         if(customer.resetotpExpireAt < Date.now()){
+            return res.json({success:false,massage:' otp expired'});
+        }
+        if(customer.resetotp === resetotp){
+             return res.json({success:true,message:'verify success!'});
+             customer.resetotpExpireAt=0;
+             customer.resetotp='';
+             await customer.save();
+        }
+
         
     } catch (error) {
-        return res.json({success:false,massage:error.massage});
-        
+        return res.json({success:false,massage:error.message});
     }
+
+
+
 
 }
