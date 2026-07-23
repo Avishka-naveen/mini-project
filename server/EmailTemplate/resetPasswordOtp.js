@@ -1,4 +1,4 @@
-export function callresetPwTemplate(otp, customerName) { // Removed 'async'
+export function callresetPwTemplate(otp, customerName) { 
      return `
          <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 30px; background: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
     

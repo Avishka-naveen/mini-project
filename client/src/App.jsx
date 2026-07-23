@@ -15,6 +15,7 @@ import AdminManageWorker from './pages/Admin/AdminManageWorker'
 import LandingPage from './pages/LandingPage'
 import Bookings from './pages/Client/Bookings'
 import VerifyOtp from './pages/Client/VerifyOtp'
+import ForgotPassword from './pages/Client/ForgotPassword'
 
 function App() {
   return (
@@ -28,7 +29,8 @@ function App() {
         <Route path="/customer/workerList" element={<WorkerList />} />
         <Route path="/customer/workerDetails/:id" element={<WorkerDetails />} />
         <Route path="/customer/workerReservation" element={<Bookings />}/>
-        <Route path="/customer/verifyOtp" element={<VerifyOtp />}/>
+        <Route path="/customer/forgotPassword" element={<ForgotPassword />}/>
+        <Route path="/customer/verifyOtp" element={<VerifyOtp/>}/>
        
 
          {/* -------------------worker routes -------------------*/}

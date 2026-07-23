@@ -254,7 +254,7 @@ function Register() {
                   </div>
                 </div>
 
-                <div className="text-right" onClick={() => navigate('/customer/verifyOtp')}>
+                <div className="text-right" onClick={() => navigate('/customer/forgotPassword')}>
                   <a href="#" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
                     Forgot password?
                   </a>

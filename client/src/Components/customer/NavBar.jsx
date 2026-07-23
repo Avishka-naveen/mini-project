@@ -15,6 +15,7 @@ function NavBar() {
     const navigate = useNavigate();
 
     const { currentCustomerData } = useContext(AppContext);
+    const { isLogged } = useContext(AppContext);
     // console.log(currentCustomerData);
 
     const hiddenUserIcon = location.pathname === '/register' || location.pathname === '/';
@@ -67,9 +68,9 @@ function NavBar() {
                     <div className="relative inline-block">
                         {/* User Icon */}
                         <div className="flex items-center gap-2 cursor-pointer " onClick={() => setOpenProfileCard(!openProfileCard)}>
-                          
+
                             {!openProfileCard && currentCustomerData?.customerName && (
-                                <div className='uppercase bg-gradient-to-br from-blue-500 to-purple-600 dark:from-purple-600 dark:to-blue-700 rounded-full w-13 h-13 flex items-center justify-center font-light text-2xl gap-1 text-white'>
+                                <div className='uppercase bg-gradient-to-br from-blue-500 to-purple-600 dark:from-purple-600 dark:to-blue-700 rounded-full sm:w-13 w-8 sm:h-13 h-8 flex items-center justify-center font-light sm:text-2xl text-sm gap-1 text-white'>
                                     <h1>
                                         {currentCustomerData.customerName.split(' ')[0][0]}
                                         {currentCustomerData.customerName.split(' ')[1]?.[0]}
@@ -93,7 +94,14 @@ function NavBar() {
 
 
 
-
+                {/* become worker button section */}
+                {
+                    isLogged && (
+                        <div>
+                            <button onClick={()=>navigate('/customer/verifyOtp')} className='bg-blue-600 dark:bg-purple-600 cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0 '>Become worker</button>
+                        </div>
+                    )
+                }
 
 
                 {/* toggle button section */}

@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import CustomerModel from '../DB_Models/CustomerModel.js';
 import transporter from '../config/nodeMail.js';
 import { callresetPwTemplate } from '../EmailTemplate/resetPasswordOtp.js';
+import { workerRegistrationTemplate } from '../EmailTemplate/becomWorker.js';
 
 //--------------user registration controller------------//
 
@@ -186,36 +187,123 @@ export const sendForgotPwOtp = async (req, res) => {
 }
 
 //------------verify forgot password otp------------------//
-export const verifyForgotPWOtp = async(req, res) => {
+export const verifyForgotPWOtp = async (req, res) => {
 
-    const {resetotp,customerEmail} = req.body;
-   
+    const { resetotp, customerEmail } = req.body;
 
-    if(!resetotp || !customerEmail){
-        return res.json({success:false,message:'Missing Details'});
+
+    if (!resetotp || !customerEmail) {
+        return res.json({ success: false, message: 'Missing Details' });
     }
     try {
-        const customer=await CustomerModel.findOne({customerEmail});
-        if(!customer){
-            return res.json({success:false,message:'no user found'});
+        const customer = await CustomerModel.findOne({ customerEmail });
+        if (!customer) {
+            return res.json({ success: false, message: 'no user found' });
         }
 
-         if(customer.resetotpExpireAt < Date.now()){
-            return res.json({success:false,massage:' otp expired'});
+        if (customer.resetotpExpireAt < Date.now()) {
+            return res.json({ success: false, massage: ' otp expired' });
         }
-        if(customer.resetotp === resetotp){
-             return res.json({success:true,message:'verify success!'});
-             customer.resetotpExpireAt=0;
-             customer.resetotp='';
-             await customer.save();
+        if (customer.resetotp === resetotp) {
+            return res.json({ success: true, message: 'verify success!' });
+            customer.resetotpExpireAt = 0;
+            customer.resetotp = '';
+            await customer.save();
+        } else {
+            return res.json({ success: false, message: 'wrong otp please check again!' });
         }
 
-        
+
     } catch (error) {
-        return res.json({success:false,massage:error.message});
+        return res.json({ success: false, massage: error.message });
+    }
+}
+
+//------------add new password ------------------//
+
+export const addNewPassword = async (req, res) => {
+
+    const { customerEmail, customerPassword } = req.body;
+    if (!customerEmail || !customerPassword) {
+        return res.json({ success: false, message: "Missing Details!" })
+    }
+
+    try {
+        const customer = await CustomerModel.findOne({ customerEmail });
+        if (!customer) {
+            return res.json({ success: false, message: 'user not found' });
+        }
+        const hashedPassword = await bcrypt.hash(customerPassword, 10);
+        customer.customerPassword = hashedPassword;
+        await customer.save()
+        return res.json({ success: true, message: 'password has been reset successfully ! ' });
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
     }
 
 
+}
+
+//------------customer becomes worker function----------//
+
+export const becomeWorker=async(req,res)=>{
+    const customerId = req.customerId;
+
+    try {
+        const customer=await CustomerModel.findById(customerId);
+        if(!customer){
+            return res.json({ success: false, message: "no user found!"});
+        }
+        const name=customer.customerName;
+        
+       const otp = String(Math.floor(10000 + Math.random() * 90000));
+        customer.verifyotp = otp;
+        customer.verifyotpExpireAt = Date.now() + 10 * 60 * 1000;
+        await customer.save();
+
+        // call email template function
+        const emailTemplate = workerRegistrationTemplate(otp, name);
+
+    
+        await transporter.sendMail({
+            from: "Quick Hire Support",
+            to: customer.customerEmail,
+            subject: 'Become Worker!',
+            html: emailTemplate
+        });
 
 
+        return res.json({ success: true, message: 'OTP sent to your email' });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+        
+    }
+
+}
+
+export const verifybecomeWorkerOTP=async(req,res)=>{
+    const customerId = req.customerId;
+    const {verifyotp } = req.body;
+
+    try {
+        const customer=await CustomerModel.findById(customerId);
+        if(!customer){
+            return res.json({ success: false, message: "no user found!"});
+        }
+        if (customer.verifyotpExpireAt < Date.now()) {
+            return res.json({ success: false, massage: ' otp expired!' });
+        }
+        if(customer.verifyotp===verifyotp){
+            customer.verifyotpExpireAt = 0;
+            customer.verifyotp= '';
+            await customer.save();
+            return res.json({ success: true, message: 'Verify successfull!' });
+        }else{
+            return res.json({ success: false, message: 'wrong otp please check again!' });
+        }
+        
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
 }
