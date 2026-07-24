@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import logo from '../../assets/logo.png'
 import { FaUserCircle } from "react-icons/fa";
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -6,6 +6,7 @@ import ToggleBtn from './ToggleBtn';
 import ProfileCard from './ProfileCard';
 import { useState } from 'react';
 import { AppContext } from '../../Context/Appcontext';
+import axios from 'axios';
 
 
 
@@ -14,9 +15,9 @@ function NavBar() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { currentCustomerData } = useContext(AppContext);
+    const { currentCustomerData, currentWorkerData, setcurrentWorkerData, backendUrl } = useContext(AppContext);
     const { isLogged } = useContext(AppContext);
-    // console.log(currentCustomerData);
+    //  console.log(currentCustomerData);
 
     const hiddenUserIcon = location.pathname === '/register' || location.pathname === '/';
     const hiddenSignInButton = location.pathname === '/';
@@ -34,6 +35,38 @@ function NavBar() {
         }
     };
 
+    const handleGetWorkerData = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.get(`${backendUrl}/api/worker/getCurrentWorkerData`, { withCredentials: true });
+            console.log("Server Response:", response.data);
+            if (response.data.success) {
+                setcurrentWorkerData(response.data.worker);
+                console.log(response.data.worker); // This will now print!
+                navigate("/worker/dashbord/workerReservation");
+            }
+
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+   // Add this right below your fetchCustomerData function in AppContext.js
+const fetchWorkerData = async () => {
+    try {
+      const response = await axios.get(backendUrl + '/api/worker/getCurrentWorkerData');
+      if (response.data.success) {
+        setcurrentWorkerData(response.data.worker);
+      } else {
+        setcurrentWorkerData(null);
+      }
+    } catch (error) {
+      console.error("Failed to fetch worker data on refresh:", error);
+      setcurrentWorkerData(null);
+    }
+};
+
+    
     return (
         <div className='border-b-3 px-3  border-blue-600 dark:border-purple-600  py-2 flex items-center justify-between bg-gray-100 dark:bg-[#0f172a] text-black dark:text-white'>
             <div>
@@ -97,9 +130,23 @@ function NavBar() {
                 {/* become worker button section */}
                 {
                     isLogged && (
-                        <div>
-                            <button onClick={()=>navigate('/customer/verifyOtp')} className='bg-blue-600 dark:bg-purple-600 cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0 '>Become worker</button>
-                        </div>
+                        currentCustomerData.role === "worker" ? (
+                            <button
+                                onClick={handleGetWorkerData}
+                                className="bg-green-600 hover:bg-green-800 cursor-pointer text-white text-sm p-2 rounded-md"
+                            >
+                                Go to Dashboard
+                            </button>
+                        ) : (
+                            <div>
+                                <button
+                                    onClick={() => navigate("/customer/verifyOtp")}
+                                    className="bg-blue-600 dark:bg-purple-600 cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
+                                >
+                                    Become Worker
+                                </button>
+                            </div>
+                        )
                     )
                 }
 

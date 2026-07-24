@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import CustomerModel from '../DB_Models/CustomerModel.js';
+import WorkerModel from '../DB_Models/WorkerModel.js'
+import ServiceModel from '../DB_Models/ServiceModel.js'
 import transporter from '../config/nodeMail.js';
 import { callresetPwTemplate } from '../EmailTemplate/resetPasswordOtp.js';
 import { workerRegistrationTemplate } from '../EmailTemplate/becomWorker.js';
@@ -115,7 +117,7 @@ export const getCurrentCustomerData = async (req, res) => {
     const customerId = req.customerId;
 
     try {
-        const customer = await CustomerModel.findById(customerId).select('customerName  customerEmail customerPhone');
+        const customer = await CustomerModel.findById(customerId).select('customerName  customerEmail customerPhone role createdAt');
         if (!customer) {
             return res.json({ success: false, message: "no user found" });
         }
@@ -246,17 +248,17 @@ export const addNewPassword = async (req, res) => {
 
 //------------customer becomes worker function----------//
 
-export const becomeWorker=async(req,res)=>{
+export const becomeWorker = async (req, res) => {
     const customerId = req.customerId;
 
     try {
-        const customer=await CustomerModel.findById(customerId);
-        if(!customer){
-            return res.json({ success: false, message: "no user found!"});
+        const customer = await CustomerModel.findById(customerId);
+        if (!customer) {
+            return res.json({ success: false, message: "no user found!" });
         }
-        const name=customer.customerName;
-        
-       const otp = String(Math.floor(10000 + Math.random() * 90000));
+        const name = customer.customerName;
+
+        const otp = String(Math.floor(10000 + Math.random() * 90000));
         customer.verifyotp = otp;
         customer.verifyotpExpireAt = Date.now() + 10 * 60 * 1000;
         await customer.save();
@@ -264,7 +266,7 @@ export const becomeWorker=async(req,res)=>{
         // call email template function
         const emailTemplate = workerRegistrationTemplate(otp, name);
 
-    
+
         await transporter.sendMail({
             from: "Quick Hire Support",
             to: customer.customerEmail,
@@ -277,33 +279,124 @@ export const becomeWorker=async(req,res)=>{
 
     } catch (error) {
         return res.json({ success: false, message: error.message });
-        
+
     }
 
 }
-
-export const verifybecomeWorkerOTP=async(req,res)=>{
+//------------customer becomes worker verify otp function----------//
+export const verifybecomeWorkerOTP = async (req, res) => {
     const customerId = req.customerId;
-    const {verifyotp } = req.body;
+    const { verifyotp } = req.body;
 
     try {
-        const customer=await CustomerModel.findById(customerId);
-        if(!customer){
-            return res.json({ success: false, message: "no user found!"});
+        const customer = await CustomerModel.findById(customerId);
+        if (!customer) {
+            return res.json({ success: false, message: "no user found!" });
         }
         if (customer.verifyotpExpireAt < Date.now()) {
             return res.json({ success: false, massage: ' otp expired!' });
         }
-        if(customer.verifyotp===verifyotp){
+        if (customer.verifyotp === verifyotp) {
             customer.verifyotpExpireAt = 0;
-            customer.verifyotp= '';
+            customer.verifyotp = '';
             await customer.save();
             return res.json({ success: true, message: 'Verify successfull!' });
-        }else{
+        } else {
             return res.json({ success: false, message: 'wrong otp please check again!' });
         }
-        
+
     } catch (error) {
         return res.json({ success: false, message: error.message });
     }
 }
+
+//-------------------------crate worker function------------//
+
+export const createWorker = async (req, res) => {
+    const customerId = req.customerId;
+    const { profile, address, nic, description } = req.body;
+
+    try {
+        const customer = await CustomerModel.findById(customerId);
+        if (!customer) {
+            return res.json({ success: false, message: "no user found!" });
+        }
+
+        const newWorker = new WorkerModel({
+            customerId,
+            profile,
+            address,
+            nic,
+            description
+        });
+
+        await newWorker.save();
+        customer.role = 'worker';
+        await customer.save();
+
+        res.json({
+            success: true,
+            message: 'You become worker Successfully!',
+            worker: newWorker,
+
+        });
+
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+}
+
+//----------------get all services---------------//
+
+// export const getAllServices = async (req, res) => {
+//     try {
+//         const services = await ServiceModel.find().populate([
+//             { path: "workerId" },
+//             { path: "commentId" },
+//         ]);
+//         res.json({success: true,services,});
+
+//     } catch (error) {
+//          res.json({success: false, message: error.message});
+//     }
+// }
+
+//-------------add servises----------------//
+
+export const addServices = async (req, res) => {
+  const {
+    serviceName,
+    price,
+    serviceLocation,
+    serviceDescription,
+    servicePhone,
+    serviceSkill,
+    workerId,
+  } = req.body;
+
+  try {
+    const newService = new ServiceModel({
+      serviceName,
+      price,
+      serviceLocation,
+      serviceDescription,
+      servicePhone,
+      serviceSkill,
+      workerId,
+    });
+
+    await newService.save();
+
+    return res.json({
+      success: true,
+      message: "Service added successfully!",
+      service: newService, // Better than "worker"
+    });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

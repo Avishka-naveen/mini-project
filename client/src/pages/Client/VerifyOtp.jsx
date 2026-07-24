@@ -12,12 +12,12 @@ import { AppContext } from '../../Context/Appcontext';
 
 function VerifyOtp() {
 
-  const { backendUrl } = useContext(AppContext);
+  const { backendUrl,setcurrentCustomerData } = useContext(AppContext);
 
   const navigate = useNavigate();
   const inputRefs = useRef([]);
 
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(1);
   const [otp, setOtp] = useState(['', '', '', '', '']);
   const [otpSent, setOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,11 +25,9 @@ function VerifyOtp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    location: '',
-     bio: '',
+    address: '',
+    description: '',
+    nic:'',
   });
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -77,53 +75,45 @@ function VerifyOtp() {
 
 
 
-
-  const handleImageUpload = (e) => {
+//---------------image upload to cloudenary----------------//
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setProfileImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+    
+
+    if (!file) return;
+
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "Quick_hire");
+    data.append("cloud_name", "dpxo105si");
+
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dpxo105si/image/upload",
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+      setImagePreview(URL.createObjectURL(file));
+      const uploadImgURL = await response.json();
+      setProfileImage(uploadImgURL.secure_url);
+     
+     
+    } catch (error) {
+      console.error(error);
     }
   };
+//----------------------------------------------//
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (!formData.fullName || !formData.email || !formData.phone ||
-      !formData.location || !formData.skills || !formData.password) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return;
-    }
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      toast.success('Registration successful! 🎉');
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error('Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
 
-  // call get otp functio || otp sent to email
+  // call get otp function || otp sent to email
   const getOTP = async (e) => {
     e.preventDefault();
     try {
@@ -169,6 +159,50 @@ function VerifyOtp() {
   };
 
   //----------------------------------------------//
+  
+    //-----------cretate worker function-----------------------//
+const handleRegister = async (e) => {
+    e.preventDefault();
+    
+
+    if (!formData.description || !formData.address || !profileImage || !formData.nic) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+   
+    setIsLoading(true); 
+
+    try {
+     
+      const response = await axios.post(backendUrl + '/api/customer/createWorker', { 
+        profile: profileImage, 
+        address: formData.address, 
+        nic: formData.nic, 
+        description: formData.description
+      }, { withCredentials: true }); 
+
+      if (response.data.success) {
+        toast.success("Congratulations! You are now a Worker!");
+        
+        const workerResponse = await axios.get(`${backendUrl}/api/worker/getCurrentWorkerData`, { withCredentials: true });
+        setcurrentCustomerData(workerResponse.data.worker); 
+        
+        navigate('/worker/dashbord/workerReservation');
+      } else {
+        toast.error(response.data.message);
+      }
+      
+    } catch (error) {
+      console.error(error);
+      
+      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+     
+      setIsLoading(false); 
+    }
+  };
+//-------------------------------------------//
 
   return (
     <div className="min-h-screen w-full">
@@ -334,17 +368,18 @@ function VerifyOtp() {
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Upload Profile Photo</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Full Name <span className="text-red-500">*</span>
+                        Address <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        name="fullName"
-                        value={formData.fullName}
+                        name="address"
+                        value={formData.address}
                         onChange={handleChange}
-                        placeholder="John Doe"
+                        placeholder="Your address.."
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                                  bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
                                  focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 outline-none"
@@ -353,63 +388,29 @@ function VerifyOtp() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Email <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="john@example.com"
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                                 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
-                                 focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 outline-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Phone <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="077 123 4567"
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                                 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
-                                 focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 outline-none"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Location <span className="text-red-500">*</span>
+                        NIC <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        name="location"
-                        value={formData.location}
+                        name="nic"
+                        value={formData.nic}
                         onChange={handleChange}
-                        placeholder="Colombo"
+                        placeholder="NIC"
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
                                  bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
                                  focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 outline-none"
                         required
                       />
                     </div>
-                   
-                   
-                   
-                    
+
+
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Bio / About You
                       </label>
                       <textarea
-                        name="bio"
-                        value={formData.bio}
+                        name="description"
+                        value={formData.description}
                         onChange={handleChange}
                         rows="2"
                         placeholder="Tell customers about yourself..."
@@ -422,12 +423,12 @@ function VerifyOtp() {
 
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    
                     className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700
                              text-white font-semibold rounded-lg transition duration-300 shadow-md hover:shadow-lg
                              disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isLoading ? 'Registering...' : '🚀 Complete Registration'}
+                    Create Worker Profile
                   </button>
                 </form>
               </div>

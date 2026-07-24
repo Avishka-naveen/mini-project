@@ -8,12 +8,11 @@ axios.defaults.withCredentials = true;
 export const AppContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-
   const [isLogged, setIsLogged] = useState(localStorage.getItem('isLogged') === 'true');
   const [currentCustomerData, setcurrentCustomerData] = useState(''); 
+  const [currentWorkerData, setcurrentWorkerData] = useState(''); 
 
-
-  //-----------------get current customer data--------------------//
+  //  Fetch Customer Data
   const fetchCustomerData = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/customer/currentCustomerData');
@@ -23,7 +22,6 @@ export const AppContextProvider = (props) => {
         localStorage.setItem('isLogged', 'true'); 
         setcurrentCustomerData(response.data.customer);
       } else {
-      
         setIsLogged(false);
         localStorage.removeItem('isLogged'); 
         setcurrentCustomerData('');
@@ -35,20 +33,41 @@ export const AppContextProvider = (props) => {
     }
   };
 
+  //  Fetch Worker Data 
+  const fetchWorkerData = async () => {
+    try {
+      const response = await axios.get(backendUrl + '/api/worker/getCurrentWorkerData');
+      
+      if (response.data.success) {
+        setcurrentWorkerData(response.data.worker);
+      } else {
+        setcurrentWorkerData('');
+      }
+    } catch (error) {
+      console.error("Worker fetch failed:", error);
+      setcurrentWorkerData('');
+    }
+  };
+
+  //  Run when refresh
   useEffect(() => {
-    // ONLY call the API on refresh if the localStorage flag says they are logged in
     if (localStorage.getItem('isLogged') === 'true') {
       fetchCustomerData();
+      fetchWorkerData(); 
     }
   }, [backendUrl]); 
 
+ 
   const value = {
     backendUrl,
     isLogged,
     setIsLogged,
     currentCustomerData,
     setcurrentCustomerData,
-    fetchCustomerData 
+    fetchCustomerData,
+    currentWorkerData, 
+    setcurrentWorkerData,
+    fetchWorkerData // <--- Missing here previously!
   };
 
   return (

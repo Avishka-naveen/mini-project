@@ -13,7 +13,7 @@ const userAuth = async (req, res, next) => {
 
         if (tokenDecode.id) {
             req.customerId= tokenDecode.id;  
-           console.log("✅ workerId set in middleware:", req.customerId);
+           console.log("✅ customerID set in middleware:", req.customerId);
             next(); 
         } else {
             return res.json({ success: false, message: 'Not authorized. Please log in again.' });

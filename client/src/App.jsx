@@ -16,6 +16,7 @@ import LandingPage from './pages/LandingPage'
 import Bookings from './pages/Client/Bookings'
 import VerifyOtp from './pages/Client/VerifyOtp'
 import ForgotPassword from './pages/Client/ForgotPassword'
+import MyProfile from './pages/Worker/MyProfile'
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path='workerReservation' element={<WorkerMyBookings />} />
           <Route path='workerServises' element={<WorkerMyServises />} />
           <Route path='workerAddServises' element={<WorkerAddServises />} />
+          <Route path='myProfile' element={<MyProfile/>} />
         </Route>
 
            {/* -------------------admin routes -------------------*/}

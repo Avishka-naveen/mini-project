@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import SideBar from "../../Components/worker/SideBar";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaTimes } from "react-icons/fa";
@@ -7,6 +7,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { SlCalender } from "react-icons/sl";
 import { Outlet } from "react-router-dom";
+import { AppContext } from "../../Context/Appcontext";
 
 
 function WorkerDashboard() {
@@ -14,6 +15,8 @@ function WorkerDashboard() {
   const [isMobile, setIsMobile] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
+
+  const{currentWorkerData,fetchWorkerData}=useContext(AppContext);
 
   // Check screen size
   useEffect(() => {
@@ -78,7 +81,7 @@ function WorkerDashboard() {
                   Dashboard
                 </h1>
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  Welcome back! Here's what's happening today.
+                  Welcome back!<span className="capitalize text-blue-600 dark:text-purple-600 font-semibold ">{currentWorkerData?.customerId?.customerName}</span> Here's what's happening today.
                 </p>
 
 

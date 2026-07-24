@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { FaUser, FaMapMarkerAlt, FaPhone, FaWrench, FaDollarSign, FaFileAlt } from 'react-icons/fa';
 import { MdLibraryAdd } from "react-icons/md";
+import { toast } from 'react-toastify';
+import { AppContext } from '../../Context/Appcontext';
 
 
 function WorkerAddServices() {
+  const { currentWorkerData } = useContext(AppContext);
+  // console.log(currentWorkerData._id);
   const [formData, setFormData] = useState({
-    service_name: '',
+    serviceName: '',
     price: '',
     location: '',
     description: '',
@@ -26,7 +30,7 @@ function WorkerAddServices() {
   // Handle reset
   const handleReset = () => {
     setFormData({
-      service_name: '',
+      serviceName: '',
       price: '',
       location: '',
       description: '',
@@ -35,6 +39,18 @@ function WorkerAddServices() {
     });
   };
 
+  const handleAddService=async(e)=>{
+    e.preventDefault();
+    
+    try {
+      if(!formData.serviceName || !formData.location || !formData.phone || !formData.price || !formData.description || !formData.skill){
+        toast.error("missing details!")
+      }
+
+    } catch (error) {
+      
+    }
+  }
   return (
     <div className="p-4 sm:p-6 dark:text-white">
       {/* Header */}
@@ -52,7 +68,7 @@ function WorkerAddServices() {
 
       {/* Form Container */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
-        <form >
+        <form onSubmit={handleAddService}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             {/* Service Name */}
@@ -64,8 +80,8 @@ function WorkerAddServices() {
                 <FaWrench className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
-                  name="service_name"
-                  value={formData.service_name}
+                  name="serviceName"
+                  value={formData.serviceName}
                   onChange={handleChange}
                   placeholder="e.g., Plumbing Service"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
