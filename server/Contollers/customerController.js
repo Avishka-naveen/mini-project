@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import CustomerModel from '../DB_Models/CustomerModel.js';
 import WorkerModel from '../DB_Models/WorkerModel.js'
 import ServiceModel from '../DB_Models/ServiceModel.js'
+import CommentModel from '../DB_Models/CommentModel.js'
+import ReservationModel from '../DB_Models/ReservationModel.js'
 import transporter from '../config/nodeMail.js';
 import { callresetPwTemplate } from '../EmailTemplate/resetPasswordOtp.js';
 import { workerRegistrationTemplate } from '../EmailTemplate/becomWorker.js';
@@ -310,7 +312,7 @@ export const verifybecomeWorkerOTP = async (req, res) => {
     }
 }
 
-//-------------------------crate worker function------------//
+//-------------------------create worker function------------//
 
 export const createWorker = async (req, res) => {
     const customerId = req.customerId;
@@ -338,7 +340,6 @@ export const createWorker = async (req, res) => {
             success: true,
             message: 'You become worker Successfully!',
             worker: newWorker,
-
         });
 
 
@@ -346,57 +347,58 @@ export const createWorker = async (req, res) => {
         return res.json({ success: false, message: error.message });
     }
 }
+//------------add comment to servise---------------//
+export const addComment = async (req, res) => {
+    const customerId = req.customerId;
+    const { serviceId, comment } = req.body;
 
-//----------------get all services---------------//
+    if (!customerId || !serviceId || !comment) {
+        return res.json({ success: false, message: "Missing details!" });
+    }
+    try {
+        const newComment = new CommentModel({
+            customerId,
+            comment,
+            serviceId
+        })
+        await newComment.save();
+        res.json({
+            success: true,
+            message: 'comment added succesfully!',
+            comment: newComment,
 
-// export const getAllServices = async (req, res) => {
-//     try {
-//         const services = await ServiceModel.find().populate([
-//             { path: "workerId" },
-//             { path: "commentId" },
-//         ]);
-//         res.json({success: true,services,});
+        });
 
-//     } catch (error) {
-//          res.json({success: false, message: error.message});
-//     }
-// }
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
 
-//-------------add servises----------------//
+}
+//----------------------add reservation ---------------//
 
-export const addServices = async (req, res) => {
-  const {
-    serviceName,
-    price,
-    serviceLocation,
-    serviceDescription,
-    servicePhone,
-    serviceSkill,
-    workerId,
-  } = req.body;
+export const addReservation = async (req, res) => {
+    const customerId = req.customerId;
+    const { serviceId, customerAddress, date, description, status } = req.body;
+    if (!customerId || !serviceId || !customerAddress || !date || !description || !status) {
+        return res.json({ success: false, message: "Missing details!" });
+    }
 
-  try {
-    const newService = new ServiceModel({
-      serviceName,
-      price,
-      serviceLocation,
-      serviceDescription,
-      servicePhone,
-      serviceSkill,
-      workerId,
-    });
+    try {
+        const newReservation = new ReservationModel({
+            customerId,
+            serviceId,
+            customerAddress,
+            date,
+            description,
+            status,
+        });
 
-    await newService.save();
+        await newReservation.save();
+        res.json({success: true,
+            message: 'Reservation added succesfully!',
+            reservation: newReservation,});
 
-    return res.json({
-      success: true,
-      message: "Service added successfully!",
-      service: newService, // Better than "worker"
-    });
-  } catch (error) {
-    return res.json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}

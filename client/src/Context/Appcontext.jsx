@@ -11,6 +11,7 @@ export const AppContextProvider = (props) => {
   const [isLogged, setIsLogged] = useState(localStorage.getItem('isLogged') === 'true');
   const [currentCustomerData, setcurrentCustomerData] = useState(''); 
   const [currentWorkerData, setcurrentWorkerData] = useState(''); 
+ const [allServicesData, setAllServicesData] = useState([]);
 
   //  Fetch Customer Data
   const fetchCustomerData = async () => {
@@ -49,13 +50,28 @@ export const AppContextProvider = (props) => {
     }
   };
 
+  // fetch allServices data
+  const fetchAllServises = async () => {
+  try {
+    const response = await axios.get( backendUrl + "/api/worker/getAllServices");
+
+    if (response.data.success) {
+      setAllServicesData(response.data.services);
+      //console.log(response.data.services);
+    }
+  } catch (error) {
+    console.error("Services fetch failed:", error);
+  }
+};
+
   //  Run when refresh
   useEffect(() => {
-    if (localStorage.getItem('isLogged') === 'true') {
-      fetchCustomerData();
-      fetchWorkerData(); 
-    }
-  }, [backendUrl]); 
+  if (localStorage.getItem("isLogged") === "true") {
+    fetchCustomerData();
+    fetchWorkerData();
+    fetchAllServises();
+  }
+}, [backendUrl]);
 
  
   const value = {
@@ -67,7 +83,8 @@ export const AppContextProvider = (props) => {
     fetchCustomerData,
     currentWorkerData, 
     setcurrentWorkerData,
-    fetchWorkerData // <--- Missing here previously!
+    fetchWorkerData,
+    allServicesData
   };
 
   return (

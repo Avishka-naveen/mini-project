@@ -3,11 +3,12 @@ import { FaUser, FaMapMarkerAlt, FaPhone, FaWrench, FaDollarSign, FaFileAlt } fr
 import { MdLibraryAdd } from "react-icons/md";
 import { toast } from 'react-toastify';
 import { AppContext } from '../../Context/Appcontext';
-
+import axios from 'axios';
 
 function WorkerAddServices() {
-  const { currentWorkerData } = useContext(AppContext);
-  // console.log(currentWorkerData._id);
+  const { currentWorkerData, backendUrl } = useContext(AppContext);
+  //console.log(currentWorkerData._id)
+
   const [formData, setFormData] = useState({
     serviceName: '',
     price: '',
@@ -17,15 +18,11 @@ function WorkerAddServices() {
     skill: '',
   });
 
-
-
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-
 
   // Handle reset
   const handleReset = () => {
@@ -39,24 +36,44 @@ function WorkerAddServices() {
     });
   };
 
-  const handleAddService=async(e)=>{
+  // Handle form submission
+  const handleAddService = async (e) => {
     e.preventDefault();
-    
-    try {
-      if(!formData.serviceName || !formData.location || !formData.phone || !formData.price || !formData.description || !formData.skill){
-        toast.error("missing details!")
-      }
 
+    try {
+
+      if (!formData.serviceName || !formData.location || !formData.phone || !formData.price || !formData.description || !formData.skill
+      ) {
+        toast.error("Missing details! Please fill all required fields.");
+        return;
+      }
+      let respnose;
+      respnose = await axios.post(backendUrl + '/api/worker/addServise', { serviceName: formData.serviceName, price: formData.price, serviceLocation: formData.location, serviceDescription: formData.description, servicePhone: formData.phone, serviceSkill: formData.skill, workerId: currentWorkerData._id });
+      if (respnose.data.success) {
+        toast.success("Service added successfully! ");
+        setFormData({
+          serviceName: '',
+          price: '',
+          location: '',
+          description: '',
+          phone: '',
+          skill: '',
+        });
+      } else {
+        toast.error(response.data.message);
+      }
     } catch (error) {
-      
+      console.error("Error adding service:", error);
+      toast.error("Something went wrong!");
     }
-  }
+  };
+
   return (
     <div className="p-4 sm:p-6 dark:text-white">
       {/* Header */}
       <div className="mb-6">
-        <div className='flex items-center gap-2'>
-          <p className='text-4xl'><MdLibraryAdd /></p>
+        <div className="flex items-center gap-2">
+          <p className="text-4xl"><MdLibraryAdd /></p>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
             Add New Service
           </h1>
@@ -85,9 +102,9 @@ function WorkerAddServices() {
                   onChange={handleChange}
                   placeholder="e.g., Plumbing Service"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
-                           outline-none transition duration-200"
+                             bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                             outline-none transition duration-200"
                   required
                 />
               </div>
@@ -107,9 +124,9 @@ function WorkerAddServices() {
                   onChange={handleChange}
                   placeholder="5000"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
-                           outline-none transition duration-200"
+                             bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                             outline-none transition duration-200"
                   min="0"
                   required
                 />
@@ -130,9 +147,9 @@ function WorkerAddServices() {
                   onChange={handleChange}
                   placeholder="0771234567"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
-                           outline-none transition duration-200"
+                             bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                             outline-none transition duration-200"
                   required
                 />
               </div>
@@ -152,9 +169,9 @@ function WorkerAddServices() {
                   onChange={handleChange}
                   placeholder="Colombo"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
-                           outline-none transition duration-200"
+                             bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                             outline-none transition duration-200"
                   required
                 />
               </div>
@@ -174,9 +191,9 @@ function WorkerAddServices() {
                   onChange={handleChange}
                   placeholder="Plumber, Electrician"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
-                           outline-none transition duration-200"
+                             bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                             outline-none transition duration-200"
                   required
                 />
               </div>
@@ -199,9 +216,9 @@ function WorkerAddServices() {
                   placeholder="Describe your service in detail..."
                   rows="4"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
-                           focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
-                           outline-none transition duration-200 resize-none"
+                             bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                             outline-none transition duration-200 resize-none"
                   required
                 ></textarea>
               </div>
@@ -209,20 +226,19 @@ function WorkerAddServices() {
                 Provide a clear description of your service (50-200 characters)
               </p>
             </div>
-
           </div>
 
           {/* Form Actions */}
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            {/* Changed to type="submit" */}
             <button
               type="submit"
-
               className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700
                        text-white font-semibold py-3 px-6 rounded-lg transition duration-300
                        shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed
-                       flex items-center justify-center gap-2"
-            >Add Service
-
+                       flex items-center justify-center gap-2 cursor-pointer"
+            >
+              Add Service
             </button>
             <button
               type="button"
@@ -241,7 +257,8 @@ function WorkerAddServices() {
             📋 Preview
           </h3>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            <p><strong>Service:</strong> {formData.service_name || 'Not set'}</p>
+            {/* Fixed the typo from service_name to serviceName here */}
+            <p><strong>Service:</strong> {formData.serviceName || 'Not set'}</p>
             <p><strong>Price:</strong> {formData.price ? `LKR ${formData.price}` : 'Not set'}</p>
             <p><strong>Location:</strong> {formData.location || 'Not set'}</p>
             <p><strong>Phone:</strong> {formData.phone || 'Not set'}</p>

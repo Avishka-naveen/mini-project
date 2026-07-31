@@ -5,21 +5,25 @@ import Footer from "../../Components/customer/Footer";
 import { useNavigate } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
 import { FaLocationArrow } from "react-icons/fa";
+import { useContext } from "react";
+import { AppContext } from "../../Context/Appcontext";
 
 function WorkerList() {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const { allServicesData } = useContext(AppContext);
+  // console.log("from workerList" + allServicesData);
 
   const navigate = useNavigate();
 
-  const filteredWorkers = serviseDummyData.filter((service) => {
-    const titleMatch = service.title
-      .toLowerCase()
+  const filteredWorkers = allServicesData.filter((service) => {
+    const titleMatch = service.serviceName
+      ?.toLowerCase()
       .includes(title.toLowerCase());
 
-    const locationMatch = service.workerDetails.location
-      .toLowerCase()
+    const locationMatch = service.serviceLocation
+      ?.toLowerCase()
       .includes(location.toLowerCase());
 
     const priceMatch =
@@ -109,6 +113,7 @@ function WorkerList() {
         </div>
 
         {/* Worker Cards */}
+        {/* Worker Cards */}
         <div className="px-4 sm:px-6 md:px-10 lg:px-20 pb-16">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
@@ -122,8 +127,8 @@ function WorkerList() {
 
                     {/* Image */}
                     <img
-                      src={service.workerDetails.profileImage}
-                      alt={service.workerDetails.name}
+                      src={service.workerId?.profile}
+                      alt={service.workerId?.customerId?.customerName}
                       className="w-28 h-28 sm:w-32 sm:h-32 lg:w-36 lg:h-36 rounded-full object-cover border-4 border-blue-600 dark:border-purple-600"
                     />
 
@@ -131,29 +136,34 @@ function WorkerList() {
                     <div className="flex-1 text-center sm:text-left">
 
                       <h2 className="text-xl lg:text-2xl font-bold mb-3">
-                        {service.title}
+                        {service.serviceName}
                       </h2>
 
                       <p className="text-gray-700 dark:text-gray-300">
                         <span className="font-semibold">Name:</span>{" "}
-                        {service.workerDetails.name}
+                        {service.workerId?.customerId?.customerName}
                       </p>
 
                       <p className="text-gray-700 dark:text-gray-300">
                         <span className="font-semibold">Location:</span>{" "}
-                        {service.workerDetails.location}
+                        {service.serviceLocation}
                       </p>
 
                       <p className="text-gray-700 dark:text-gray-300">
                         <span className="font-semibold">Phone:</span>{" "}
-                        {service.workerDetails.phone}
+                        {service.servicePhone}
                       </p>
 
                       <p className="text-green-600 text-xl font-bold mt-3">
                         Rs. {service.price}
                       </p>
 
-                      <button onClick={() => navigate(`/customer/workerDetails/${service._id}`)} className="mt-5 w-full bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 duration-300 text-white py-3 rounded-lg font-semibold cursor-pointer">
+                      <button
+                        onClick={() =>
+                          navigate(`/customer/workerDetails/${service._id}`)
+                        }
+                        className="mt-5 w-full bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 duration-300 text-white py-3 rounded-lg font-semibold cursor-pointer"
+                      >
                         View Details
                       </button>
 
