@@ -378,8 +378,8 @@ export const addComment = async (req, res) => {
 
 export const addReservation = async (req, res) => {
     const customerId = req.customerId;
-    const { serviceId, customerAddress, date, description, status } = req.body;
-    if (!customerId || !serviceId || !customerAddress || !date || !description || !status) {
+    const { serviceId, workerId, customerName, customerEmail, customerPhone, customerAddress, date, description, status } = req.body;
+    if (!customerId || !serviceId || !workerId || !customerName || !customerEmail || !customerPhone || !customerAddress || !date || !description || !status) {
         return res.json({ success: false, message: "Missing details!" });
     }
 
@@ -387,6 +387,10 @@ export const addReservation = async (req, res) => {
         const newReservation = new ReservationModel({
             customerId,
             serviceId,
+            workerId,
+            customerName,
+            customerEmail,
+            customerPhone,
             customerAddress,
             date,
             description,
@@ -394,10 +398,26 @@ export const addReservation = async (req, res) => {
         });
 
         await newReservation.save();
-        res.json({success: true,
+        res.json({
+            success: true,
             message: 'Reservation added succesfully!',
-            reservation: newReservation,});
+            reservation: newReservation,
+        });
 
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+//------------------get current cusromer reservations------------------//
+export const getCurrentCustomerReservations = async (req, res) => {
+    const customerId = req.customerId;
+    if (!customerId) {
+        return res.json({ success: false, message: "Not Authorized. Please log in again!" });
+    }
+    try {
+        const reservations = await ReservationModel.find({ customerId });
+        res.json({ success: true, message: "Reservations retrieved successfully!", reservations });
     } catch (error) {
         res.json({ success: false, message: error.message });
     }

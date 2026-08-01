@@ -42,7 +42,9 @@ function WorkerDetails() {
 
       if (response.data.success) {
         setServiceData(response.data.service);
-        //console.log("4. SUCCESS! Service Data:", response.data.service);
+        console.log("4. SUCCESS! Service Data:", response.data.service);
+        console.log(serviceData.workerId._id)
+       
       } else {
         console.log(" FAILED in backend. Message:", response.data.message);
       }
@@ -104,7 +106,23 @@ function WorkerDetails() {
 
   const handleSubmit=async(e)=>{
     e.preventDefault();
-    console.log(formData.name,formData.email,formData.number,formData.address,formData.date,formData.description)
+    if(!formData.name || !formData.email || !formData.number || !formData.address || !formData.date || !formData.description) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    try {
+      let response;
+      response=await axios.post(backendUrl+'/api/customer/addReservation',{serviceId:serviceId,workerId:serviceData.workerId._id,customerName:formData.name,customerEmail:formData.email,customerPhone:formData.number,customerAddress:formData.address,date:formData.date,description:formData.description,status:"pending"},{withCredentials:true});
+      if(response.data.success){
+        toast.success("Reservation added successfully!");
+        setShowBooking(false);
+        hadleClear();
+      }else{
+        toast.error("Failed to add reservation.");
+      }
+    } catch (error) {
+      toast.error("Error submitting form.");
+    }
 
   }
 

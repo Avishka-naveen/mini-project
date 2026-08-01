@@ -1,6 +1,7 @@
 import WorkerModel from '../DB_Models/WorkerModel.js'
 import ServiceModel from '../DB_Models/ServiceModel.js'
 import CommentModel from '../DB_Models/CommentModel.js'
+import ReservationModel from '../DB_Models/ReservationModel.js'
 
 
 //-------------------get current worker data------//
@@ -117,3 +118,60 @@ export const getAllComment = async (req, res) => {
     });
   }
 };
+
+//---------------get my reservations(worker)-----------------//
+
+export const getMyReservations = async (req, res) => {
+  const customerId = req.customerId;
+
+  try {
+    const worker = await WorkerModel.findOne({ customerId });
+    const workerId = worker._id;
+    const reservation = await ReservationModel.find({ workerId }).populate("customerId").populate("serviceId");
+    res.json({
+      success: true,
+      reservation,
+    });
+
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error.message
+    });
+  }
+}
+
+//----------------get worker services------------//
+
+export const getMyServices = async (req, res) => {
+
+  const customerId = req.customerId;
+  try {
+    const worker = await WorkerModel.findOne({ customerId });
+    if(!worker){
+      return res.json({success: false,message: "No worker found"});
+    }
+    const workerId = worker._id;
+    //console.log("workerID:",workerId)
+    const services = await ServiceModel.find({ workerId });
+    res.json({success: true,services,});
+  } catch (error) {
+    res.json({success: false,message: error.message
+    });
+  }
+
+}
+
+//-----------------delete service-----------------//
+export const deleteService = async (req, res) => {
+  const {serviceId} = req.body;
+  try{
+    const deletedService = await ServiceModel.findByIdAndDelete(serviceId);
+    if(!deletedService){
+      return res.json({success: false,message: "Service not found"});
+    }
+    res.json({success: true,message: "Service deleted successfully"});
+  }catch(error){
+    res.json({success: false,message: error.message});
+  }
+}

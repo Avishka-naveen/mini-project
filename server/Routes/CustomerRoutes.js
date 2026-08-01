@@ -1,5 +1,5 @@
 import express from 'express'
-import { getCurrentCustomerData, addNewPassword ,login, logout, register, sendForgotPwOtp, verifyForgotPWOtp, becomeWorker, verifybecomeWorkerOTP, createWorker, addComment, addReservation } from '../Contollers/customerController.js';
+import {getCurrentCustomerReservations, getCurrentCustomerData, addNewPassword ,login, logout, register, sendForgotPwOtp, verifyForgotPWOtp, becomeWorker, verifybecomeWorkerOTP, createWorker, addComment, addReservation } from '../Contollers/customerController.js';
 import userAuth from '../middleWare/userAuth.js';
 
 const customerRoute= express.Router();
@@ -16,5 +16,6 @@ customerRoute.post('/verifybecomeWorkerOTP',userAuth,verifybecomeWorkerOTP);
 customerRoute.post('/createWorker',userAuth,createWorker);
 customerRoute.post('/addComment',userAuth,addComment);
 customerRoute.post('/addReservation',userAuth,addReservation);
+customerRoute.get('/myReservations',userAuth,getCurrentCustomerReservations);
 
 export default customerRoute;

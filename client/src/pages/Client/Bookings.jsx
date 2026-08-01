@@ -1,26 +1,46 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../../Components/customer/NavBar';
 import Footer from '../../Components/customer/Footer';
 import { bookingDummyData } from '../../assets/dummyData';
+import { AppContext } from '../../Context/Appcontext';
+import axios from 'axios';
 
 function Bookings() {
 
+  const{backendUrl}=useContext(AppContext)
   const navigate = useNavigate();
+  const[reservations,setReservations]=React.useState('');
   // Status color mapping
   const getStatusColor = (status) => {
     const statusMap = {
-      'Pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'Confirmed': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      'Completed': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      'Cancelled': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      'In Progress': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      'pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      'confirmed': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      'completed': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      'cancelled': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      'in progress': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
     };
     return statusMap[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
-  console.log(bookingDummyData);
+  //----------call get reservation function --------------------//
 
+  const fetchReservations = async () => {
+    try{
+      let response;
+      response = await axios.get(backendUrl + '/api/customer/myReservations', { withCredentials: true });
+      if(response.data.success){
+        setReservations(response.data.reservations);
+      }
+      console.log(response.data.reservations);
+    }catch(error){
+      console.error("Error fetching reservations:", error);
+    }
+  }
+
+  useEffect(()=>{
+    fetchReservations();
+  },[]);
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#1e1e1e] text-black dark:text-white">
       <NavBar />
@@ -39,7 +59,7 @@ function Bookings() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              Total: <span className="font-semibold text-gray-800 dark:text-white">{bookingDummyData.length}</span>
+              Total: <span className="font-semibold text-gray-800 dark:text-white">{reservations.length}</span>
             </span>
             <button onClick={()=>navigate('/customer/workerList')} className="bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 
                              text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300
@@ -73,8 +93,8 @@ function Bookings() {
                 </tr>
               </thead>
               <tbody>
-                {bookingDummyData.length > 0 ? (
-                  bookingDummyData.map((booking, index) => (
+                {reservations.length > 0 ? (
+                  reservations.map((booking, index) => (
                     <tr 
                       key={index}
                       className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
@@ -83,7 +103,7 @@ function Bookings() {
                         {String(index + 1)}
                       </td>
                       <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                        {booking.date}
+                        {new Date(booking.date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
@@ -101,7 +121,7 @@ function Bookings() {
                           {booking.status }
                         </span>
                         {
-                          booking.status === 'Pending' && (
+                          booking.status === 'pending' && (
                             <button className="ml-2 bg-red-600 cursor-pointer hover:bg-red-700 text-white px-2 py-1 rounded-md text-xs">
                               Cancel
                             </button>
@@ -132,7 +152,7 @@ function Bookings() {
           {/* Footer */}
           <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-600">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-              <span>Showing {bookingDummyData.length} booking(s)</span>
+              <span>Showing {reservations.length} booking(s)</span>
             </div>
           </div>
         </div>

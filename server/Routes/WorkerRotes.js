@@ -1,6 +1,6 @@
 import express from 'express'
 import userAuth from '../middleWare/userAuth.js';
-import { addServices, getAllComment, getCurrentWorkerData, getServiceData } from '../Contollers/workerController.js';
+import { addServices, getAllComment, getCurrentWorkerData, getServiceData,getMyReservations,getMyServices,deleteService } from '../Contollers/workerController.js';
 import { getAllServices } from '../Contollers/workerController.js';
 
 
@@ -11,6 +11,9 @@ WorkerRoute.get('/getCurrentWorkerData',userAuth,getCurrentWorkerData);
 WorkerRoute.get('/getAllServices',getAllServices);
 WorkerRoute.get('/getServiseData/:serviceId',getServiceData);
 WorkerRoute.get('/getAllCommets/:serviceId',getAllComment);
+WorkerRoute.get('/getMyReservations',userAuth,getMyReservations);
+WorkerRoute.get('/getMyServices',userAuth,getMyServices);
+WorkerRoute.post('/deleteService',deleteService);
 
 
 // customerRoute.get('/getAllServices',getAllServices);
