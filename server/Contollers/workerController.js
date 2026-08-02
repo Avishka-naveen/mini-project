@@ -204,3 +204,37 @@ export const editService = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 }
+
+
+//-----------------update worker profile-------------------//
+export const updateWorkerProfile = async (req, res) => {
+
+  const customerId = req.customerId;
+
+  const { profile, address, description, nic } = req.body;
+
+  try {
+
+    const worker = await WorkerModel.findOneAndUpdate(
+      { customerId },
+      {
+        profile,
+        address,
+        description,
+        nic
+      },
+      { new: true }
+    );
+
+    if (!worker) {
+      return res.json({ success: false, message: "No worker found" });
+    }
+
+    res.json({ success: true, message: "Worker profile updated successfully", worker });
+
+  } catch (error) {
+
+    res.json({ success: false, message: error.message });
+
+  }
+}
