@@ -296,7 +296,7 @@ export const verifybecomeWorkerOTP = async (req, res) => {
             return res.json({ success: false, message: "no user found!" });
         }
         if (customer.verifyotpExpireAt < Date.now()) {
-            return res.json({ success: false, massage: ' otp expired!' });
+            return res.json({ success: false, message: ' otp expired!' });
         }
         if (customer.verifyotp === verifyotp) {
             customer.verifyotpExpireAt = 0;
@@ -347,33 +347,56 @@ export const createWorker = async (req, res) => {
         return res.json({ success: false, message: error.message });
     }
 }
-//------------add comment to servise---------------//
+
+//------------ Add Comment aND  Rating to Service ------------//
+
 export const addComment = async (req, res) => {
     const customerId = req.customerId;
-    const { serviceId, comment } = req.body;
+    const { serviceId, comment, rating } = req.body;
 
-    if (!customerId || !serviceId || !comment) {
-        return res.json({ success: false, message: "Missing details!" });
+   
+    if (!customerId || !serviceId || !comment || !rating) {
+
+        return res.json({ success: false, message: "Missing details!", });
     }
+
     try {
+
+        const service = await ServiceModel.findById(serviceId);
+
+        if (!service) {
+            return res.json({ success: false, message: "Service not found!", });
+        }
+
         const newComment = new CommentModel({
             customerId,
+            serviceId,
             comment,
-            serviceId
-        })
-        await newComment.save();
-        res.json({
-            success: true,
-            message: 'comment added succesfully!',
-            comment: newComment,
-
+            rating,
         });
 
-    } catch (error) {
-        res.json({ success: false, message: error.message });
-    }
+        await newComment.save();
 
-}
+        // Get all ratings for this service 
+        const comments = await CommentModel.find({ serviceId });
+
+
+        const totalRating = comments.reduce((sum, item) => {
+            return sum + item.rating;
+        }, 0);
+
+        const averageRating = totalRating / comments.length;
+
+
+        service.rating = Number(averageRating.toFixed(1));
+        await service.save();
+
+        return res.json({ success: true, message: "Comment added successfully!", comment: newComment, averageRating: service.rating, });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message, });
+    }
+};
 //----------------------add reservation ---------------//
 
 export const addReservation = async (req, res) => {
@@ -416,7 +439,9 @@ export const getCurrentCustomerReservations = async (req, res) => {
         return res.json({ success: false, message: "Not Authorized. Please log in again!" });
     }
     try {
-        const reservations = await ReservationModel.find({ customerId });
+        const reservations = await ReservationModel.find({ customerId }).populate({
+            path: "serviceId", populate: { path: "workerId", populate: { path: "customerId", }, },
+        });
         res.json({ success: true, message: "Reservations retrieved successfully!", reservations });
     } catch (error) {
         res.json({ success: false, message: error.message });

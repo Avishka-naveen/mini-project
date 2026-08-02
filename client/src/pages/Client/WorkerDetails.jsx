@@ -42,8 +42,8 @@ function WorkerDetails() {
 
       if (response.data.success) {
         setServiceData(response.data.service);
-        console.log("4. SUCCESS! Service Data:", response.data.service);
-        console.log(serviceData.workerId._id)
+        //console.log("4. SUCCESS! Service Data:", response.data.service);
+        //console.log(serviceData.workerId._id)
        
       } else {
         console.log(" FAILED in backend. Message:", response.data.message);
@@ -292,10 +292,10 @@ function WorkerDetails() {
               <p className='text-center text-gray-500 dark:text-gray-400 text-sm'>
                 {serviceData.serviceName}
               </p>
-              <div className='flex justify-center gap-2 mt-3'>
-                <p><FaStar /></p>
+              <div className='flex justify-center items-center gap-2 mt-3'>
+                <p className='text-yellow-500'><FaStar /></p>
                 <span className='bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-3 py-1 rounded-full text-xs sm:text-sm font-medium'>
-                  {'4.5'}
+                  {serviceData.rating.toFixed(1)} / 5.0
                 </span>
               </div>
             </div>

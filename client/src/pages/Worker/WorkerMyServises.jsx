@@ -8,7 +8,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 function WorkerMyServices() {
-  // 1. Initialized as an empty array to prevent map errors before data loads
+
   const [services, setServices] = useState([]);
   const navigate = useNavigate();
   const { backendUrl } = useContext(AppContext);
@@ -16,6 +16,8 @@ function WorkerMyServices() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [serviceId, setServiceId] = useState('');
 
+
+  //console.log(serviceId);
   const fetchServicesData = async () => {
     try {
       const response = await axios.get(
@@ -55,7 +57,6 @@ function WorkerMyServices() {
 
   //---------------edit service function-----------------//
   const [editData, setEditData] = useState({
-    serviceId: "",
     serviceName: "",
     price: "",
     location: "",
@@ -66,7 +67,6 @@ function WorkerMyServices() {
 
   const handleEdit = (service) => {
     setEditData({
-      serviceId: service._id,
       serviceName: service.serviceName,
       price: service.price,
       location: service.serviceLocation,
@@ -88,16 +88,21 @@ function WorkerMyServices() {
   // Prevent page reload and handle update submission
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting updated data:", editData);
-
-    // Uncomment and adjust this when your backend update route is ready
-    /*
+    //console.log(serviceId,editData.serviceName,editData.price,editData.location,editData.phone,editData.skill,editData.description)
     try {
-      const response = await axios.post(backendUrl + "/api/worker/updateService", editData, { withCredentials: true });
+      const response = await axios.post(backendUrl + "/api/worker/updateService", { serviceId, serviceName: editData.serviceName, price: editData.price, serviceLocation: editData.location, serviceDescription: editData.description, servicePhone: editData.phone, serviceSkill: editData.skill }, { withCredentials: true });
       if (response.data.success) {
         toast.success("Service updated successfully!");
         setShowEditModal(false);
-        fetchServicesData(); // Refresh list to show new data
+        fetchServicesData();
+        setEditData({
+          serviceName: "",
+          price: "",
+          location: "",
+          phone: "",
+          skill: "",
+          description: "",
+        })
       } else {
         toast.error(response.data.message);
       }
@@ -105,7 +110,7 @@ function WorkerMyServices() {
       console.error("Error updating service:", error);
       toast.error("An error occurred");
     }
-    */
+
   };
 
   return (
@@ -195,7 +200,7 @@ function WorkerMyServices() {
               <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
                 <div className="flex items-center justify-around">
                   <button
-                    onClick={() => handleEdit(service)}
+                    onClick={() => { handleEdit(service); setServiceId(service._id); }}
                     className="flex items-center gap-1 px-3 py-1.5 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition-colors text-sm"
                   >
                     <FaEdit /> Edit
@@ -301,7 +306,7 @@ function WorkerMyServices() {
                       <input
                         type="text"
                         name="serviceName"
-                        value={editData.serviceName} // 3. Changed to read from editData
+                        value={editData.serviceName}
                         onChange={handleEditChange}
                         placeholder="Enter service name"
                         className="w-full pl-4 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition duration-200"
@@ -319,7 +324,7 @@ function WorkerMyServices() {
                       <input
                         type="number"
                         name="price"
-                        value={editData.price} // 3. Changed to read from editData
+                        value={editData.price}
                         onChange={handleEditChange}
                         placeholder="0.00"
                         className="w-full pl-4 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition duration-200"
@@ -339,7 +344,7 @@ function WorkerMyServices() {
                       <input
                         type="tel"
                         name="phone"
-                        value={editData.phone} // 3. Changed to read from editData
+                        value={editData.phone}
                         onChange={handleEditChange}
                         placeholder="077 123 4567"
                         className="w-full pl-4 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition duration-200"
@@ -357,7 +362,7 @@ function WorkerMyServices() {
                       <input
                         type="text"
                         name="location"
-                        value={editData.location} // 3. Changed to read from editData
+                        value={editData.location}
                         onChange={handleEditChange}
                         placeholder="Colombo"
                         className="w-full pl-4 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition duration-200"
@@ -375,14 +380,14 @@ function WorkerMyServices() {
                       <input
                         type="text"
                         name="skill"
-                        value={editData.skill} // 3. Changed to read from editData
+                        value={editData.skill}
                         onChange={handleEditChange}
                         placeholder="Plumbing, Electrical, Painting"
                         className="w-full pl-4 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition duration-200"
                         required
                       />
                     </div>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    <p className="text-xs text-red-500  mt-1">
                       Separate multiple skills with commas
                     </p>
                   </div>
@@ -416,6 +421,7 @@ function WorkerMyServices() {
                     Cancel
                   </button>
                   <button
+                    onClick={() => handleUpdateSubmit()}
                     type="submit"
                     className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                   >

@@ -7,13 +7,14 @@ import { CiSearch } from "react-icons/ci";
 import { FaLocationArrow } from "react-icons/fa";
 import { useContext } from "react";
 import { AppContext } from "../../Context/Appcontext";
+import { FaStar } from "react-icons/fa";
 
 function WorkerList() {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const { allServicesData } = useContext(AppContext);
-  // console.log("from workerList" + allServicesData);
+  //console.log("from workerList" + allServicesData);
 
   const navigate = useNavigate();
 
@@ -135,9 +136,15 @@ function WorkerList() {
                     {/* Details */}
                     <div className="flex-1 text-center sm:text-left">
 
-                      <h2 className="text-xl lg:text-2xl font-bold mb-3">
-                        {service.serviceName}
-                      </h2>
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <h2 className="text-xl capitalize lg:text-2xl font-bold mb-3">
+                          {service.serviceName}
+                        </h2>
+                        <div className="text-yellow-500 flex justify-center items-center">
+                          <h1>{service.rating.toFixed(1)}</h1>
+                          <p><FaStar /></p>
+                        </div>
+                      </div>
 
                       <p className="text-gray-700 dark:text-gray-300">
                         <span className="font-semibold">Name:</span>{" "}
@@ -155,7 +162,7 @@ function WorkerList() {
                       </p>
 
                       <p className="text-green-600 text-xl font-bold mt-3">
-                        Rs. {service.price}
+                        LKR. {service.price}
                       </p>
 
                       <button

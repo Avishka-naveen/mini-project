@@ -4,6 +4,7 @@ import { FaBookmark, FaCheck, FaTimes, FaEye, FaUserCircle, FaEnvelope, FaPhone,
 import { AppContext } from '../../Context/Appcontext';
 import axios from 'axios';
 import { IoMdClose } from "react-icons/io";
+import { IoMdDoneAll } from "react-icons/io";
 
 function WorkerMyBookings() {
   const [reservation, setReservation] = useState([]);
@@ -123,6 +124,13 @@ function WorkerMyBookings() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
+                      {
+                        reservation.status === 'confirmed' && (
+                          <>
+                            <button className='p-2  cursor-pointer text-white bg-blue-400 dark:bg-purple-400  dark:hover:text-white hover:bg-blue-600 dark:hover:bg-purple-600 rounded-lg transition-colors'><IoMdDoneAll /></button>
+                          </>
+                        )
+                      }
                         
                         {reservation.status === 'pending' && (
                           <>

@@ -1,16 +1,23 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../../Components/customer/NavBar';
 import Footer from '../../Components/customer/Footer';
 import { bookingDummyData } from '../../assets/dummyData';
 import { AppContext } from '../../Context/Appcontext';
 import axios from 'axios';
+import Rate from '../../Components/customer/Rate';
 
 function Bookings() {
 
-  const{backendUrl}=useContext(AppContext)
+  const { backendUrl } = useContext(AppContext)
   const navigate = useNavigate();
-  const[reservations,setReservations]=React.useState('');
+  const [reservations, setReservations] = React.useState('');
+  const [addRatingModalVisible, setAddRatingModalVisible] = useState(false);
+  const[selectedReservation,setSelectedReservation]=useState('');
+ 
+
+ 
+
   // Status color mapping
   const getStatusColor = (status) => {
     const statusMap = {
@@ -26,21 +33,21 @@ function Bookings() {
   //----------call get reservation function --------------------//
 
   const fetchReservations = async () => {
-    try{
+    try {
       let response;
       response = await axios.get(backendUrl + '/api/customer/myReservations', { withCredentials: true });
-      if(response.data.success){
+      if (response.data.success) {
         setReservations(response.data.reservations);
       }
-      console.log(response.data.reservations);
-    }catch(error){
+      //console.log(response.data.reservations);
+    } catch (error) {
       console.error("Error fetching reservations:", error);
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchReservations();
-  },[]);
+  }, []);
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#1e1e1e] text-black dark:text-white">
       <NavBar />
@@ -51,7 +58,7 @@ function Bookings() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
-               My Bookings
+              My Bookings
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               View and manage all your booking requests
@@ -61,7 +68,7 @@ function Bookings() {
             <span className="text-sm text-gray-500 dark:text-gray-400">
               Total: <span className="font-semibold text-gray-800 dark:text-white">{reservations.length}</span>
             </span>
-            <button onClick={()=>navigate('/customer/workerList')} className="bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 
+            <button onClick={() => navigate('/customer/workerList')} className="bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 
                              text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300
                              shadow-md hover:shadow-lg">
               + New Booking
@@ -71,7 +78,7 @@ function Bookings() {
 
         {/* Table Container */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-          
+
           {/* Responsive Table Wrapper */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -89,13 +96,13 @@ function Bookings() {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                     Status
                   </th>
-                  
+
                 </tr>
               </thead>
               <tbody>
                 {reservations.length > 0 ? (
                   reservations.map((booking, index) => (
-                    <tr 
+                    <tr
                       key={index}
                       className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
                     >
@@ -107,7 +114,7 @@ function Bookings() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          
+
                           <span className="text-gray-700 dark:text-gray-300">
                             {/* {booking.serviceId || 'Unknown Worker'} */}
                             <button onClick={() => navigate(`/customer/workerDetails/${booking.serviceId}`)} className="cursor-pointer bg-blue-600 dark:bg-purple-600 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm">
@@ -118,7 +125,7 @@ function Bookings() {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`px-3 py-2 rounded-md text-xs cursor-pointer font-medium ${getStatusColor(booking.status)}`}>
-                          {booking.status }
+                          {booking.status}
                         </span>
                         {
                           booking.status === 'pending' && (
@@ -127,8 +134,15 @@ function Bookings() {
                             </button>
                           )
                         }
+                        {
+                          booking.status === 'completed' && (
+                            <button onClick={() => {setAddRatingModalVisible(true);setSelectedReservation(booking)}} className="ml-2 bg-blue-600 cursor-pointer hover:bg-blue-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white px-2 py-1 rounded-md text-xs">
+                              Add Rate
+                            </button>
+                          )
+                        }
                       </td>
-                      
+
                     </tr>
                   ))
                 ) : (
@@ -157,6 +171,12 @@ function Bookings() {
           </div>
         </div>
       </main>
+
+      {/* add reating and comment model */}
+      {addRatingModalVisible && (
+        <Rate addRatingModalVisible={addRatingModalVisible} setAddRatingModalVisible={setAddRatingModalVisible} selectedReservation={selectedReservation}/>
+      )}
+      +
 
       <Footer />
     </div>

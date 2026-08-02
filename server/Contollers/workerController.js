@@ -148,15 +148,16 @@ export const getMyServices = async (req, res) => {
   const customerId = req.customerId;
   try {
     const worker = await WorkerModel.findOne({ customerId });
-    if(!worker){
-      return res.json({success: false,message: "No worker found"});
+    if (!worker) {
+      return res.json({ success: false, message: "No worker found" });
     }
     const workerId = worker._id;
     //console.log("workerID:",workerId)
     const services = await ServiceModel.find({ workerId });
-    res.json({success: true,services,});
+    res.json({ success: true, services, });
   } catch (error) {
-    res.json({success: false,message: error.message
+    res.json({
+      success: false, message: error.message
     });
   }
 
@@ -164,14 +165,42 @@ export const getMyServices = async (req, res) => {
 
 //-----------------delete service-----------------//
 export const deleteService = async (req, res) => {
-  const {serviceId} = req.body;
-  try{
+  const { serviceId } = req.body;
+  try {
     const deletedService = await ServiceModel.findByIdAndDelete(serviceId);
-    if(!deletedService){
-      return res.json({success: false,message: "Service not found"});
+    if (!deletedService) {
+      return res.json({ success: false, message: "Service not found" });
     }
-    res.json({success: true,message: "Service deleted successfully"});
-  }catch(error){
-    res.json({success: false,message: error.message});
+    res.json({ success: true, message: "Service deleted successfully" });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+}
+
+//-----------------------edit service------------------------//
+export const editService = async (req, res) => {
+  const { serviceId, serviceName, price, serviceLocation, serviceDescription, servicePhone, serviceSkill } = req.body;
+  if (!serviceId || !serviceName || !price || !serviceLocation || !serviceDescription || !servicePhone || !serviceSkill) {
+    return res.json({ success: false, message: "Missing Details!" });
+  }
+  try {
+    const service = await ServiceModel.findById(serviceId);
+
+    if (!service) {
+      return res.json({ success: false, message: "Service not found", });
+    }
+
+    service.serviceName = serviceName;
+    service.price = price;
+    service.serviceLocation = serviceLocation;
+    service.serviceDescription = serviceDescription;
+    service.servicePhone = servicePhone;
+    service.serviceSkill = serviceSkill;
+
+    await service.save();
+
+    return res.json({ success: true, message: "Service updated successfully!", service, });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
   }
 }
