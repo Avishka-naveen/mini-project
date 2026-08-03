@@ -18,7 +18,7 @@ function Bookings() {
   const [selectedReservation, setSelectedReservation] = useState('');
   const [cancelModalVisible, setcancelModalVisible] = useState(false);
 
-  //console.log(selectedReservation._id);
+  console.log(selectedReservation);
 
 
   // Status color mapping
@@ -141,7 +141,7 @@ function Bookings() {
 
                           <span className="text-gray-700 dark:text-gray-300">
                             {/* {booking.serviceId || 'Unknown Worker'} */}
-                            <button onClick={() => navigate(`/customer/workerDetails/${booking.serviceId}`)} className="cursor-pointer bg-blue-600 dark:bg-purple-600 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm">
+                            <button onClick={() => navigate(`/customer/workerDetails/${booking.serviceId?._id}`)} className="cursor-pointer bg-blue-600 dark:bg-purple-600 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm">
                               View Profile
                             </button>
                           </span>
