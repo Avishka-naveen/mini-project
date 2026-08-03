@@ -447,3 +447,50 @@ export const getCurrentCustomerReservations = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 }
+
+//------------------------update customer Profile----------------//
+
+export const updateProfile=async(req,res)=>{
+    const customerId = req.customerId;
+    const{customerName,customerPhone}=req.body;
+
+    if(!customerName || !customerPhone){
+         return res.json({ success: false, message: "Missing details!" });
+    }
+    try {
+        const customer=await CustomerModel.findById(customerId);
+        if(!customer){
+            return res.json({ success: false, message: "No user Found!" });
+        }
+        customer.customerName=customerName;
+        customer.customerPhone=customerPhone;
+        await customer.save();
+        return res.json({success: true,message: "Profile updated successfully!",customer
+});
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+
+//--------------cancel current booking-----//
+
+export const cancellbooking = async (req, res) => {
+    const { reservationId } = req.body;
+
+    if (!reservationId) {
+        return res.json({success: false,message: "Missing details!"});
+    }
+
+    try {
+        const reservation = await ReservationModel.findByIdAndDelete(reservationId);
+
+        if (!reservation) {
+            return res.json({success: false,message: "No reservation found!"});
+        }
+        return res.json({success: true,message: "Booking cancelled successfully!",reservation});
+
+    } catch (error) {
+        return res.json({success: false,message: error.message});
+    }
+};
