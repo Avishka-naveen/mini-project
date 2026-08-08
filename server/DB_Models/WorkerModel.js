@@ -8,6 +8,7 @@ const workerSchema = new mongoose.Schema(
         address: { type: String, required: true, trim: true, },
         description: { type: String, default: "", trim: true, },
         nic: { type: String, default: "", trim: true, },
+        isActive: {type: Boolean,default: true,},
     },
     { timestamps: true }
 );

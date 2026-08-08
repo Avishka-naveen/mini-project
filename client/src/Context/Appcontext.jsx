@@ -84,7 +84,8 @@ export const AppContextProvider = (props) => {
     currentWorkerData, 
     setcurrentWorkerData,
     fetchWorkerData,
-    allServicesData
+    allServicesData,
+    fetchAllServises
   };
 
   return (

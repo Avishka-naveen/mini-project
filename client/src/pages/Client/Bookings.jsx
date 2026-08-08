@@ -18,7 +18,7 @@ function Bookings() {
   const [selectedReservation, setSelectedReservation] = useState('');
   const [cancelModalVisible, setcancelModalVisible] = useState(false);
 
-  console.log(selectedReservation);
+  //console.log(selectedReservation);
 
 
   // Status color mapping
@@ -28,7 +28,7 @@ function Bookings() {
       'confirmed': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
       'completed': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
       'cancelled': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      'in progress': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      'rejected': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
     };
     return statusMap[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
@@ -160,7 +160,7 @@ function Bookings() {
                         }
                         {
                           booking.status === 'completed' && (
-                            <button onClick={() => { setAddRatingModalVisible(true); setSelectedReservation(booking) }} className="ml-2 bg-blue-600 cursor-pointer hover:bg-blue-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white px-2 py-1 rounded-md text-xs">
+                            <button onClick={() => { setAddRatingModalVisible(true); setSelectedReservation(booking) }} className="ml-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 px-2 py-1 rounded-md text-xs cursor-pointer">
                               Add Rate
                             </button>
                           )

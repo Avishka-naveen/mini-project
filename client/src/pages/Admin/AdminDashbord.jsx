@@ -110,7 +110,7 @@ function AdminDashbord() {
           </div>
 
           {/* Your Content */}
-          <div className="p-4 sm:p-6">
+          <div className=" sm:p-6">
             <div className="h-[85vh] overflow-y-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6">
 
               <Outlet />

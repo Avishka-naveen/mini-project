@@ -238,3 +238,75 @@ export const updateWorkerProfile = async (req, res) => {
 
   }
 }
+
+// --------------------accept customer booking----------------------------//
+export const acceptUserBooking=async(req,res)=>{
+  const{reservationId}=req.body;
+  if(!reservationId){
+    return res.json({ success: false, message: "missing details" });
+  }
+  
+  try {
+    const reservation=await ReservationModel.findById(reservationId);
+    if(!reservation){
+      return res.json({ success: false, message: "reservation not found!" });
+    }
+    reservation.status='confirmed';
+    await reservation.save();
+   res.json({ success: true, message: " Booking confirmed succesfully!", reservation });
+
+
+
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+}
+
+//---------------------------delete customer booking---------------------//
+
+
+export const deleteUserBooking=async(req,res)=>{
+  const{reservationId}=req.body;
+  if(!reservationId){
+    return res.json({ success: false, message: "missing details" });
+  }
+  
+  try {
+    const reservation=await ReservationModel.findById(reservationId);
+    if(!reservation){
+      return res.json({ success: false, message: "reservation not found!" });
+    }
+    reservation.status='rejected';
+    await reservation.save();
+   res.json({ success: true, message: "Booking  rejected succesfully!", reservation });
+
+
+
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+}
+//---------------------------delete customer booking---------------------//
+
+
+export const completeUserBooking=async(req,res)=>{
+  const{reservationId}=req.body;
+  if(!reservationId){
+    return res.json({ success: false, message: "missing details" });
+  }
+  
+  try {
+    const reservation=await ReservationModel.findById(reservationId);
+    if(!reservation){
+      return res.json({ success: false, message: "reservation not found!" });
+    }
+    reservation.status='completed';
+    await reservation.save();
+   res.json({ success: true, message: "Booking  completed succesfully!", reservation });
+
+
+
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+}

@@ -20,7 +20,7 @@ function LandingPage() {
   return (
 
 
-    <div className="min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white">
+    <div className="min-h-screen  bg-white dark:bg-[#1e1e1e] text-black dark:text-white" >
 
       <NavBar />
       <div className=' lg:mx-15 mx-5 mt-5'>

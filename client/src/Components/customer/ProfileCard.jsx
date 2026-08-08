@@ -89,9 +89,9 @@ function ProfileCard() {
       const response = await axios.post(backendUrl + '/api/customer/logout');
       if (response.data.success) {
         setIsLogged(false);
-        toast.success(response.data.message);
+        toast.success(response.data.massage);
         localStorage.removeItem('isLogged');
-        setCurrentCustomerData('');
+        //setCurrentCustomerData('');
         navigate('/');
       } else {
         toast.error(response.data.message);
@@ -180,7 +180,7 @@ function ProfileCard() {
 
       {/* Update Profile Modal */}
       {showUpdateModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4 animate-fade-in">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50  z-50 p-4 animate-fade-in">
           
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
             

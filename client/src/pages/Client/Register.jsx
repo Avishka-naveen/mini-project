@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 
 function Register() {
   const navigate = useNavigate();
-  const { backendUrl,isLogged,setIsLogged,setcurrentCustomerData,fetchCustomerData } = useContext(AppContext);
+  const { backendUrl,isLogged,setIsLogged,setcurrentCustomerData,fetchCustomerData,fetchAllServises } = useContext(AppContext);
 
   const [isSignIn, setIsSignIn] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -117,6 +117,7 @@ function Register() {
         toast.success(response.data.message);
         fetchCustomerData();
         navigate('/customer/workerList');
+        fetchAllServises();
         
 
       } else {

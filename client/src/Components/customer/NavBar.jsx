@@ -22,6 +22,7 @@ function NavBar() {
     const hiddenUserIcon = location.pathname === '/register' || location.pathname === '/';
     const hiddenSignInButton = location.pathname === '/';
     const hiddenLinks = location.pathname === '/';
+    const hiddenBecomeWorker=location.pathname ==='/';
 
     const [openProfileCard, setOpenProfileCard] = useState(false);
 
@@ -139,12 +140,14 @@ const fetchWorkerData = async () => {
                             </button>
                         ) : (
                             <div>
-                                <button
+                                {!hiddenBecomeWorker && (
+                                    <button
                                     onClick={() => navigate("/customer/verifyOtp")}
                                     className="bg-blue-600 dark:bg-purple-600 cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
                                 >
                                     Become Worker
                                 </button>
+                                )}
                             </div>
                         )
                     )

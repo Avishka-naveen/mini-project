@@ -5,13 +5,20 @@ import { AppContext } from '../../Context/Appcontext';
 import axios from 'axios';
 import { IoMdClose } from "react-icons/io";
 import { IoMdDoneAll } from "react-icons/io";
+import { toast } from 'react-toastify';
 
 function WorkerMyBookings() {
   const [reservation, setReservation] = useState([]);
-  const { backendUrl } = useContext(AppContext);
+  const { backendUrl} = useContext(AppContext);
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedReservation, setSelectedReservation] = useState('');
+  const [visibleAcceptModel, setVisibleAcceptModel] = useState(false);
+  const [visibleDeleteModel, setVisibleDeleteModel] = useState(false);
+  const [visibleCompleteModel, setVisibleCompleteModel] = useState(false);
+  // console.log(selectedReservation._id);
 
+ 
   const fetchBookingData = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/worker/getMyReservations', { withCredentials: true });
@@ -43,7 +50,7 @@ function WorkerMyBookings() {
   const handleViewCustomer = (customer) => {
     setSelectedCustomer(customer);
     setDetailsVisible(true);
-    console.log(selectedCustomer)
+    //console.log(selectedCustomer)
   };
 
   // Handle close modal
@@ -51,6 +58,54 @@ function WorkerMyBookings() {
     setDetailsVisible(false);
     setSelectedCustomer(null);
   };
+
+  //handle accept booking function
+  const handleAccept = async () => {
+    try {
+      let response;
+      response = await axios.post(backendUrl + '/api/worker/acceptUserBooking', { reservationId: selectedReservation._id });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setSelectedReservation('');
+        fetchBookingData();
+        setVisibleAcceptModel(false);
+      }
+    } catch (error) {
+      toast.error(error);
+    }
+
+  }
+  //handle delete booking function
+  const handleDelete = async () => {
+    try {
+      let response;
+      response = await axios.post(backendUrl + '/api/worker/deleteUserBooking', { reservationId: selectedReservation._id });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setSelectedReservation('');
+        fetchBookingData();
+        setVisibleDeleteModel(false);
+      }
+    } catch (error) {
+      toast.error(error);
+    }
+  }
+
+  //handle complete booking function
+  const handleComplete = async () => {
+    try {
+      let response;
+      response = await axios.post(backendUrl + '/api/worker/completeUserBooking', { reservationId: selectedReservation._id });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setSelectedReservation('');
+        fetchBookingData();
+        setVisibleCompleteModel(false);
+      }
+    } catch (error) {
+      toast.error(error);
+    }
+  }
 
   return (
     <div className="p-4 sm:p-6 dark:text-white">
@@ -103,7 +158,7 @@ function WorkerMyBookings() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div 
+                        <div
                           onClick={() => handleViewCustomer(reservation)}
                           className="w-8 h-8 rounded-full cursor-pointer bg-blue-100 dark:bg-purple-900 flex items-center justify-center text-blue-600 dark:text-white text-xs font-bold"
                         >
@@ -124,20 +179,20 @@ function WorkerMyBookings() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
-                      {
-                        reservation.status === 'confirmed' && (
-                          <>
-                            <button className='p-2  cursor-pointer text-white bg-blue-400 dark:bg-purple-400  dark:hover:text-white hover:bg-blue-600 dark:hover:bg-purple-600 rounded-lg transition-colors'><IoMdDoneAll /></button>
-                          </>
-                        )
-                      }
-                        
+                        {
+                          reservation.status === 'confirmed' && (
+                            <>
+                              <button onClick={() => { setVisibleCompleteModel(true); setSelectedReservation(reservation) }} className='p-2  cursor-pointer text-white bg-blue-400 dark:bg-purple-400  dark:hover:text-white hover:bg-blue-600 dark:hover:bg-purple-600 rounded-lg transition-colors'><IoMdDoneAll /></button>
+                            </>
+                          )
+                        }
+
                         {reservation.status === 'pending' && (
                           <>
-                            <button className="p-2 text-green-500 cursor-pointer dark:text-white bg-green-100 dark:bg-green-400 hover:text-green-700 dark:hover:text-white hover:bg-green-200 dark:hover:bg-green-600 rounded-lg transition-colors">
+                            <button onClick={() => { setSelectedReservation(reservation); setVisibleAcceptModel(true) }} className="p-2 text-green-500 cursor-pointer dark:text-white bg-green-100 dark:bg-green-400 hover:text-green-700 dark:hover:text-white hover:bg-green-200 dark:hover:bg-green-600 rounded-lg transition-colors">
                               <FaCheck />
                             </button>
-                            <button className="p-2 text-red-500 cursor-pointer dark:text-white bg-red-100 dark:bg-red-400 hover:text-red-700 dark:hover:text-white hover:bg-red-200 dark:hover:bg-red-600 rounded-lg transition-colors">
+                            <button onClick={() => { setSelectedReservation(reservation), setVisibleDeleteModel(true) }} className="p-2 text-red-500 cursor-pointer dark:text-white bg-red-100 dark:bg-red-400 hover:text-red-700 dark:hover:text-white hover:bg-red-200 dark:hover:bg-red-600 rounded-lg transition-colors">
                               <FaTimes />
                             </button>
                           </>
@@ -171,138 +226,209 @@ function WorkerMyBookings() {
 
       {/* Customer Details Modal */}
       {detailsVisible && selectedCustomer && (
-  <>
-    {/* Backdrop */}
-    <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 animate-fade-in"
-      onClick={handleCloseModal}
-    ></div>
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+            onClick={handleCloseModal}
+          ></div>
 
-    {/* Modal - Responsive */}
-    <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-md max-h-[90vh] overflow-y-auto animate-scale-in">
-      
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
-        
-        {/* Modal Header - Fixed */}
-        <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 dark:from-purple-700 dark:to-blue-800 px-6 pt-8 pb-12">
-          <div className="flex justify-center">
-            <div className="flex items-center gap-3">
-              {/* Avatar - Fixed position */}
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-50">
-                <div className="w-24 h-24 rounded-full  dark:bg-gray-700 
+          {/* Modal - Responsive */}
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-md max-h-[90vh] overflow-y-auto animate-scale-in">
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+
+              {/* Modal Header - Fixed */}
+              <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 dark:from-purple-700 dark:to-blue-800 px-6 pt-8 pb-12">
+                <div className="flex justify-center">
+                  <div className="flex items-center gap-3">
+                    {/* Avatar - Fixed position */}
+                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-50">
+                      <div className="w-24 h-24 rounded-full  dark:bg-gray-700 
                                 flex items-center justify-center  font-bold text-3xl
                                 border-4 border-white dark:border-gray-800 
                                 text-blue-800 bg-blue-100 dark:text-white">
-                  {selectedCustomer?.customerName?.split(' ')?.map(name => name[0]).join("").toUpperCase() || 'C'}
+                        {selectedCustomer?.customerName?.split(' ')?.map(name => name[0]).join("").toUpperCase() || 'C'}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Modal Body - Added padding-top for avatar space */}
-        <div className="pt-14 px-6 pb-4 space-y-4">
-          {/* Customer Name - Centered */}
-          <div className="text-center mb-4">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white">
-              {selectedCustomer?.customerName || 'Customer'}
-            </h3>
-            <span className="inline-block mt-1 bg-blue-100 dark:bg-purple-900/50 
+              {/* Modal Body - Added padding-top for avatar space */}
+              <div className="pt-14 px-6 pb-4 space-y-4">
+                {/* Customer Name - Centered */}
+                <div className="text-center mb-4">
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white">
+                    {selectedCustomer?.customerName || 'Customer'}
+                  </h3>
+                  <span className="inline-block mt-1 bg-blue-100 dark:bg-purple-900/50 
                            text-blue-700 dark:text-purple-300 
                            text-xs font-semibold px-3 py-1 rounded-full 
                            border border-blue-200 dark:border-purple-700/30">
-              {selectedCustomer?.role || 'Customer'}
-            </span>
-          </div>
+                    {selectedCustomer?.role || 'Customer'}
+                  </span>
+                </div>
 
-          {/* Customer Details Grid */}
-          <div className="grid grid-cols-1 gap-3">
-            {/* Name */}
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-              <FaUserCircle className="text-blue-500 dark:text-blue-400 text-lg flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Full Name</p>
-                <p className="text-sm text-gray-800 dark:text-white font-medium truncate">
-                  {selectedCustomer?.customerName || 'N/A'}
-                </p>
+                {/* Customer Details Grid */}
+                <div className="grid grid-cols-1 gap-3">
+                  {/* Name */}
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                    <FaUserCircle className="text-blue-500 dark:text-blue-400 text-lg flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Full Name</p>
+                      <p className="text-sm text-gray-800 dark:text-white font-medium truncate">
+                        {selectedCustomer?.customerName || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                    <FaEnvelope className="text-blue-500 dark:text-blue-400 text-lg flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Email</p>
+                      <p className="text-sm text-gray-800 dark:text-white break-all">
+                        {selectedCustomer?.customerEmail || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                    <FaPhone className="text-green-500 dark:text-green-400 text-lg flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Phone</p>
+                      <p className="text-sm text-gray-800 dark:text-white">
+                        {selectedCustomer?.customerPhone || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Address */}
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                    <FaMapMarkerAlt className="text-red-500 dark:text-red-400 text-lg flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Address</p>
+                      <p className="text-sm text-gray-800 dark:text-white truncate">
+                        {selectedCustomer?.customerAddress || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                    <FaInfoCircle className="text-purple-500 dark:text-purple-400 text-lg flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Description</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300  line-clamp-3">
+                        {selectedCustomer?.description || 'No description available'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Info */}
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <p className="text-xs text-center text-gray-400 dark:text-gray-500">
+                    Customer since: {selectedCustomer?.createdAt
+                      ? new Date(selectedCustomer.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                      : 'N/A'
+                    }
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Email */}
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-              <FaEnvelope className="text-blue-500 dark:text-blue-400 text-lg flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Email</p>
-                <p className="text-sm text-gray-800 dark:text-white break-all">
-                  {selectedCustomer?.customerEmail || 'N/A'}
-                </p>
-              </div>
-            </div>
-
-            {/* Phone */}
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-              <FaPhone className="text-green-500 dark:text-green-400 text-lg flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Phone</p>
-                <p className="text-sm text-gray-800 dark:text-white">
-                  {selectedCustomer?.customerPhone || 'N/A'}
-                </p>
-              </div>
-            </div>
-
-            {/* Address */}
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-              <FaMapMarkerAlt className="text-red-500 dark:text-red-400 text-lg flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Address</p>
-                <p className="text-sm text-gray-800 dark:text-white truncate">
-                  {selectedCustomer?.customerAddress || 'N/A'}
-                </p>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-              <FaInfoCircle className="text-purple-500 dark:text-purple-400 text-lg flex-shrink-0 mt-0.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Description</p>
-                <p className="text-sm text-gray-700 dark:text-gray-300  line-clamp-3">
-                  {selectedCustomer?.description || 'No description available'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Info */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-            <p className="text-xs text-center text-gray-400 dark:text-gray-500">
-              Customer since: {selectedCustomer?.createdAt 
-                ? new Date(selectedCustomer.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })
-                : 'N/A'
-              }
-            </p>
-          </div>
-        </div>
-
-        {/* Modal Footer */}
-        <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
-          <button
-            onClick={handleCloseModal}
-            className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
+              {/* Modal Footer */}
+              <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                <button
+                  onClick={handleCloseModal}
+                  className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
                      text-white font-medium rounded-lg transition duration-200 shadow-md hover:shadow-lg"
-          >
-            Close
-          </button>
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* accept booking model */}
+      {visibleAcceptModel && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-96">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Accept Booking</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to accept this Booking?</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setVisibleAcceptModel(false)}
+                className="px-4 py-2 cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAccept}
+                className="px-4 py-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+              >
+                Accept
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </>
-)}
-     
+      )}
+      {/* delete booking model */}
+      {visibleDeleteModel && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-96">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Reject Booking</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to Reject this Booking?</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setVisibleDeleteModel(false)}
+                className="px-4 py-2 cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 cursor-pointer bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* delete booking model */}
+      {visibleCompleteModel && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 sm:w-96">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Complete Booking</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to mark this booking as completed?</p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setVisibleCompleteModel(false)}
+                className="px-4 py-2 cursor-pointer text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleComplete}
+                className="px-4 py-2 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                Complete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+
     </div>
   );
 }
