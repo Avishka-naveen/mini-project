@@ -12,6 +12,7 @@ const reservationSchema = new mongoose.Schema(
     date: {type: Date,required: true,},
     description: {type: String,required: true,trim: true,},
     status: {type: String,enum: ["pending", "completed","confirmed","rejected"],default: "pending",},
+    isComment:{type:Boolean,default:false},
   },
   { timestamps: true }
 );

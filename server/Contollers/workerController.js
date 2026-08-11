@@ -166,16 +166,24 @@ export const getMyServices = async (req, res) => {
 //-----------------delete service-----------------//
 export const deleteService = async (req, res) => {
   const { serviceId } = req.body;
+
   try {
     const deletedService = await ServiceModel.findByIdAndDelete(serviceId);
+
     if (!deletedService) {
-      return res.json({ success: false, message: "Service not found" });
+      return res.json({success: false,message: "Service not found"});
     }
-    res.json({ success: true, message: "Service deleted successfully" });
+
+    
+    await CommentModel.deleteMany({ serviceId });
+    await ReservationModel.deleteMany({ serviceId });
+
+    return res.json({success: true,message: "Service deleted successfully"});
+
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    return res.json({success: false,message: error.message});
   }
-}
+};
 
 //-----------------------edit service------------------------//
 export const editService = async (req, res) => {

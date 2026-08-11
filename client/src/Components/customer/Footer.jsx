@@ -12,12 +12,14 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLocation } from "react-router-dom";
 
 function Footer() {
   const currentYear = new Date().getFullYear();
+  const location = useLocation();
 
   return (
-    <footer className="bg-gray-100 dark:bg-[#0f172a] text-gray-700 dark:text-gray-300 pt-16">
+    <footer className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  text-gray-700 dark:text-gray-300 pt-16`}>
 
       {/* TOP SECTION */}
       <div className="max-w-7xl mx-auto px-6">
@@ -129,11 +131,7 @@ function Footer() {
         <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row justify-between items-center text-sm">
           <p>© {currentYear} QuickHire. All rights reserved.</p>
 
-          <div className="flex gap-3 mt-3 sm:mt-0">
-            <span>Visa</span>
-            <span>MasterCard</span>
-            <span>PayPal</span>
-          </div>
+          
         </div>
       </div>
 

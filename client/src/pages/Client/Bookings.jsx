@@ -13,13 +13,13 @@ function Bookings() {
 
   const { backendUrl } = useContext(AppContext)
   const navigate = useNavigate();
-  const [reservations, setReservations] = React.useState('');
+  const [reservations, setReservations] = useState('');
   const [addRatingModalVisible, setAddRatingModalVisible] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState('');
   const [cancelModalVisible, setcancelModalVisible] = useState(false);
 
   //console.log(selectedReservation);
-
+//console.log(reservations)
 
   // Status color mapping
   const getStatusColor = (status) => {
@@ -42,7 +42,7 @@ function Bookings() {
       if (response.data.success) {
         setReservations(response.data.reservations);
       }
-      //console.log(response.data.reservations);
+      console.log(response.data.reservations);
     } catch (error) {
       console.error("Error fetching reservations:", error);
     }
@@ -93,7 +93,7 @@ function Bookings() {
               Total: <span className="font-semibold text-gray-800 dark:text-white">{reservations.length}</span>
             </span>
             <button onClick={() => navigate('/customer/workerList')} className="bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 
-                             text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300
+                             text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300 scale-[.8] sm:scale-[1]
                              shadow-md hover:shadow-lg">
               + New Booking
             </button>
@@ -141,14 +141,14 @@ function Bookings() {
 
                           <span className="text-gray-700 dark:text-gray-300">
                             {/* {booking.serviceId || 'Unknown Worker'} */}
-                            <button onClick={() => navigate(`/customer/workerDetails/${booking.serviceId?._id}`)} className="cursor-pointer bg-blue-600 dark:bg-purple-600 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm">
-                              View Profile
+                            <button onClick={() => navigate(`/customer/workerDetails/${booking.serviceId?._id}`)} className="cursor-pointer scale-[.8] sm:scale-[1] flex items-center gap-1 bg-blue-600 dark:bg-purple-600 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm">
+                             <p> View</p> <p className='hidden sm:block'>Profile</p>
                             </button>
                           </span>
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`px-3 py-2 rounded-md text-xs cursor-pointer font-medium ${getStatusColor(booking.status)}`}>
+                        <span className={`px-3 py-2 rounded-md text-xs  cursor-pointer font-medium ${getStatusColor(booking.status)}`}>
                           {booking.status}
                         </span>
                         {
@@ -159,8 +159,8 @@ function Bookings() {
                           )
                         }
                         {
-                          booking.status === 'completed' && (
-                            <button onClick={() => { setAddRatingModalVisible(true); setSelectedReservation(booking) }} className="ml-2 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 px-2 py-1 rounded-md text-xs cursor-pointer">
+                          booking.status === 'completed' && booking.isComment ===false &&(
+                            <button onClick={() => { setAddRatingModalVisible(true); setSelectedReservation(booking) }} className="ml-2 bg-slate-200 mt-2 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 px-2 py-1 rounded-md text-xs cursor-pointer">
                               Add Rate
                             </button>
                           )
@@ -198,7 +198,7 @@ function Bookings() {
 
       {/* add reating and comment model */}
       {addRatingModalVisible && (
-        <Rate addRatingModalVisible={addRatingModalVisible} setAddRatingModalVisible={setAddRatingModalVisible} selectedReservation={selectedReservation} />
+        <Rate addRatingModalVisible={addRatingModalVisible} setAddRatingModalVisible={setAddRatingModalVisible} selectedReservation={selectedReservation} fetchReservations={fetchReservations}/>
       )}
       +
       {/* Cancel Booking Modal */}

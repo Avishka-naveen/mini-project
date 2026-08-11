@@ -4,13 +4,13 @@ import { toast } from 'react-toastify';
 import { useContext } from 'react';
 import { AppContext } from '../../Context/Appcontext';
 
-function Rate({ addRatingModalVisible, setAddRatingModalVisible, selectedReservation }) {
+function Rate({ addRatingModalVisible, setAddRatingModalVisible, selectedReservation,fetchReservations }) {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [comment, setComment] = useState('');
     const { backendUrl } = useContext(AppContext)
 
-    //console.log(selectedReservation.serviceId?._id);
+    //console.log(selectedReservation._id);
     const handleSubmitRating = async () => {
         if (!rating || !comment.trim()) {
             toast.error('Please provide both rating and review');
@@ -22,12 +22,13 @@ function Rate({ addRatingModalVisible, setAddRatingModalVisible, selectedReserva
         try {
 
             let response;
-            response = await axios.post(backendUrl + '/api/customer/addComment', {  serviceId: selectedReservation.serviceId?._id, rating, comment }, { withCredentials: true });
+            response = await axios.post(backendUrl + '/api/customer/addComment', {  serviceId: selectedReservation.serviceId?._id, rating, comment ,reservationId:selectedReservation._id}, { withCredentials: true });
             if (response.data.success) {
                 toast.success('Thank you for your review!');
                 setAddRatingModalVisible(false);
                 setRating(0);
                 setComment('');
+                fetchReservations();
             }
 
 

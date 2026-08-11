@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 // import { dummybookingData } from '../../assets/dummyData'; // Can be removed if strictly using API
-import { FaSearch, FaTrash, FaUserCircle, FaIdCard, FaEnvelope, FaPhone, FaMapMarkerAlt,FaTimes, FaInfoCircle,FaExclamationTriangle } from 'react-icons/fa';
+import { FaSearch, FaTrash, FaUserCircle, FaIdCard, FaEnvelope, FaPhone, FaMapMarkerAlt, FaTimes, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import axios from 'axios';
 import { AppContext } from '../../Context/Appcontext';
+import { toast } from 'react-toastify';
 
 function AdminManageBookings() {
   const { backendUrl } = useContext(AppContext);
@@ -15,10 +16,10 @@ function AdminManageBookings() {
   const [selectedCustomer, setSelectedCustomer] = useState('');
   const [workerDetailsVisible, setWorkerDetailsVisible] = useState('');
   const [customerDetailsVisible, setCustomerDetailsVisible] = useState('');
-  const[deleteModelVisible,setdeleteModelVisible]=useState(false);
-const[selectedReservation,setSelectedReservation]=useState('');
+  const [deleteModelVisible, setdeleteModelVisible] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState('');
 
-  console.log(selectedCustomer);
+
   const getReservations = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/admin/getAllReservations');
@@ -36,7 +37,16 @@ const[selectedReservation,setSelectedReservation]=useState('');
 
   // Handle Delete Function
   const handleDelete = async () => {
-    console.log(selectedReservation._id)
+    try {
+      const response = await axios.post(backendUrl + '/api/admin/deleteReservation', { reservationId: selectedReservation._id });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        getReservations();
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
 
   };
 
@@ -69,10 +79,10 @@ const[selectedReservation,setSelectedReservation]=useState('');
 
     return matchesSearch && matchesStatus;
   }
- 
 
-);
- 
+
+  );
+
   return (
     <div className="  sm:p-6 dark:text-white">
       {/* Header */}
@@ -220,7 +230,7 @@ const[selectedReservation,setSelectedReservation]=useState('');
                       <div className="flex items-center justify-center gap-1.5 flex-wrap">
                         {/* Delete Button */}
                         <button
-                          onClick={() => {setdeleteModelVisible(true);setSelectedReservation(booking)}}
+                          onClick={() => { setdeleteModelVisible(true); setSelectedReservation(booking) }}
                           className="p-1.5 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                           title="Delete Booking"
                         >
@@ -396,7 +406,7 @@ const[selectedReservation,setSelectedReservation]=useState('');
       {customerDetailsVisible && (
         <>
           {/* Backdrop */}
-          <div onClick={()=>setCustomerDetailsVisible(false)}
+          <div onClick={() => setCustomerDetailsVisible(false)}
             className="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
 
           ></div>
@@ -497,7 +507,7 @@ const[selectedReservation,setSelectedReservation]=useState('');
               {/* Modal Footer */}
               <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
                 <button
-                  onClick={() =>setCustomerDetailsVisible(false)}
+                  onClick={() => setCustomerDetailsVisible(false)}
                   className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
                                  text-white font-medium rounded-lg transition duration-200 shadow-md hover:shadow-lg"
                 >
@@ -508,12 +518,12 @@ const[selectedReservation,setSelectedReservation]=useState('');
           </div>
         </>
       )}
-          
-          
-     {/* delete booking model */}
+
+
+      {/* delete booking model */}
 
       {deleteModelVisible && (
-        <div onClick={()=>setdeleteModelVisible(false)} className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in">
+        <div onClick={() => setdeleteModelVisible(false)} className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in">
 
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in overflow-hidden">
 

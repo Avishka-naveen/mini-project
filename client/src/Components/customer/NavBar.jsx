@@ -10,6 +10,7 @@ import axios from 'axios';
 
 
 
+
 function NavBar() {
 
     const location = useLocation();
@@ -23,6 +24,7 @@ function NavBar() {
     const hiddenSignInButton = location.pathname === '/';
     const hiddenLinks = location.pathname === '/';
     const hiddenBecomeWorker=location.pathname ==='/';
+    const hiddenGoToDashbord=location.pathname==='/';
 
     const [openProfileCard, setOpenProfileCard] = useState(false);
 
@@ -69,7 +71,7 @@ const fetchWorkerData = async () => {
 
     
     return (
-        <div className='border-b-3 px-3  border-blue-600 dark:border-purple-600  py-2 flex items-center justify-between bg-gray-100 dark:bg-[#0f172a] text-black dark:text-white'>
+        <div className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  border-b-3 px-3  border-blue-600 dark:border-purple-600  py-2 flex items-center justify-between   text-black dark:text-white`}>
             <div>
                 <img src={logo} alt='logo' className='w-15 h-15 lg:w-28 lg:h-25' />
             </div>
@@ -119,8 +121,9 @@ const fetchWorkerData = async () => {
 
                         {/* profile card section */}
                         {
-                            openProfileCard && <ProfileCard />
+                            openProfileCard && <div onClick={()=>setOpenProfileCard(false)} className='fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in'><ProfileCard /></div>
                         }
+                        
 
 
                     </div>
@@ -130,11 +133,11 @@ const fetchWorkerData = async () => {
 
                 {/* become worker button section */}
                 {
-                    isLogged && (
+                    isLogged &&  (
                         currentCustomerData.role === "worker" ? (
                             <button
                                 onClick={handleGetWorkerData}
-                                className="bg-green-600 hover:bg-green-800 cursor-pointer text-white text-sm p-2 rounded-md"
+                                className="bg-green-600 hover:bg-green-800 scale-[0.8] sm:scale-[1] cursor-pointer text-white text-sm p-2 rounded-md"
                             >
                                 Go to Dashboard
                             </button>
@@ -143,7 +146,7 @@ const fetchWorkerData = async () => {
                                 {!hiddenBecomeWorker && (
                                     <button
                                     onClick={() => navigate("/customer/verifyOtp")}
-                                    className="bg-blue-600 dark:bg-purple-600 cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
+                                    className="bg-blue-600 dark:bg-purple-600 scale-[0.8] sm:scale-[1] cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
                                 >
                                     Become Worker
                                 </button>

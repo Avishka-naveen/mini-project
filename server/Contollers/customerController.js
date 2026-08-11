@@ -352,10 +352,10 @@ export const createWorker = async (req, res) => {
 
 export const addComment = async (req, res) => {
     const customerId = req.customerId;
-    const { serviceId, comment, rating } = req.body;
+    const { serviceId, comment, rating ,reservationId} = req.body;
 
    
-    if (!customerId || !serviceId || !comment || !rating) {
+    if (!customerId || !serviceId || !comment || !rating || !reservationId) {
 
         return res.json({ success: false, message: "Missing details!", });
     }
@@ -363,16 +363,26 @@ export const addComment = async (req, res) => {
     try {
 
         const service = await ServiceModel.findById(serviceId);
+        const reservation=await ReservationModel.findById(reservationId);
 
         if (!service) {
             return res.json({ success: false, message: "Service not found!", });
         }
+        if (!reservation) {
+            return res.json({ success: false, message: "reservation not found!", });
+        }
+
+        
+        reservation.isComment=true;
+        await reservation.save();
+
 
         const newComment = new CommentModel({
             customerId,
             serviceId,
             comment,
             rating,
+            isComment:true
         });
 
         await newComment.save();
@@ -390,6 +400,7 @@ export const addComment = async (req, res) => {
 
         service.rating = Number(averageRating.toFixed(1));
         await service.save();
+
 
         return res.json({ success: true, message: "Comment added successfully!", comment: newComment, averageRating: service.rating, });
 

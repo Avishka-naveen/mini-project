@@ -3,11 +3,12 @@
 /* Enable class-based dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
 
-*{
-    box-sizing: border-box;
-    font-family: sans-serif;
-    
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
+
 }
+
 /* Light Mode Variables - Blue Theme */
 :root {
   --scrollbar-track: #e6f0ff;
@@ -59,3 +60,53 @@
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
+/* 
+landing page background amnimation */
+@property --blob1-x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 20%;
+}
+
+@property --blob1-y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 30%;
+}
+
+@property --blob2-x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 80%;
+}
+
+@property --blob2-y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 70%;
+}
+
+@keyframes float-blobs {
+
+  0%,
+  100% {
+    --blob1-x: 20%;
+    --blob1-y: 30%;
+    --blob2-x: 80%;
+    --blob2-y: 70%;
+  }
+
+  33% {
+    --blob1-x: 65%;
+    --blob1-y: 25%;
+    --blob2-x: 30%;
+    --blob2-y: 60%;
+  }
+
+  66% {
+    --blob1-x: 40%;
+    --blob1-y: 75%;
+    --blob2-x: 70%;
+    --blob2-y: 35%;
+  }
+}

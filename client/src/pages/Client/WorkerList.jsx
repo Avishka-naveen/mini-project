@@ -50,7 +50,7 @@ function WorkerList() {
               Home / Worker List
             </p>
           </div>
-          <div className="px-4 flex justify-center items-center gap-3 sm:px-6 md:px-10 lg:px-20 pt-8">
+          <div className="scale-[0.7] sm:scale-[1] px-4 flex justify-center items-center gap-3 sm:px-6 md:px-10 lg:px-20 pt-8">
             <div onClick={() => navigate("/customer/workerReservation")} className="bg-blue-600 flex items-center gap-3 dark:bg-purple-600 hover:dark:bg-purple-700 hover:bg-blue-700 text-white py-3 px-4 rounded-sm transition duration-300 cursor-pointer">
               <span><FaLocationArrow /></span>
               <button >
@@ -61,7 +61,7 @@ function WorkerList() {
         </div>
 
         {/* Filter Section */}
-        <div className="px-4 sm:px-6 md:px-10 lg:px-20 py-5 dark:bg-gray-800 bg-gray-200 mx-20 mb-5">
+        <div className="px-4 sm:px-6 md:px-10 lg:px-20 py-5 dark:bg-gray-800 bg-gray-200 sm:mx-20 mx-4 mb-5">
           <h2 className='text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200 flex items-center gap-2'>
             <p className="text-3xl"><CiSearch /></p>
             <p>Filter Workers</p>

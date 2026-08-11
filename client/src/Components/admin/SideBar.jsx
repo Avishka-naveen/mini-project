@@ -1,21 +1,23 @@
-import React from 'react';
-import { 
-  FaHome, 
-  FaUserCog, 
-  FaSignOutAlt, 
-  FaUserCircle, 
-  FaUsers, 
-  FaCalendarCheck, 
+import React, { useContext } from 'react';
+import {
+  FaHome,
+  FaUserCog,
+  FaSignOutAlt,
+  FaUserCircle,
+  FaUsers,
+  FaCalendarCheck,
   FaChartBar,
   FaClipboardList,
   FaCog,
   FaBell,
   FaMoneyBillWave
 } from 'react-icons/fa';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import ToggleBtn from '../customer/ToggleBtn';
-import {  MdOutlineWork } from "react-icons/md";
+import { MdOutlineWork } from "react-icons/md";
 import logo from '../../assets/logo.png';
+import { AppContext } from '../../Context/Appcontext';
+
 
 function AdminSideBar() {
   const menuItems = [
@@ -31,7 +33,7 @@ function AdminSideBar() {
       icon: <FaUsers />,
       path: '/admin/dashbord/manageUsers'
     },
-    
+
     {
       id: 'bookings',
       label: 'Manage Bookings',
@@ -45,7 +47,8 @@ function AdminSideBar() {
       path: '/admin/dashbord/manageServises'
     }
   ];
-
+  const navigate = useNavigate();
+  const { setcurrentCustomerData } = useContext(AppContext);
   return (
     <div className=" h-screen overflow-y-auto scrollbar-hide w-[280px] bg-gray-100 dark:bg-[#0f172a] text-black dark:text-white border-r-2 border-blue-600 dark:border-purple-600 ">
 
@@ -90,9 +93,9 @@ function AdminSideBar() {
           </div>
 
           {/* Logout */}
-          <button
+          <button onClick={() => {navigate('/');setcurrentCustomerData('')}}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg
-            text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30
+            text-red-600 dark:text-red-400 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30
             transition-all duration-200"
           >
             <FaSignOutAlt />
