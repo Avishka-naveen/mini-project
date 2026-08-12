@@ -88,6 +88,9 @@ export const login = async (req, res) => {
             return res.json({ success: false, message: "Invalied Password !" });
 
         }
+        if(customer.role==='admin'){
+             return res.json({success: true,message: 'admin Login Successfully !',customer});
+        }
 
         const token = jwt.sign({ id: customer._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
@@ -102,9 +105,8 @@ export const login = async (req, res) => {
         res.json({
             success: true,
             message: 'Login Successfully !',
-
-
-        });
+            customer
+});
         //  console.log(token);
 
 

@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 
 function Register() {
   const navigate = useNavigate();
-  const { backendUrl,isLogged,setIsLogged,setcurrentCustomerData,fetchCustomerData,fetchAllServises } = useContext(AppContext);
+  const { backendUrl, isLogged, setIsLogged, setcurrentCustomerData, fetchCustomerData, fetchAllServises } = useContext(AppContext);
 
   const [isSignIn, setIsSignIn] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -108,17 +108,27 @@ function Register() {
       });
 
       if (response.data.success) {
-        setLoginData({
-          email: '',
-          password: ''
-        });
-        setIsLogged(true);
-         localStorage.setItem('isLogged', 'true');
-        toast.success(response.data.message);
-        fetchCustomerData();
-        navigate('/customer/workerList');
-        fetchAllServises();
-        
+        if (response.data.customer.role === 'admin') {
+          navigate('/admin/dashbord/manageWorkers');
+           setLoginData({
+            email: '',
+            password: ''
+          });
+
+        } else {
+          setLoginData({
+            email: '',
+            password: ''
+          });
+          setIsLogged(true);
+          localStorage.setItem('isLogged', 'true');
+          toast.success(response.data.message);
+          fetchCustomerData();
+          navigate('/customer/workerList');
+          fetchAllServises();
+        }
+
+
 
       } else {
         toast.error(response.data.message);

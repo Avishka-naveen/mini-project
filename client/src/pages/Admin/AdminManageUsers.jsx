@@ -112,7 +112,7 @@ function AdminManageUsers() {
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                 {/* FIX: Changed sm:block to sm:table-cell */}
-                <th className="px-4 py-3 text-left text-xs font-semibold hidden sm:table-cell text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-semibold  text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                   No.
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
@@ -139,7 +139,7 @@ function AdminManageUsers() {
                     className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
                   >
                     {/* FIX: Changed sm:block to sm:table-cell */}
-                    <td className="px-4 py-3 hidden sm:table-cell text-gray-800 dark:text-gray-200 font-medium">
+                    <td className="px-4 py-3  text-gray-800 dark:text-gray-200 font-medium">
                       {String(index + 1).padStart(2, '0')}
                     </td>
                     <td className="px-4 py-3">

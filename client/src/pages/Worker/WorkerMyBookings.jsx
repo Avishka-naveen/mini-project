@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 function WorkerMyBookings() {
   const [reservation, setReservation] = useState([]);
-  const { backendUrl} = useContext(AppContext);
+  const { backendUrl } = useContext(AppContext);
   const [detailsVisible, setDetailsVisible] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [selectedReservation, setSelectedReservation] = useState('');
@@ -18,7 +18,7 @@ function WorkerMyBookings() {
   const [visibleCompleteModel, setVisibleCompleteModel] = useState(false);
   // console.log(selectedReservation._id);
 
- 
+
   const fetchBookingData = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/worker/getMyReservations', { withCredentials: true });
@@ -108,7 +108,7 @@ function WorkerMyBookings() {
   }
 
   return (
-    <div className="p-4 sm:p-6 dark:text-white">
+    <div className="p-1 sm:p-6 dark:text-white">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
         <div>
@@ -135,14 +135,34 @@ function WorkerMyBookings() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">No.</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Date</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Customer</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Service</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Action</th>
+
+                <th className="px-4 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                  No.
+                </th>
+
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                  Date
+                </th>
+
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                  Customer
+                </th>
+
+                <th className="px-4 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                  Service
+                </th>
+
+                <th className="px-4 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                  Status
+                </th>
+
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                  Action
+                </th>
+
               </tr>
             </thead>
+
             <tbody>
               {reservation.length > 0 ? (
                 reservation.map((reservation, index) => (
@@ -150,64 +170,106 @@ function WorkerMyBookings() {
                     key={reservation._id || index}
                     className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
                   >
-                    <td className="px-4 py-3 text-gray-800 dark:text-gray-200 font-medium">
-                      {String(index + 1)}
+
+                    <td className="px-4 py-3 hidden sm:table-cell text-gray-800 dark:text-gray-200 font-medium">
+                      {index + 1}
                     </td>
-                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
+
+                    <td className="px-4 py-3 text-gray-700 text-xs dark:text-gray-300">
                       {new Date(reservation.date).toLocaleDateString("en-GB")}
                     </td>
+
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
+
                         <div
                           onClick={() => handleViewCustomer(reservation)}
                           className="w-8 h-8 rounded-full cursor-pointer bg-blue-100 dark:bg-purple-900 flex items-center justify-center text-blue-600 dark:text-white text-xs font-bold"
                         >
-                          {reservation.customerId?.customerName?.split(' ')?.map(name => name[0]).join("").toUpperCase() || 'C'}
+                          {reservation.customerId?.customerName
+                            ?.split(" ")
+                            ?.map(name => name[0])
+                            .join("")
+                            .toUpperCase() || "C"}
                         </div>
-                        <span className="text-gray-700 dark:text-gray-300 text-sm">
-                          {reservation.customerId?.customerName || 'Unknown'}
+
+                        <span className="text-gray-700 hidden sm:block dark:text-gray-300 text-sm">
+                          {reservation.customerId?.customerName || "Unknown"}
                         </span>
+
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                      {reservation.serviceId?.serviceName || 'General Service'}
+
+                    <td className="px-4 py-3 hidden sm:table-cell text-gray-700 dark:text-gray-300">
+                      {reservation.serviceId?.serviceName || "General Service"}
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(reservation.status)}`}>
-                        {reservation.status || 'Pending'}
+
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <span
+                        className={`px-3 py-1 inline-block rounded-full text-xs font-medium ${getStatusColor(
+                          reservation.status
+                        )}`}
+                      >
+                        {reservation.status || "Pending"}
                       </span>
                     </td>
+
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
-                        {
-                          reservation.status === 'confirmed' && (
-                            <>
-                              <button onClick={() => { setVisibleCompleteModel(true); setSelectedReservation(reservation) }} className='p-2  cursor-pointer text-white bg-blue-400 dark:bg-purple-400  dark:hover:text-white hover:bg-blue-600 dark:hover:bg-purple-600 rounded-lg transition-colors'><IoMdDoneAll /></button>
-                            </>
-                          )
-                        }
 
-                        {reservation.status === 'pending' && (
+                        {reservation.status === "confirmed" && (
+                          <button
+                            onClick={() => {
+                              setVisibleCompleteModel(true);
+                              setSelectedReservation(reservation);
+                            }}
+                            className="p-2 cursor-pointer text-white bg-blue-400 dark:bg-purple-400 hover:bg-blue-600 dark:hover:bg-purple-600 rounded-lg transition-colors"
+                          >
+                            <IoMdDoneAll />
+                          </button>
+                        )}
+
+                        {reservation.status === "pending" && (
                           <>
-                            <button onClick={() => { setSelectedReservation(reservation); setVisibleAcceptModel(true) }} className="p-2 text-green-500 cursor-pointer dark:text-white bg-green-100 dark:bg-green-400 hover:text-green-700 dark:hover:text-white hover:bg-green-200 dark:hover:bg-green-600 rounded-lg transition-colors">
+                            <button
+                              onClick={() => {
+                                setSelectedReservation(reservation);
+                                setVisibleAcceptModel(true);
+                              }}
+                              className="p-2 text-green-500 cursor-pointer dark:text-white bg-green-100 dark:bg-green-400 hover:text-green-700 dark:hover:text-white hover:bg-green-200 dark:hover:bg-green-600 rounded-lg transition-colors"
+                            >
                               <FaCheck />
                             </button>
-                            <button onClick={() => { setSelectedReservation(reservation), setVisibleDeleteModel(true) }} className="p-2 text-red-500 cursor-pointer dark:text-white bg-red-100 dark:bg-red-400 hover:text-red-700 dark:hover:text-white hover:bg-red-200 dark:hover:bg-red-600 rounded-lg transition-colors">
+
+                            <button
+                              onClick={() => {
+                                setSelectedReservation(reservation);
+                                setVisibleDeleteModel(true);
+                              }}
+                              className="p-2 text-red-500 cursor-pointer dark:text-white bg-red-100 dark:bg-red-400 hover:text-red-700 dark:hover:text-white hover:bg-red-200 dark:hover:bg-red-600 rounded-lg transition-colors"
+                            >
                               <FaTimes />
                             </button>
                           </>
                         )}
+
                       </div>
                     </td>
+
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                  <td
+                    colSpan="6"
+                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
+                  >
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-4xl">📭</span>
                       <p className="font-medium">No bookings found</p>
-                      <p className="text-sm">You don't have any bookings yet.</p>
+                      <p className="text-sm">
+                        You don't have any bookings yet.
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -427,7 +489,7 @@ function WorkerMyBookings() {
           </div>
         </div>
       )}
-      
+
 
     </div>
   );

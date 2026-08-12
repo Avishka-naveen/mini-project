@@ -172,7 +172,7 @@ function AdminManageWorker() {
                           <img
                             src={worker.profile}
                             alt={worker.profile}
-                            className="w-15 h-15 rounded-full object-cover border-blue-500 dark:border-purple-600 border-3"
+                            className="w-15 h-15 sm:scale-[1] scale-[0.8] rounded-full object-cover border-blue-500 dark:border-purple-600 border-3"
                           />
                         ) : (
                           <FaUserCircle className="text-3xl text-gray-400 dark:text-gray-500" />

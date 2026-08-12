@@ -12,35 +12,36 @@ import { Outlet } from "react-router-dom";
 
 function AdminDashbord() {
   const [showSidebar, setShowSidebar] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
-    const [date, setDate] = useState(new Date());
-    const [showCalendar, setShowCalendar] = useState(false);
-  
-    // Check screen size
-    useEffect(() => {
-      const checkScreen = () => {
-        setIsMobile(window.innerWidth < 1024);
-        if (window.innerWidth >= 1024) {
-          setShowSidebar(true);
-        } else {
-          setShowSidebar(false);
-        }
-      };
-  
-      checkScreen();
-      window.addEventListener('resize', checkScreen);
-      return () => window.removeEventListener('resize', checkScreen);
-    }, []);
-  
-  
-    // Close sidebar on mobile
-    const closeSidebar = () => {
-      if (isMobile) {
+  const [isMobile, setIsMobile] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  console.log(showSidebar);
+  // Check screen size
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 1024);
+      if (window.innerWidth >= 1024) {
+        setShowSidebar(true);
+      } else {
         setShowSidebar(false);
       }
     };
+
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
+
+
+  // Close sidebar on mobile
+  const closeSidebar = () => {
+    if (isMobile) {
+      setShowSidebar(false);
+    }
+  };
   return (
-   <>
+    <>
 
 
       <div className="flex  h-screen bg-gray-50 dark:bg-[#1e1e1e] relative">
@@ -54,13 +55,19 @@ function AdminDashbord() {
         )}
 
         {/* Sidebar */}
-        <div className={`  ${showSidebar ? 'block' : 'hidden'} lg:relative z-50  top-[64px] lg:top-0 transition-transform duration-300 ease-in-out  `}>
+        <div
+className={`
+    fixed lg:relative z-50 top-[0px] lg:top-0 h-full
+    transition-transform duration-300 ease-in-out
+    ${showSidebar ? 'translate-x-0' : '-translate-x-full '}
+  `}
+        >
           <SideBar />
         </div>
-        {/* ${showSidebar ? 'translate-x-0' : '-translate-x-full'} */}
+       
 
         {/* Content Area */}
-        <div className="flex-1 transition-all  duration-300">
+        <div className={`flex-1 transition-all duration-300 ${showSidebar ? 'ml-0' : 'lg:-ml-[280px] ml-0'}`}>
           {/* Header with Menu Button */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3">

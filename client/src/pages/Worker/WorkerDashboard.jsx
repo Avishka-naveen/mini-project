@@ -15,7 +15,7 @@ function WorkerDashboard() {
   const [isMobile, setIsMobile] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
-  const navigate =useNavigate()
+  const navigate = useNavigate()
 
   const { currentWorkerData, fetchWorkerData } = useContext(AppContext);
 
@@ -58,13 +58,17 @@ function WorkerDashboard() {
         )}
 
         {/* Sidebar */}
-        <div className={`  ${showSidebar ? 'block' : 'hidden'} lg:relative z-50  top-[64px] lg:top-0 transition-transform duration-300 ease-in-out  `}>
+        <div className={`
+    fixed lg:relative z-50 top-[0px] lg:top-0 h-full
+    transition-transform duration-300 ease-in-out
+    ${showSidebar ? 'translate-x-0' : '-translate-x-full '}
+  `}>
           <SideBar />
         </div>
         {/* ${showSidebar ? 'translate-x-0' : '-translate-x-full'} */}
 
         {/* Content Area */}
-        <div className="flex-1 transition-all  duration-300">
+        <div className={`flex-1 transition-all duration-300 ${showSidebar ? 'ml-0' : 'lg:-ml-[280px] ml-0'}`}>
           {/* Header with Menu Button */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3">
@@ -127,15 +131,15 @@ function WorkerDashboard() {
 
 
           {currentWorkerData?.isActive ? (
-           
+
             <span ></span>
           ) : (
-            
+
             <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4 animate-fade-in">
 
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-scale-in">
 
-              
+
                 <div className="relative bg-gradient-to-r from-red-600 to-red-700 dark:from-red-800 dark:to-red-900 px-6 py-5">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl">
@@ -152,7 +156,7 @@ function WorkerDashboard() {
                   </div>
                 </div>
 
-                
+
                 <div className="p-6">
                   <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded-lg mb-4">
                     <p className="text-red-700 dark:text-red-300 text-sm font-medium">
@@ -202,7 +206,7 @@ function WorkerDashboard() {
                       Contact Support
                     </button>
                     <button
-                      onClick={()=>navigate('/customer/workerList')}
+                      onClick={() => navigate('/customer/workerList')}
                       className="flex-1 py-2.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 
                      text-gray-700 cursor-pointer dark:text-gray-200 font-medium rounded-xl transition duration-200"
                     >

@@ -61,11 +61,12 @@ function Banner() {
               <div className="
 grid grid-cols-1 sm:grid-cols-2
 items-center min-h-[80vh]
-bg-gradient-to-r
+
+py-10 px-15 bg-gradient-to-r
 from-gray-300 to-slate-100
 dark:from-slate-900 dark:via-blue-600 dark:to-purple-900
-py-10 px-15
 ">
+
                 {/* Text */}
                 <div className='flex flex-col gap-4  items-start justify-center relative z-10'>
                   <h3 className='text-2xl sm:text-6xl lg:text-xl font-bold lg:text-nowrap'>{data.subtitle}</h3>

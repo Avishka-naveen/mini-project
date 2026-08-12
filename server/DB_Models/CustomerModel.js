@@ -10,7 +10,7 @@ const customerSchema = new mongoose.Schema(
         verifyotpExpireAt:{type:Number, default:0},
         resetotp:{type:String, default:''},
         resetotpExpireAt:{type:Number, default:0},
-        role: {type: String,enum: ['customer', 'worker'],default: 'customer',
+        role: {type: String,enum: ['customer', 'worker','admin'],default: 'customer',
             
         },
     },

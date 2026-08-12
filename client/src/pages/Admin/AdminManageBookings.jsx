@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-// import { dummybookingData } from '../../assets/dummyData'; // Can be removed if strictly using API
-import { FaSearch, FaTrash, FaUserCircle, FaIdCard, FaEnvelope, FaPhone, FaMapMarkerAlt, FaTimes, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
+// import { dummybookingData } from '../../assets/dummyData'; 
+import { FaSearch, FaTrash, FaCalendarCheck,FaUserCircle, FaIdCard, FaEnvelope, FaPhone, FaMapMarkerAlt, FaTimes, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import axios from 'axios';
 import { AppContext } from '../../Context/Appcontext';
 import { toast } from 'react-toastify';
@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 function AdminManageBookings() {
   const { backendUrl } = useContext(AppContext);
 
-  // Single source of truth for your data
+
   const [reservations, setReservations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -88,8 +88,8 @@ function AdminManageBookings() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
-            📋 Manage Bookings
+          <h1 className="text-2xl flex items-center gap-1 sm:text-3xl font-bold text-gray-800 dark:text-white">
+            <FaCalendarCheck /> <p>Manage Bookings</p>
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             View and manage all customer bookings
@@ -131,136 +131,222 @@ function AdminManageBookings() {
       </div>
 
       {/* Table Container */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                <th className="px-1 py-3 sm:block hidden text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   No.
                 </th>
-                <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Worker
                 </th>
-                <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Customer
                 </th>
-                <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Service
                 </th>
-                <th className="px-2 py-3 text-left hidden sm:block text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+
+                <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Booking Date
                 </th>
-                <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Status
                 </th>
-                <th className="px-2 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-2 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
                   Actions
                 </th>
+
               </tr>
             </thead>
+
             <tbody>
-              {/* FIXED: Map over filteredBookings instead of raw reservations array */}
+
               {filteredBookings.length > 0 ? (
+
                 filteredBookings.map((booking, index) => (
+                  
                   <tr
                     key={booking._id || booking.id || index}
                     className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
                   >
-                    <td className="px-4 py-3 sm:block hidden text-gray-800 dark:text-gray-200 font-medium">
-                      {String(index + 1).padStart(2, '0')}
+
+                    {/* No. */}
+                    <td className="px-4 py-3 hidden sm:table-cell text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap">
+                      {String(index + 1).padStart(2, "0")}
                     </td>
+
                     {/* Worker */}
                     <td className="px-2 py-3">
                       <div className="flex items-center gap-2">
+
                         <div
-                          onClick={() => { setSelectedWorker(booking); setWorkerDetailsVisible(true) }}
-                          className="w-8 h-8 rounded-full bg-blue-100
-            dark:bg-blue-900 flex items-center justify-center
-            text-blue-600 dark:text-blue-400 text-xs font-bold
-            cursor-pointer"
+                          onClick={() => {
+                            setSelectedWorker(booking);
+                            setWorkerDetailsVisible(true);
+                          }}
+                          className="w-8 h-8 min-w-8 rounded-full bg-blue-100
+                    dark:bg-blue-900 flex items-center justify-center
+                    text-blue-600 dark:text-blue-400 text-xs font-bold
+                    cursor-pointer overflow-hidden"
                         >
+
                           <img
                             src={booking.workerId?.profile}
                             alt="Worker"
                             className="w-8 h-8 rounded-full object-cover"
                           />
+
                         </div>
 
-                        <span className="hidden sm:inline text-gray-700 dark:text-gray-300">
+                        <span className="hidden sm:inline text-gray-700 dark:text-gray-300 whitespace-nowrap">
                           {booking.workerId?.customerId?.customerName || "Unknown"}
                         </span>
+
                       </div>
                     </td>
 
                     {/* Customer */}
                     <td className="px-2 py-3">
                       <div className="flex items-center gap-2">
+
                         <div
-                          onClick={() => { setSelectedCustomer(booking); setCustomerDetailsVisible(true) }}
-                          className="w-8 h-8 rounded-full bg-green-100
-            dark:bg-green-900 flex items-center justify-center
-            text-green-600 dark:text-green-400 text-xs font-bold
-            cursor-pointer"
+                          onClick={() => {
+                            setSelectedCustomer(booking);
+                            setCustomerDetailsVisible(true);
+                          }}
+                          className="w-8 h-8 min-w-8 rounded-full bg-green-100
+                    dark:bg-green-900 flex items-center justify-center
+                    text-green-600 dark:text-green-400 text-xs font-bold
+                    cursor-pointer"
                         >
                           {booking.customerName?.charAt(0) || "C"}
                         </div>
 
-                        <span className="hidden sm:inline text-gray-700 dark:text-gray-300">
+                        <span className="hidden sm:inline text-gray-700 dark:text-gray-300 whitespace-nowrap">
                           {booking.customerName || "Unknown"}
                         </span>
+
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                      {booking.serviceId?.serviceName || 'N/A'}
+
+                    {/* Service */}
+                    <td className="px-2 py-3 hidden sm:table-cell text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                      {booking.serviceId?.serviceName || "N/A"}
                     </td>
-                    <td className="px-4 py-3 hidden sm:block">
-                      <div className="flex items-center  gap-2">
+
+                    {/* Booking Date */}
+                    <td className="px-2 py-3 hidden sm:table-cell whitespace-nowrap">
+
+                      <div className="flex items-center gap-2">
+
                         <span className="text-gray-700 dark:text-gray-300 text-xs">
-                          {booking.date ? new Date(booking.date).toLocaleDateString() : "N/A"}
+                          {booking.date
+                            ? new Date(booking.date).toLocaleDateString()
+                            : "N/A"}
                         </span>
+
                       </div>
+
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(booking.status)}`}>
-                        {booking.status || 'Pending'}
+
+                    {/* Status */}
+                    <td className="px-2 py-3 hidden sm:table-cell whitespace-nowrap">
+
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
+                          booking.status
+                        )}`}
+                      >
+                        {booking.status || "Pending"}
                       </span>
+
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-1.5 flex-wrap">
+
+                    {/* Actions */}
+                    <td className="px-2 py-3 whitespace-nowrap">
+
+                      <div className="flex items-center justify-center gap-1.5">
+
                         {/* Delete Button */}
                         <button
-                          onClick={() => { setdeleteModelVisible(true); setSelectedReservation(booking) }}
-                          className="p-1.5 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          onClick={() => {
+                            setdeleteModelVisible(true);
+                            setSelectedReservation(booking);
+                          }}
+                          className="p-1.5 text-red-500 hover:text-red-700
+                    dark:text-red-400 dark:hover:text-red-300
+                    hover:bg-red-50 dark:hover:bg-red-900/20
+                    rounded-lg transition-colors"
                           title="Delete Booking"
                         >
                           <FaTrash size={14} />
                         </button>
+
                       </div>
+
                     </td>
+                   
+
                   </tr>
+                  
+                  
+
                 ))
+
               ) : (
+
+             
                 <tr>
-                  <td colSpan="7" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+
+                  <td
+                    colSpan="7"
+                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
+                  >
+
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-4xl">📭</span>
-                      <p className="font-medium">No bookings found</p>
-                      <p className="text-sm">Try adjusting your search or filter.</p>
+
+                      <span className="text-4xl">
+                        📭
+                      </span>
+
+                      <p className="font-medium">
+                        No bookings found
+                      </p>
+
+                      <p className="text-sm">
+                        Try adjusting your search or filter.
+                      </p>
+
                     </div>
+
                   </td>
+
                 </tr>
+
               )}
+
             </tbody>
           </table>
         </div>
 
         {/* Table Footer */}
         <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-600">
+
           <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-            <span>Showing {filteredBookings.length} booking(s)</span>
+
+            <span>
+              Showing {filteredBookings.length} booking(s)
+            </span>
+
           </div>
+
         </div>
+
       </div>
 
       {/* Worker Details Modal */}

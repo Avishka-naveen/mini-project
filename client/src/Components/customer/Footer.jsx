@@ -16,10 +16,10 @@ import { useLocation } from "react-router-dom";
 
 function Footer() {
   const currentYear = new Date().getFullYear();
-  const location = useLocation();
+
 
   return (
-    <footer className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  text-gray-700 dark:text-gray-300 pt-16`}>
+    <footer className="bg-gray-100 dark:bg-[#0f172a]  text-gray-700 dark:text-gray-300 pt-16">
 
       {/* TOP SECTION */}
       <div className="max-w-7xl mx-auto px-6">

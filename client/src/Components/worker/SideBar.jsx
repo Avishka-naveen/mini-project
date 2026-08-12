@@ -99,7 +99,7 @@ function SideBar() {
                         navigate('/customer/workerList');
                         setcurrentWorkerData('');
                     }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30"
+                        className="w-full flex  items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30"
                     >
                         <FaSignOutAlt />
                         Logout
@@ -108,9 +108,9 @@ function SideBar() {
             </nav>
 
             {/* Footer */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-300 dark:border-gray-700">
+            <div className="absolute bottom-0 hidden sm:block left-0 right-0 p-4 border-t border-gray-300 dark:border-gray-700">
                 <div className='flex justify-between items-center gap-4'>
-                    <img className='w-15' src={logo} alt="Logo" />
+                    <img className='w-15 ' src={logo} alt="Logo" />
                     <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
                         Worker Panel
                     </p>
