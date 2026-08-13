@@ -133,7 +133,7 @@ const fetchWorkerData = async () => {
 
                 {/* become worker button section */}
                 {
-                    isLogged &&  (
+                    isLogged &&  !hiddenGoToDashbord &&(
                         currentCustomerData.role === "worker" ? (
                             <button
                                 onClick={handleGetWorkerData}

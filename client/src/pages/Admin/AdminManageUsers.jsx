@@ -4,6 +4,7 @@ import { FaTimes, FaExclamationTriangle, FaInfoCircle, FaMapMarkerAlt, FaPhone, 
 import axios from 'axios';
 import { AppContext } from '../../Context/Appcontext';
 import { toast } from 'react-toastify';
+import { MdAdminPanelSettings } from "react-icons/md";
 
 function AdminManageUsers() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -176,6 +177,10 @@ function AdminManageUsers() {
                         >
                           <FaTrash />
                         </button>
+                        {/* <button className="p-2 text-green-500 text-xl hover:text-green-700 dark:text-green-400 dark:hover:text-green-600 
+                                     hover:bg-green-50 dark:hover:bg-green-900/50 rounded-lg transition-colors">
+                          <MdAdminPanelSettings />
+                        </button> */}
                       </div>
                     </td>
                   </tr>

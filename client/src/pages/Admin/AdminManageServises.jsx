@@ -8,54 +8,31 @@ import {
 import axios from 'axios';
 import { AppContext } from '../../Context/Appcontext';
 
-
 function AdminManageServices() {
   const [services, setServices] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSkill, setFilterSkill] = useState('all');
   const [selectedService, setSelectedService] = useState('');
-  const[viewDetailsModel,setViewDetailsModel]=useState(false);
-  const [comments, setComments] = useState('')
+  const [viewDetailsModel, setViewDetailsModel] = useState(false);
+  const [comments, setComments] = useState('');
   const { backendUrl } = useContext(AppContext);
-  //console.log(dummyManageServicesData)
-  // Get unique skills for filter
-
-  //console.log(services)
-
-
-  console.log(selectedService?._id);
-
-  // Filter services based on search and skill
-  // const filteredServices = services.filter(service => {
-  //   const matchesSearch = 
-  //     service.service_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     service.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     service.location?.toLowerCase().includes(searchTerm.toLowerCase());
-
-  //   return matchesSearch ;
-  // });
-
-
 
   const fetchServices = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/admin/getAllServices');
       if (response.data.success) {
         setServices(response.data.services);
-
       }
-
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchServices();
   }, []);
 
-
-  // Get comment 
+ // call get comment  function
   const getComment = async (serviceId) => {
     try {
       const response = await axios.post(
@@ -67,13 +44,19 @@ function AdminManageServices() {
 
       if (response.data.success) {
         setComments(response.data.comments);
-        //console.log(response.data.comments);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const filteredServices = services.filter(service => {
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch =
+      service.serviceName?.toLowerCase().includes(searchLower) 
+
+    return matchesSearch;
+  });
 
   return (
     <div className="p-4 sm:p-6 dark:text-white">
@@ -92,9 +75,8 @@ function AdminManageServices() {
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            Total: <span className="font-semibold text-gray-800 dark:text-white">{services.length}</span>
+            Total: <span className="font-semibold text-gray-800 dark:text-white">{filteredServices.length}</span>
           </span>
-
         </div>
       </div>
 
@@ -104,7 +86,7 @@ function AdminManageServices() {
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search services by name, description, or location..."
+            placeholder="Search services by name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
@@ -113,13 +95,13 @@ function AdminManageServices() {
                      outline-none transition duration-200"
           />
         </div>
-
       </div>
 
       {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-        {services.length > 0 ? (
-          services.map((service) => (
+       
+        {filteredServices.length > 0 ? (
+          filteredServices.map((service) => (
             <div
               key={service._id}
               className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700
@@ -136,9 +118,7 @@ function AdminManageServices() {
                     <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium">
                       {service.serviceSkill}
                     </span>
-
                   </div>
-
                 </div>
               </div>
 
@@ -182,12 +162,10 @@ function AdminManageServices() {
                   <div className="flex items-center gap-4">
                     <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                       <FaComment className="text-blue-500" />
-                     
                     </span>
                     <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                       <FaStar className="text-yellow-500" />
                       {service.rating}
-
                     </span>
                   </div>
                 </div>
@@ -197,7 +175,7 @@ function AdminManageServices() {
               <div className="p-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
                 <div className="flex items-center justify-around">
                   <button
-                    onClick={() => {setViewDetailsModel(true); setSelectedService(service); getComment(service._id) }}
+                    onClick={() => { setViewDetailsModel(true); setSelectedService(service); getComment(service._id) }}
                     className="flex items-center gap-1 px-3 py-1.5 text-blue-600 dark:text-blue-400 
                              hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors text-sm"
                   >
@@ -227,10 +205,7 @@ function AdminManageServices() {
       {/* View Service Modal */}
       {viewDetailsModel && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
-
-      
             <div className="sticky top-0 bg-white dark:bg-gray-800 rounded-t-2xl border-b border-gray-200 dark:border-gray-700 px-6 py-4 z-10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -249,7 +224,7 @@ function AdminManageServices() {
                   </div>
                 </div>
                 <button
-                  onClick={() => {setSelectedService('');setViewDetailsModel(false)}}
+                  onClick={() => { setSelectedService(''); setViewDetailsModel(false) }}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,7 +238,6 @@ function AdminManageServices() {
             <div className="p-6">
               {/* Service Info Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                 {/* Service Name */}
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -287,7 +261,7 @@ function AdminManageServices() {
                 {/* Location */}
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                     Location
+                    Location
                   </p>
                   <p className="text-sm text-gray-800 dark:text-white mt-1">
                     {selectedService?.serviceLocation || selectedService?.location || 'N/A'}
@@ -297,7 +271,7 @@ function AdminManageServices() {
                 {/* Skill */}
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                     Skill
+                    Skill
                   </p>
                   <p className="text-sm text-gray-800 dark:text-white mt-1">
                     {selectedService?.serviceSkill || selectedService?.skill || 'N/A'}
@@ -307,7 +281,7 @@ function AdminManageServices() {
                 {/* Phone */}
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                     Phone
+                    Phone
                   </p>
                   <p className="text-sm text-gray-800 dark:text-white mt-1">
                     {selectedService?.servicePhone || selectedService?.phone || 'N/A'}
@@ -317,7 +291,7 @@ function AdminManageServices() {
                 {/* Created At */}
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3">
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                     Created At
+                    Created At
                   </p>
                   <p className="text-sm text-gray-800 dark:text-white mt-1">
                     {selectedService?.createdAt
@@ -361,11 +335,9 @@ function AdminManageServices() {
                         className="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-3 border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
                       >
                         <div className="flex items-start gap-3">
-                          
                           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                             {comment.customerId?.customerName?.[0]?.toUpperCase() || 'U'}
                           </div>
-
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <p className="text-sm font-medium text-gray-800 dark:text-white">
@@ -408,13 +380,12 @@ function AdminManageServices() {
             <div className="sticky bottom-0 bg-white dark:bg-gray-800 rounded-b-2xl border-t border-gray-200 dark:border-gray-700 px-6 py-4">
               <div className="flex gap-3">
                 <button
-                  onClick={() => {setSelectedService(null);setViewDetailsModel(false)}}
+                  onClick={() => { setSelectedService(null); setViewDetailsModel(false) }}
                   className="flex-1 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
-                     text-white font-medium rounded-xl transition duration-200 shadow-md hover:shadow-lg"
+                           text-white font-medium rounded-xl transition duration-200 shadow-md hover:shadow-lg"
                 >
                   Close
                 </button>
-                
               </div>
             </div>
           </div>
@@ -424,7 +395,8 @@ function AdminManageServices() {
       {/* Footer */}
       <div className="mt-6 px-4 py-3 bg-gray-100 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <span>Showing {services.length} service(s)</span>
+          {/* UPDATED FOOTER TO SHOW FILTERED LENGTH */}
+          <span>Showing {filteredServices.length} service(s)</span>
           <span>Last updated: {new Date().toLocaleDateString()}</span>
         </div>
       </div>

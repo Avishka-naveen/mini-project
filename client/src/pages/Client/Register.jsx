@@ -221,7 +221,7 @@ function Register() {
 
             {/* Sign In Form */}
             {isSignIn ? (
-              <form onSubmit={handleSignIn} className="space-y-4">
+              <form onSubmit={handleSignIn} className="space-y-4" autoComplete="off">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Email Address
@@ -233,6 +233,7 @@ function Register() {
                       name="email"
                       value={loginData.email}
                       onChange={handleLoginChange}
+                      autoComplete="off"
                       placeholder="you@example.com"
                       className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
                                bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
@@ -254,6 +255,7 @@ function Register() {
                       name="password"
                       value={loginData.password}
                       onChange={handleLoginChange}
+                      autoComplete="new-password"
                       placeholder="••••••••"
                       className="w-full pl-10 pr-12 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
                                bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
