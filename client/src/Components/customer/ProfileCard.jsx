@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { createPortal } from 'react-dom'; 
 import { 
   FaWindowClose, 
   FaUser, 
@@ -26,19 +27,21 @@ function ProfileCard() {
   } = useContext(AppContext);
   const navigate = useNavigate();
 
-  // State for update modal
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [updateData, setUpdateData] = useState({
     name: '',
     phone: '',
   });
-console.log(showUpdateModal);
 
-  const handleOpenUpdate = () => {
+
+  const handleOpenUpdate = (e) => {
+    e.preventDefault();
+    e.stopPropagation(); 
+
     setUpdateData({
-      name: currentCustomerData?.customerName ,
-      phone: currentCustomerData?.customerPhone ,
+      name: currentCustomerData?.customerName || '',
+      phone: currentCustomerData?.customerPhone || '',
     });
     setShowUpdateModal(true);
   };
@@ -48,26 +51,26 @@ console.log(showUpdateModal);
     setUpdateData(prev => ({ ...prev, [name]: value }));
   };
 
-  // ------- update profile function
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     
     if (!updateData.name.trim() || !updateData.phone.trim()) {
       toast.error('Please fill in all fields');
       return;
     }
 
-    // console.log(updateData.name,updateData.phone)
-   
     try {
+      setIsLoading(true);
       axios.defaults.withCredentials = true;
       
-      const response = await axios.post(backendUrl + '/api/customer/updateProfile',{customerName: updateData.name,customerPhone: updateData.phone,});
+      const response = await axios.post(backendUrl + '/api/customer/updateProfile',{
+        customerName: updateData.name,
+        customerPhone: updateData.phone,
+      });
 
       if (response.data.success) {
-   
-        
-        toast.success(response.data.message );
+        toast.success(response.data.message);
         setShowUpdateModal(false);
         fetchCustomerData();
       } else {
@@ -75,13 +78,14 @@ console.log(showUpdateModal);
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
-    
   };
 
-  // Logout function
   const logout = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
 
     try {
       axios.defaults.withCredentials = true;
@@ -89,9 +93,8 @@ console.log(showUpdateModal);
       const response = await axios.post(backendUrl + '/api/customer/logout');
       if (response.data.success) {
         setIsLogged(false);
-        toast.success(response.data.massage);
+        toast.success(response.data.massage || 'Logged out successfully');
         localStorage.removeItem('isLogged');
-        //setCurrentCustomerData('');
         navigate('/');
       } else {
         toast.error(response.data.message);
@@ -103,10 +106,9 @@ console.log(showUpdateModal);
 
   return (
     <>
-      {/* Profile Card */}
-      <div className=" bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
-        
-        {/* Header */}
+  
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+   
         <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
           <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
             <FaUserCircle className="text-blue-600 dark:text-purple-500" />
@@ -114,9 +116,8 @@ console.log(showUpdateModal);
           </h3>
         </div>
 
-        {/* Profile Content */}
         <div className="p-5 space-y-4">
-          {/* Avatar */}
+         
           <div className="flex flex-col items-center">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 dark:from-purple-600 dark:to-blue-700 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
               {currentCustomerData?.customerName?.split(' ')[0]?.[0]?.toUpperCase() || 'U'}
@@ -130,7 +131,7 @@ console.log(showUpdateModal);
             </span>
           </div>
 
-          {/* User Details */}
+  
           <div className="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
               <FaUser className="text-blue-500 dark:text-purple-400 w-4" />
@@ -152,9 +153,8 @@ console.log(showUpdateModal);
             </div>
           </div>
 
-          {/* Update Button */}
           <button
-            onClick={handleOpenUpdate}
+            onClick={handleOpenUpdate} 
             className="mt-2 w-full flex items-center justify-center gap-2 cursor-pointer 
                      bg-gradient-to-r from-blue-600 to-purple-600 
                      hover:from-blue-700 hover:to-purple-700
@@ -164,7 +164,6 @@ console.log(showUpdateModal);
             Update Profile
           </button>
 
-          {/* Logout Button */}
           <button
             onClick={logout}
             className="w-full flex items-center justify-center gap-2 cursor-pointer 
@@ -178,13 +177,14 @@ console.log(showUpdateModal);
         </div>
       </div>
 
-      {/* Update Profile Modal */}
-      {showUpdateModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50  z-50 p-4 animate-fade-in">
-          
+      {showUpdateModal && createPortal(
+        <div 
+          className="fixed inset-0 flex items-center justify-center bg-black/60 z-[9999] p-4 animate-fade-in"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
             
-            {/* Modal Header */}
+      
             <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -201,7 +201,11 @@ console.log(showUpdateModal);
                   </div>
                 </div>
                 <button
-                  onClick={() => setShowUpdateModal(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowUpdateModal(false);
+                  }}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <FaTimes className="w-5 h-5 text-gray-500 dark:text-gray-400" />
@@ -209,11 +213,10 @@ console.log(showUpdateModal);
               </div>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6">
               <form onSubmit={handleUpdateProfile} className="space-y-5">
                 
-                {/* Name */}
+              
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                     Full Name <span className="text-red-500">*</span>
@@ -237,7 +240,7 @@ console.log(showUpdateModal);
                   </div>
                 </div>
 
-                {/* Phone */}
+   
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                     Phone Number <span className="text-red-500">*</span>
@@ -261,11 +264,15 @@ console.log(showUpdateModal);
                   </div>
                 </div>
 
-                {/* Action Buttons */}
+              
                 <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     type="button"
-                    onClick={() => setShowUpdateModal(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowUpdateModal(false);
+                    }}
                     className="px-6 py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 
                              text-gray-700 dark:text-gray-200 font-medium transition duration-200"
                   >
@@ -298,10 +305,9 @@ console.log(showUpdateModal);
               </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body 
       )}
-
-     
     </>
   );
 }
