@@ -95,8 +95,8 @@ className={`
               </div>
             </div>
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setShowCalendar(!showCalendar)}>
-              <span className="text-xl p-2 bg-blue-100 dark:bg-yellow-900/30 rounded-lg">
-                <SlCalender className="text-blue-600 dark:text-purple-600 dark:text-purple-400" />
+              <span className="text- p-2 bg-blue-100 dark:bg-yellow-900/30 rounded-lg">
+                <SlCalender className="text-blue-600  dark:text-purple-600 dark:text-purple-400" />
               </span>
               <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 {new Date().toLocaleDateString('en-US', {
@@ -106,7 +106,7 @@ className={`
                 })}
               </span>
               {showCalendar && (
-                <div className="absolute right-4 top-20 z-50">
+                <div className="absolute w-70 sm:w-90 right-4 top-20 z-50">
                   <Calendar
                     onChange={setDate}
                     value={date}

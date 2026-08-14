@@ -33,7 +33,7 @@ function ProfileCard() {
     name: '',
     phone: '',
   });
-
+console.log(showUpdateModal);
 
   const handleOpenUpdate = () => {
     setUpdateData({

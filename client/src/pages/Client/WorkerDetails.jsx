@@ -42,9 +42,9 @@ function WorkerDetails() {
 
       if (response.data.success) {
         setServiceData(response.data.service);
-        //console.log("4. SUCCESS! Service Data:", response.data.service);
+        console.log("4. SUCCESS! Service Data:", response.data.service);
         //console.log(serviceData.workerId._id)
-       
+
       } else {
         console.log(" FAILED in backend. Message:", response.data.message);
       }
@@ -104,20 +104,20 @@ function WorkerDetails() {
     });
   }
 
-  const handleSubmit=async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if(!formData.name || !formData.email || !formData.number || !formData.address || !formData.date || !formData.description) {
+    if (!formData.name || !formData.email || !formData.number || !formData.address || !formData.date || !formData.description) {
       toast.error("Please fill in all fields.");
       return;
     }
     try {
       let response;
-      response=await axios.post(backendUrl+'/api/customer/addReservation',{serviceId:serviceId,workerId:serviceData.workerId._id,customerName:formData.name,customerEmail:formData.email,customerPhone:formData.number,customerAddress:formData.address,date:formData.date,description:formData.description,status:"pending"},{withCredentials:true});
-      if(response.data.success){
+      response = await axios.post(backendUrl + '/api/customer/addReservation', { serviceId: serviceId, workerId: serviceData.workerId._id, customerName: formData.name, customerEmail: formData.email, customerPhone: formData.number, customerAddress: formData.address, date: formData.date, description: formData.description, status: "pending" }, { withCredentials: true });
+      if (response.data.success) {
         toast.success("Reservation added successfully!");
         setShowBooking(false);
         hadleClear();
-      }else{
+      } else {
         toast.error("Failed to add reservation.");
       }
     } catch (error) {
@@ -140,9 +140,61 @@ function WorkerDetails() {
 
   return (
     <>
+      {serviceData.workerId?.isActive === false && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-scale-in">
+
+            {/* Header with Gradient */}
+            <div className="bg-gradient-to-r from-yellow-500 to-orange-500 dark:from-yellow-600 dark:to-orange-600 px-6 py-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-xl">
+                  ⏳
+                </div>
+                <div>
+                  <h2 className="text-white font-bold text-lg">Temporarily Unavailable</h2>
+                  <p className="text-white/80 text-sm">This worker is not accepting requests right now</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-6">
+              <div className="flex items-start gap-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/30 rounded-xl p-4 mb-4">
+                <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                  This worker is currently not accepting new bookings. They may be on leave, fully booked, or temporarily inactive.
+                </p>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                <p className="font-medium text-gray-800 dark:text-white">What you can do:</p>
+                <ul className="space-y-1.5 list-disc list-inside text-gray-500 dark:text-gray-400">
+                  <li>Check back later</li>
+                  <li>Browse other available workers</li>
+                  <li>Contact support for assistance</li>
+                </ul>
+              </div>
+
+              {/* Buttons */}
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => navigate('/customer/workerList')}
+                  className="flex-1 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
+                   text-white font-medium rounded-xl transition duration-200 shadow-md hover:shadow-lg"
+                >
+                  Browse Workers
+                </button>
+              
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <NavBar />
 
-      <div className='min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white px-4 sm:px-6 md:px-10 lg:px-20 py-6'>
+      <div className='min-h-screen  bg-white dark:bg-[#1e1e1e] text-black dark:text-white px-4 sm:px-6 md:px-10 lg:px-20 py-6'>
 
         {/* Breadcrumb */}
         <p className='text-sm text-gray-500 dark:text-gray-400 mb-4 cursor-pointer ' >
@@ -521,7 +573,7 @@ function WorkerDetails() {
                       {/* Buttons */}
                       <div className="flex gap-3 pt-2">
                         <button
-                        onClick={handleSubmit}
+                          onClick={handleSubmit}
                           type="submit"
                           className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 
                        text-white font-semibold py-3 rounded-lg transition duration-300

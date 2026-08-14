@@ -2,6 +2,10 @@ import WorkerModel from '../DB_Models/WorkerModel.js'
 import ServiceModel from '../DB_Models/ServiceModel.js'
 import CommentModel from '../DB_Models/CommentModel.js'
 import ReservationModel from '../DB_Models/ReservationModel.js'
+import transporter from '../config/nodeMail.js'
+import { acceptBookingTemplate } from '../EmailTemplate/acceptBooking.js'
+import { rejectBookingTemplate } from '../EmailTemplate/rejectBooking.js'
+import { completeWorkTemplate } from '../EmailTemplate/completedWork.js'
 
 
 //-------------------get current worker data------//
@@ -171,17 +175,17 @@ export const deleteService = async (req, res) => {
     const deletedService = await ServiceModel.findByIdAndDelete(serviceId);
 
     if (!deletedService) {
-      return res.json({success: false,message: "Service not found"});
+      return res.json({ success: false, message: "Service not found" });
     }
 
-    
+
     await CommentModel.deleteMany({ serviceId });
     await ReservationModel.deleteMany({ serviceId });
 
-    return res.json({success: true,message: "Service deleted successfully"});
+    return res.json({ success: true, message: "Service deleted successfully" });
 
   } catch (error) {
-    return res.json({success: false,message: error.message});
+    return res.json({ success: false, message: error.message });
   }
 };
 
@@ -248,20 +252,40 @@ export const updateWorkerProfile = async (req, res) => {
 }
 
 // --------------------accept customer booking----------------------------//
-export const acceptUserBooking=async(req,res)=>{
-  const{reservationId}=req.body;
-  if(!reservationId){
+export const acceptUserBooking = async (req, res) => {
+  const { reservationId } = req.body;
+  if (!reservationId) {
     return res.json({ success: false, message: "missing details" });
   }
-  
+
   try {
-    const reservation=await ReservationModel.findById(reservationId);
-    if(!reservation){
+    const reservation = await ReservationModel.findById(reservationId)
+      .populate({
+        path: 'workerId',
+        populate: {
+          path: 'customerId'
+        }
+      })
+      .populate('serviceId');
+    if (!reservation) {
       return res.json({ success: false, message: "reservation not found!" });
     }
-    reservation.status='confirmed';
+    reservation.status = 'confirmed';
     await reservation.save();
-   res.json({ success: true, message: " Booking confirmed succesfully!", reservation });
+    res.json({ success: true, message: " Booking confirmed succesfully!", reservation });
+
+    // call email template function
+    const emailTemplate = acceptBookingTemplate(reservation.customerName, reservation.workerId.customerId.customerName, reservation.serviceId.serviceName, reservation.date);
+
+    //send mail
+    await transporter.sendMail({
+      from: "Quick Hire Support",
+      to: reservation.customerEmail,
+      subject: 'Booking Accept!',
+      html: emailTemplate
+
+    });
+
 
 
 
@@ -273,20 +297,37 @@ export const acceptUserBooking=async(req,res)=>{
 //---------------------------delete customer booking---------------------//
 
 
-export const deleteUserBooking=async(req,res)=>{
-  const{reservationId}=req.body;
-  if(!reservationId){
+export const deleteUserBooking = async (req, res) => {
+  const { reservationId } = req.body;
+  if (!reservationId) {
     return res.json({ success: false, message: "missing details" });
   }
-  
+
   try {
-    const reservation=await ReservationModel.findById(reservationId);
-    if(!reservation){
+    const reservation = await ReservationModel.findById(reservationId).populate({
+      path: 'workerId',
+      populate: {
+        path: 'customerId'
+      }
+    }).populate('serviceId');
+    if (!reservation) {
       return res.json({ success: false, message: "reservation not found!" });
     }
-    reservation.status='rejected';
+    reservation.status = 'rejected';
     await reservation.save();
-   res.json({ success: true, message: "Booking  rejected succesfully!", reservation });
+    res.json({ success: true, message: "Booking  rejected succesfully!", reservation });
+
+    // call email template 
+    const emailTemplate = rejectBookingTemplate(reservation.customerName, reservation.workerId.customerId.customerName, reservation.serviceId.serviceName, reservation.date);
+
+    //send mail
+    await transporter.sendMail({
+      from: "Quick Hire Support",
+      to: reservation.customerEmail,
+      subject: 'Booking Reject!',
+      html: emailTemplate
+
+    });
 
 
 
@@ -294,24 +335,40 @@ export const deleteUserBooking=async(req,res)=>{
     res.json({ success: false, message: error.message });
   }
 }
-//---------------------------delete customer booking---------------------//
+//---------------------------complete customer booking---------------------//
 
 
-export const completeUserBooking=async(req,res)=>{
-  const{reservationId}=req.body;
-  if(!reservationId){
+export const completeUserBooking = async (req, res) => {
+  const { reservationId } = req.body;
+  if (!reservationId) {
     return res.json({ success: false, message: "missing details" });
   }
-  
+
   try {
-    const reservation=await ReservationModel.findById(reservationId);
-    if(!reservation){
+    const reservation = await ReservationModel.findById(reservationId).populate({
+      path: 'workerId',
+      populate: {
+        path: 'customerId'
+      }
+    }).populate('serviceId');;;
+    if (!reservation) {
       return res.json({ success: false, message: "reservation not found!" });
     }
-    reservation.status='completed';
+    reservation.status = 'completed';
     await reservation.save();
-   res.json({ success: true, message: "Booking  completed succesfully!", reservation });
+    res.json({ success: true, message: "Booking  completed succesfully!", reservation });
 
+    // call email template 
+    const emailTemplate = completeWorkTemplate(reservation.customerName, reservation.workerId.customerId.customerName, reservation.serviceId.serviceName, reservation.date);
+
+    //send mail
+    await transporter.sendMail({
+      from: "Quick Hire Support",
+      to: reservation.customerEmail,
+      subject: 'Work Done!',
+      html: emailTemplate
+
+    });
 
 
   } catch (error) {
