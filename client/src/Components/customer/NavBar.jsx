@@ -71,9 +71,9 @@ const fetchWorkerData = async () => {
 
     
     return (
-        <div className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  border-b-3 px-3  border-blue-600 dark:border-purple-600  py-2 flex items-center justify-between   text-black dark:text-white`}>
+        <div className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  border-b-3 px-3 py-3 border-blue-600 dark:border-purple-600  flex items-center justify-between   text-black dark:text-white`}>
             <div>
-                <img src={logo} alt='logo' className='w-15 h-15 lg:w-28 lg:h-25' />
+                <img src={logo} alt='logo' className='w-15 h-15 lg:w-18 lg:h-15' />
             </div>
             <div className='flex items-center justify-center lg:gap-6 gap-1'>
 

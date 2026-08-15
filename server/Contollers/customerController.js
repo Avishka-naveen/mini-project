@@ -8,6 +8,7 @@ import ReservationModel from '../DB_Models/ReservationModel.js'
 import transporter from '../config/nodeMail.js';
 import { callresetPwTemplate } from '../EmailTemplate/resetPasswordOtp.js';
 import { workerRegistrationTemplate } from '../EmailTemplate/becomWorker.js';
+import { workerReservationTemplate } from '../EmailTemplate/workerReservation.js'
 
 //--------------user registration controller------------//
 
@@ -88,8 +89,8 @@ export const login = async (req, res) => {
             return res.json({ success: false, message: "Invalied Password !" });
 
         }
-        if(customer.role==='admin'){
-             return res.json({success: true,message: 'admin Login Successfully !',customer});
+        if (customer.role === 'admin') {
+            return res.json({ success: true, message: 'admin Login Successfully !', customer });
         }
 
         const token = jwt.sign({ id: customer._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -106,7 +107,7 @@ export const login = async (req, res) => {
             success: true,
             message: 'Login Successfully !',
             customer
-});
+        });
         //  console.log(token);
 
 
@@ -354,9 +355,9 @@ export const createWorker = async (req, res) => {
 
 export const addComment = async (req, res) => {
     const customerId = req.customerId;
-    const { serviceId, comment, rating ,reservationId} = req.body;
+    const { serviceId, comment, rating, reservationId } = req.body;
 
-   
+
     if (!customerId || !serviceId || !comment || !rating || !reservationId) {
 
         return res.json({ success: false, message: "Missing details!", });
@@ -365,7 +366,7 @@ export const addComment = async (req, res) => {
     try {
 
         const service = await ServiceModel.findById(serviceId);
-        const reservation=await ReservationModel.findById(reservationId);
+        const reservation = await ReservationModel.findById(reservationId);
 
         if (!service) {
             return res.json({ success: false, message: "Service not found!", });
@@ -374,8 +375,8 @@ export const addComment = async (req, res) => {
             return res.json({ success: false, message: "reservation not found!", });
         }
 
-        
-        reservation.isComment=true;
+
+        reservation.isComment = true;
         await reservation.save();
 
 
@@ -384,7 +385,7 @@ export const addComment = async (req, res) => {
             serviceId,
             comment,
             rating,
-            isComment:true
+            isComment: true
         });
 
         await newComment.save();
@@ -410,6 +411,7 @@ export const addComment = async (req, res) => {
         return res.json({ success: false, message: error.message, });
     }
 };
+
 //----------------------add reservation ---------------//
 
 export const addReservation = async (req, res) => {
@@ -434,11 +436,21 @@ export const addReservation = async (req, res) => {
         });
 
         await newReservation.save();
-        res.json({
-            success: true,
-            message: 'Reservation added succesfully!',
-            reservation: newReservation,
+         res.json({success: true,message: 'Reservation added succesfully!',reservation: newReservation,});
+
+        const worker = await WorkerModel.findById(workerId).populate('customerId');
+        const service = await ServiceModel.findById(serviceId);
+
+        const emailTemplate = workerReservationTemplate(worker.customerId.customerName, service.serviceName, customerName, date, customerAddress);
+
+        await transporter.sendMail({
+            from: "Quick Hire Support",
+            to: worker.customerId.customerEmail,
+            subject: 'Reservation Confirmed!',
+            html: emailTemplate
         });
+
+       
 
     } catch (error) {
         res.json({ success: false, message: error.message });
@@ -463,23 +475,24 @@ export const getCurrentCustomerReservations = async (req, res) => {
 
 //------------------------update customer Profile----------------//
 
-export const updateProfile=async(req,res)=>{
+export const updateProfile = async (req, res) => {
     const customerId = req.customerId;
-    const{customerName,customerPhone}=req.body;
+    const { customerName, customerPhone } = req.body;
 
-    if(!customerName || !customerPhone){
-         return res.json({ success: false, message: "Missing details!" });
+    if (!customerName || !customerPhone) {
+        return res.json({ success: false, message: "Missing details!" });
     }
     try {
-        const customer=await CustomerModel.findById(customerId);
-        if(!customer){
+        const customer = await CustomerModel.findById(customerId);
+        if (!customer) {
             return res.json({ success: false, message: "No user Found!" });
         }
-        customer.customerName=customerName;
-        customer.customerPhone=customerPhone;
+        customer.customerName = customerName;
+        customer.customerPhone = customerPhone;
         await customer.save();
-        return res.json({success: true,message: "Profile updated successfully!",customer
-});
+        return res.json({
+            success: true, message: "Profile updated successfully!", customer
+        });
     } catch (error) {
         res.json({ success: false, message: error.message });
     }
@@ -492,18 +505,18 @@ export const cancellbooking = async (req, res) => {
     const { reservationId } = req.body;
 
     if (!reservationId) {
-        return res.json({success: false,message: "Missing details!"});
+        return res.json({ success: false, message: "Missing details!" });
     }
 
     try {
         const reservation = await ReservationModel.findByIdAndDelete(reservationId);
 
         if (!reservation) {
-            return res.json({success: false,message: "No reservation found!"});
+            return res.json({ success: false, message: "No reservation found!" });
         }
-        return res.json({success: true,message: "Booking cancelled successfully!",reservation});
+        return res.json({ success: true, message: "Booking cancelled successfully!", reservation });
 
     } catch (error) {
-        return res.json({success: false,message: error.message});
+        return res.json({ success: false, message: error.message });
     }
 };

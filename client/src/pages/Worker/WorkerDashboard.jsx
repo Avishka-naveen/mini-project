@@ -85,8 +85,8 @@ function WorkerDashboard() {
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
                   Dashboard
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  Welcome back!<span className="capitalize text-blue-600 dark:text-purple-600 font-semibold ">{currentWorkerData?.customerId?.customerName}</span> Here's what's happening today.
+                <p className="text-xs flex gap-1 justify-center sm:text-sm text-gray-500 dark:text-gray-400">
+                  Welcome back!<span className="capitalize text-blue-600 dark:text-purple-600 font-semibold ">{currentWorkerData?.customerId?.customerName}</span><span className="hidden sm:block"> Here's what's happening today.</span>
                 </p>
 
 

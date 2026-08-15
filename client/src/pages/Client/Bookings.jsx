@@ -84,13 +84,12 @@ function Bookings() {
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
               My Bookings
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              View and manage all your booking requests
-            </p>
+            
+            <p className=' text-gray-700 dark:text-gray-400 mt-1'> <span className='cursor-pointer hover:text-blue-500 dark:hover:text-purple-500' onClick={()=>navigate('/customer/workerList')}>WorkerList </span>/MyBookings</p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              Total: <span className="font-semibold text-gray-800 dark:text-white">{reservations.length}</span>
+            <span className=" text-gray-500 dark:text-gray-400">
+              Total: <span className="font-semibold  text-gray-800 dark:text-white">{reservations.length}</span>
             </span>
             <button onClick={() => navigate('/customer/workerList')} className="bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 
                              text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300 scale-[.8] sm:scale-[1]

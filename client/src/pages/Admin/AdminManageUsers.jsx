@@ -145,23 +145,23 @@ function AdminManageUsers() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                       
+
                         <div
                           onClick={() => { setdetailsVisible(true); setSelectedUser(user); }}
-                          className={`cursor-pointer flex items-center justify-center text-white h-8 w-8 rounded-full ${user.role === 'worker' ? "bg-green-500 dark:bg-green-600" : "bg-blue-500 dark:bg-purple-500"}`}
+                          className={`cursor-pointer flex items-center justify-center text-white h-8 w-8 rounded-full ${user.role === 'worker' ? "bg-green-500 dark:bg-green-600" : "bg-blue-500 dark:bg-purple-500"} ${user.role === 'admin' ? 'bg-red-500 dark:bg-red-600' : ''}`}
                         >
-                          <p>{user.customerName ? user.customerName[0] :''}</p>
+                          <p>{user.customerName ? user.customerName[0] : ''}</p>
                         </div>
                         <div>
                           <p className="font-medium text-gray-800 dark:text-white">
-                            {user.customerName }
+                            {user.customerName}
                           </p>
                         </div>
                       </div>
                     </td>
-                    
+
                     <td className="px-4 py-3 hidden sm:table-cell text-gray-600 dark:text-gray-300">
-                      {user.customerEmail }
+                      {user.customerEmail}
                     </td>
                     <td className="px-4 hidden sm:table-cell py-3 text-gray-700 dark:text-gray-300 text-xs">
                       {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
@@ -169,14 +169,18 @@ function AdminManageUsers() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
                         {/* Delete Button */}
-                        <button
-                          onClick={() => { setdeleteModelVisible(true); setSelectedUser(user) }}
-                          className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 
+                        {
+                          user.role !== 'admin' && (
+                            <button
+                              onClick={() => { setdeleteModelVisible(true); setSelectedUser(user) }}
+                              className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 
                                      hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                          title="Delete User"
-                        >
-                          <FaTrash />
-                        </button>
+                              title="Delete User"
+                            >
+                              <FaTrash />
+                            </button>
+                          )
+                        }
                         {/* <button className="p-2 text-green-500 text-xl hover:text-green-700 dark:text-green-400 dark:hover:text-green-600 
                                      hover:bg-green-50 dark:hover:bg-green-900/50 rounded-lg transition-colors">
                           <MdAdminPanelSettings />
