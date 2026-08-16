@@ -12,44 +12,44 @@ function ToggleBtn() {
   const onToggle = useCallback(async (e) => {
     if (!buttonRef.current) return;
 
-    
+
     if (!document.startViewTransition) {
       setTheme(darkMode ? "light" : "dark");
       return;
     }
 
-   
     const x = e.clientX;
     const y = e.clientY;
 
-    
+  
     const endRadius = Math.hypot(
       Math.max(x, window.innerWidth - x),
       Math.max(y, window.innerHeight - y)
     );
 
-    
+ 
     const transition = document.startViewTransition(() => {
       flushSync(() => {
         setTheme(darkMode ? "light" : "dark");
       });
     });
 
-    
-    await transition.ready;
+   
+   await transition.ready;
+
+    const isGoingDark = !darkMode;
 
     document.documentElement.animate(
-      {
-        clipPath: [
-          `circle(0px at ${x}px ${y}px)`,
-          `circle(${endRadius}px at ${x}px ${y}px)`,
-        ],
-      },
-      {
-        duration: 500, 
-        easing: "ease-out",
-        pseudoElement: "::view-transition-new(root)",
-      }
+     {
+    clipPath: isGoingDark
+      ? ['inset(0 100% 0 0)', 'inset(0 0 0 0)']
+      : ['inset(0 0 0 100%)', 'inset(0 0 0 0)'],
+  },
+  {
+    duration: 500,
+    easing: "ease-in-out",
+    pseudoElement: "::view-transition-new(root)",
+  }
     );
   }, [darkMode, setTheme]);
 

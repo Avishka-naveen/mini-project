@@ -23,6 +23,8 @@
 }
 
 /* ===== View Transition Animation (Telegram Style) ===== */
+
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -34,6 +36,7 @@
 }
 
 /* ===== Scrollbar Styling ===== */
+
 
 /* Webkit Browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
