@@ -12,7 +12,7 @@ import { AppContext } from '../../Context/Appcontext';
 
 function VerifyOtp() {
 
-  const { backendUrl,setcurrentCustomerData } = useContext(AppContext);
+  const { backendUrl, setcurrentCustomerData } = useContext(AppContext);
 
   const navigate = useNavigate();
   const inputRefs = useRef([]);
@@ -27,7 +27,7 @@ function VerifyOtp() {
   const [formData, setFormData] = useState({
     address: '',
     description: '',
-    nic:'',
+    nic: '',
   });
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -75,10 +75,10 @@ function VerifyOtp() {
 
 
 
-//---------------image upload to cloudenary----------------//
+  //---------------image upload to cloudenary----------------//
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    
+
 
     if (!file) return;
 
@@ -98,13 +98,13 @@ function VerifyOtp() {
       setImagePreview(URL.createObjectURL(file));
       const uploadImgURL = await response.json();
       setProfileImage(uploadImgURL.secure_url);
-     
-     
+
+
     } catch (error) {
       console.error(error);
     }
   };
-//----------------------------------------------//
+  //----------------------------------------------//
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -159,50 +159,50 @@ function VerifyOtp() {
   };
 
   //----------------------------------------------//
-  
-    //-----------cretate worker function-----------------------//
-const handleRegister = async (e) => {
+
+  //-----------cretate worker function-----------------------//
+  const handleRegister = async (e) => {
     e.preventDefault();
-    
+
 
     if (!formData.description || !formData.address || !profileImage || !formData.nic) {
       toast.error('Please fill in all required fields');
       return;
     }
 
-   
-    setIsLoading(true); 
+
+    setIsLoading(true);
 
     try {
-     
-      const response = await axios.post(backendUrl + '/api/customer/createWorker', { 
-        profile: profileImage, 
-        address: formData.address, 
-        nic: formData.nic, 
+
+      const response = await axios.post(backendUrl + '/api/customer/createWorker', {
+        profile: profileImage,
+        address: formData.address,
+        nic: formData.nic,
         description: formData.description
-      }, { withCredentials: true }); 
+      }, { withCredentials: true });
 
       if (response.data.success) {
         toast.success("Congratulations! You are now a Worker!");
-        
+
         const workerResponse = await axios.get(`${backendUrl}/api/worker/getCurrentWorkerData`, { withCredentials: true });
-        setcurrentCustomerData(workerResponse.data.worker); 
-        
+        setcurrentCustomerData(workerResponse.data.worker);
+
         navigate('/worker/dashbord/workerReservation');
       } else {
         toast.error(response.data.message);
       }
-      
+
     } catch (error) {
       console.error(error);
-      
+
       toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
-     
-      setIsLoading(false); 
+
+      setIsLoading(false);
     }
   };
-//-------------------------------------------//
+  //-------------------------------------------//
 
   return (
     <div className="min-h-screen w-full">
@@ -217,7 +217,7 @@ const handleRegister = async (e) => {
             alt="Worker"
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <div className="absolute inset-0  bg-gradient-to-br from-blue-600/80 via-purple-600/60 to-black/50  dark:from-purple-800/80 dark:via-blue-900/70 dark:to-black/90" />
+          <div className="absolute inset-0  bg-gradient-to-br from-black/80 via-black/60 to-black/90 dark:from-purple-800/80 dark:via-blue-900/70 dark:to-black/90" />
 
 
           <div className="relative z-10 h-full flex flex-col justify-center px-12 py-16">
@@ -232,10 +232,27 @@ const handleRegister = async (e) => {
               {benefits.map((benefit, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-3 bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-white/10"
+                  className="group relative overflow-hidden rounded-xl transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl"
                 >
-                  <span className="text-xl mt-0.5">{benefit.icon}</span>
-                  <p className="text-white/90 text-sm leading-relaxed">{benefit.text}</p>
+            
+                  <div className="absolute inset-0 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl transition-all duration-500 group-hover:bg-white/10 group-hover:border-white/20" />
+
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  <div className="relative flex items-start gap-4 p-4 rounded-xl">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400/30 to-orange-500/30 flex items-center justify-center text-xl backdrop-blur-sm border border-white/10 group-hover:scale-110 transition-transform duration-300">
+                      {benefit.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white/90 text-sm leading-relaxed group-hover:text-white transition-colors duration-300 font-medium">
+                        {benefit.text}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -423,7 +440,7 @@ const handleRegister = async (e) => {
 
                   <button
                     type="submit"
-                    
+
                     className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700
                              text-white font-semibold rounded-lg transition duration-300 shadow-md hover:shadow-lg
                              disabled:opacity-50 disabled:cursor-not-allowed"

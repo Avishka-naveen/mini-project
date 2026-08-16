@@ -4,9 +4,21 @@ import img1 from '../../assets/bannercarpenter.png'
 import img2 from '../../assets/bannerelect.png'
 import img3 from '../../assets/bannerPlumber.png'
 import img4 from '../../assets/other_worker.png'
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function Banner() {
 
+  const navigate=useNavigate();
+
+
+  const handleNavigate=()=>{
+    navigate('/register')
+    toast.success('Please Register to Book Services', {
+      position: "top-right",
+      autoClose: 3000,  
+    });
+  };
   const SlideData = [
     {
       id: 1,
@@ -74,7 +86,7 @@ dark:from-slate-900 dark:via-blue-600 dark:to-purple-900
 
                   <h1 className='text-5xl lg:text-nowrap uppercase text-white sm:text-[80px] md-text-[100px] xl:text-[150px] font-bold'>{data.title}</h1>
                  
-                  <button className='text-white hover:bg-blue-800 bg-blue-700 py-3 px-5 rounded-md hover:dark:bg-purple-700 dark:bg-purple-600'>Book Now</button>
+                  <button  onClick={handleNavigate} className='text-white hover:bg-blue-800 bg-blue-700 py-3 px-5 rounded-md hover:dark:bg-purple-700 dark:bg-purple-600'>Book Now</button>
                 </div>
 
                 {/* Image */}

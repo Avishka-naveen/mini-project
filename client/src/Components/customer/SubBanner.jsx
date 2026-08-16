@@ -1,7 +1,22 @@
 import React from 'react'
 import subbannerPhoto from '../../assets/subbannerphoto.png'
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function SubBanner() {
+
+
+    const navigate = useNavigate();
+
+
+    const handleNavigate = () => {
+        navigate('/register')
+        toast.success('Please Register to Book Services', {
+            position: "top-right",
+            autoClose: 3000,
+        });
+    };
+
     return (
         <div className='min-h-[550px] py-12 mt-[70px]'>
             <div>
@@ -13,15 +28,14 @@ bg-blue-700
 dark:bg-gradient-to-r dark:from-[#0f172a] dark:via-[#1e1b4b] dark:to-[#4c1d95]
 ">
 
-                    {/* first col */}
                     <div className='p-6 sm:p-8'>
                         <p
-                           
+
                             className='text-sm'>Find Trusted</p>
-                        <h1  className='uppercase text-4xl lg:text-7xl font-bold'>&nbsp;Workres</h1>
-                        
+                        <h1 className='uppercase text-4xl lg:text-7xl font-bold'>&nbsp;Workres</h1>
+
                     </div>
-                    {/* second col */}
+                  
                     <div className="h-full flex items-center">
                         <img
                             src={subbannerPhoto}
@@ -35,7 +49,6 @@ dark:bg-gradient-to-r dark:from-[#0f172a] dark:via-[#1e1b4b] dark:to-[#4c1d95]
                         />
                     </div>
 
-                    {/* third col */}
                     <div className='flex flex-col justify-center items-center gap-4 p-6 sm:p-8'>
                         <p className='font-bold text-xl'>Hire skilled</p>
                         <p className='text-3xl sm:text-5xl font-bold'> WORKERS</p>
@@ -43,6 +56,7 @@ dark:bg-gradient-to-r dark:from-[#0f172a] dark:via-[#1e1b4b] dark:to-[#4c1d95]
                         <div  >
                             <button
 
+                                onClick={handleNavigate}
                                 className="p-3 px-8 font-bold rounded-full text-white 
                                         border-2 border-white/30
                                         hover:bg-white hover:text-gray-800 

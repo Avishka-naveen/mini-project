@@ -45,7 +45,7 @@ function NavBar() {
             console.log("Server Response:", response.data);
             if (response.data.success) {
                 setcurrentWorkerData(response.data.worker);
-                console.log(response.data.worker); // This will now print!
+                //console.log(response.data.worker);
                 navigate("/worker/dashbord/workerReservation");
             }
 
@@ -54,7 +54,7 @@ function NavBar() {
         }
     }
 
-   // Add this right below your fetchCustomerData function in AppContext.js
+  
 const fetchWorkerData = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/worker/getCurrentWorkerData');
