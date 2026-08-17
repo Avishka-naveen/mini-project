@@ -8,6 +8,7 @@ import SubBanner from '../Components/customer/SubBanner';
 import Footer from '../Components/customer/Footer';
 import Services from '../Components/customer/Services';
 import About from '../Components/customer/About';
+import Reviews from '../Components/customer/Reviews';
 
 function LandingPage() {
 
@@ -33,6 +34,10 @@ function LandingPage() {
         {/* services section */}
         <div id='services'>
           <Services />
+        </div>
+        {/* customer review section */}
+        <div>
+          <Reviews />
         </div>
         {/* footer section */}
         <Footer />
