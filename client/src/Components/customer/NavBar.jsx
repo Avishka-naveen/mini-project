@@ -1,0 +1,183 @@
+import React, { useContext, useEffect } from 'react'
+import logo from '../../assets/logo.png'
+import { FaUserCircle } from "react-icons/fa";
+import { useLocation, useNavigate } from 'react-router-dom';
+import ToggleBtn from './ToggleBtn';
+import ProfileCard from './ProfileCard';
+import { useState } from 'react';
+import { AppContext } from '../../Context/Appcontext';
+import axios from 'axios';
+
+
+
+
+function NavBar() {
+
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const { currentCustomerData, currentWorkerData, setcurrentWorkerData, backendUrl } = useContext(AppContext);
+    const { isLogged } = useContext(AppContext);
+    //  console.log(currentCustomerData);
+
+    const hiddenUserIcon = location.pathname === '/register' || location.pathname === '/';
+    const hiddenSignInButton = location.pathname === '/';
+    const hiddenLinks = location.pathname === '/';
+    const hiddenBecomeWorker=location.pathname ==='/';
+    const hiddenGoToDashbord=location.pathname==='/';
+
+    const [openProfileCard, setOpenProfileCard] = useState(false);
+
+    const scrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId);
+
+        if (element) {
+            element.scrollIntoView({
+                behavior: "smooth"
+            });
+        }
+    };
+
+    const handleGetWorkerData = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.get(`${backendUrl}/api/worker/getCurrentWorkerData`, { withCredentials: true });
+            console.log("Server Response:", response.data);
+            if (response.data.success) {
+                setcurrentWorkerData(response.data.worker);
+                //console.log(response.data.worker);
+                navigate("/worker/dashbord/workerReservation");
+            }
+
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+  
+const fetchWorkerData = async () => {
+    try {
+      const response = await axios.get(backendUrl + '/api/worker/getCurrentWorkerData');
+      if (response.data.success) {
+        setcurrentWorkerData(response.data.worker);
+      } else {
+        setcurrentWorkerData(null);
+      }
+    } catch (error) {
+      console.error("Failed to fetch worker data on refresh:", error);
+      setcurrentWorkerData(null);
+    }
+};
+
+    
+    return (
+        <div className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  border-b-3 px-3 py-3 border-blue-600 dark:border-purple-600  flex items-center justify-between   text-black dark:text-white`}>
+            <div>
+                <img src={logo} alt='logo' className='w-15 h-15 lg:w-18 lg:h-15' />
+            </div>
+            <div className='flex items-center justify-center lg:gap-6 gap-1'>
+
+                {/* link section */}
+                {
+                    hiddenLinks && (
+                        <div className="hidden lg:flex items-center justify-center gap-6  text-lg ">
+                            <ul className='flex items-center justify-center gap-6  text-lg '>
+                                <li onClick={() => scrollToSection("services")}
+                                    className='cursor-pointer hover:text-blue-600 dark:hover:text-purple-600 duration-300'
+                                >
+                                    Services
+                                </li>
+                                <li
+                                    onClick={() => scrollToSection("about")}
+                                    className='cursor-pointer hover:text-blue-600 dark:hover:text-purple-600 duration-300'
+                                >
+                                    About Us
+                                </li>
+                            </ul>
+                        </div>
+                    )
+                }
+
+                {/* user icon section */}
+
+                {!hiddenUserIcon && (
+                    <div className="relative inline-block">
+                        {/* User Icon */}
+                        <div className="flex items-center gap-2 cursor-pointer " onClick={() => setOpenProfileCard(!openProfileCard)}>
+
+                            {!openProfileCard && currentCustomerData?.customerName && (
+                                <div className='uppercase bg-gradient-to-br from-blue-500 to-purple-600 dark:from-purple-600 dark:to-blue-700 rounded-full sm:w-13 w-8 sm:h-13 h-8 flex items-center justify-center font-light sm:text-2xl text-sm gap-1 text-white'>
+                                    <h1>
+                                        {currentCustomerData.customerName.split(' ')[0][0]}
+                                        {currentCustomerData.customerName.split(' ')[1]?.[0]}
+                                    </h1>
+                                </div>
+                            )}
+                            <p className='flex items-center gap-1'>
+                                Hi <span className="text-blue-600 hidden sm:block capitalize dark:text-purple-600">{currentCustomerData.customerName}</span>!
+                            </p>
+                        </div>
+
+
+                        {/* profile card section */}
+                        {
+                            openProfileCard && <div onClick={()=>setOpenProfileCard(false)} className='fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in'><ProfileCard /></div>
+                        }
+                        
+
+
+                    </div>
+                )}
+
+
+
+                {/* become worker button section */}
+                {
+                    isLogged &&  !hiddenGoToDashbord &&(
+                        currentCustomerData.role === "worker" ? (
+                            <button
+                                onClick={handleGetWorkerData}
+                                className="bg-green-600 hover:bg-green-800 scale-[0.8] sm:scale-[1] cursor-pointer text-white text-sm p-2 rounded-md"
+                            >
+                                Go to Dashboard
+                            </button>
+                        ) : (
+                            <div>
+                                {!hiddenBecomeWorker && (
+                                    <button
+                                    onClick={() => navigate("/customer/verifyOtp")}
+                                    className="bg-blue-600 dark:bg-purple-600 scale-[0.8] sm:scale-[1] cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
+                                >
+                                    Become Worker
+                                </button>
+                                )}
+                            </div>
+                        )
+                    )
+                }
+
+
+                {/* toggle button section */}
+                <div className='flex items-center justify-center gap-2 bg-gray-200 dark:bg-[#1e1e1e] hover:bg-gray-500 lg:p-1 duration-300 rounded-full' >
+                    <ToggleBtn />
+                </div>
+
+                {/* sign up button section */}
+                {hiddenSignInButton && (
+                    <div className='px-4 py-2'>
+                        <button onClick={() => navigate('/register')} className="px-3 py-1.5 text-sm sm:px-4 sm:py-2 sm:text-base lg:px-5 lg:py-2 lg:text-lg bg-blue-700 dark:bg-purple-600 hover:dark:bg-purple-500 hover:bg-blue-500 font-semibold text-white rounded  whitespace-nowrap
+                        transition-all duration-300">
+                            Sign In
+                        </button>
+                    </div>
+                )}
+
+
+
+
+            </div>
+        </div>
+    )
+}
+
+export default NavBar

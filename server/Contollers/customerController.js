@@ -1,0 +1,522 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import CustomerModel from '../DB_Models/CustomerModel.js';
+import WorkerModel from '../DB_Models/WorkerModel.js'
+import ServiceModel from '../DB_Models/ServiceModel.js'
+import CommentModel from '../DB_Models/CommentModel.js'
+import ReservationModel from '../DB_Models/ReservationModel.js'
+import transporter from '../config/nodeMail.js';
+import { callresetPwTemplate } from '../EmailTemplate/resetPasswordOtp.js';
+import { workerRegistrationTemplate } from '../EmailTemplate/becomWorker.js';
+import { workerReservationTemplate } from '../EmailTemplate/workerReservation.js'
+
+//--------------user registration controller------------//
+
+export const register = async (req, res) => {
+
+    const { customerName, customerEmail, customerPassword, customerPhone } = req.body;
+
+
+    if (!customerName || !customerEmail || !customerPassword || !customerPhone) {
+        return res.json({ success: false, message: "Missing Details" });
+    }
+
+    try {
+
+        const existingUser = await CustomerModel.findOne({ customerEmail });
+
+        if (existingUser) {
+            return res.json({ success: false, message: "User Already Exists using this email" });
+        }
+
+
+        const hashedPassword = await bcrypt.hash(customerPassword, 10);
+
+
+        const newCustomer = new CustomerModel({
+            customerName,
+            customerEmail,
+            customerPassword: hashedPassword,
+            customerPhone
+        });
+
+        await newCustomer.save();
+
+
+        const token = jwt.sign({ id: newCustomer._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+
+        res.json({
+            success: true,
+            message: 'Registered Successfully',
+            customer: newCustomer,
+            token
+        });
+
+    } catch (error) {
+
+        res.json({ success: false, message: 'Error in Registering User', error: error.message });
+    }
+}
+
+//--------------user loging controller------------//
+
+export const login = async (req, res) => {
+
+    const { customerEmail, customerPassword } = req.body;
+    if (!customerEmail || !customerPassword) {
+        return res.json({ success: false, massage: 'email and password is requied' })
+
+    }
+
+    try {
+        const customer = await CustomerModel.findOne({ customerEmail });
+
+        if (!customer) {
+            return res.json({ success: false, message: "Invalied Email!" });
+        }
+
+        const isMatch = await bcrypt.compare(customerPassword, customer.customerPassword);
+
+        if (!isMatch) {
+            return res.json({ success: false, message: "Invalied Password !" });
+
+        }
+        if (customer.role === 'admin') {
+            return res.json({ success: true, message: 'admin Login Successfully !', customer });
+        }
+
+        const token = jwt.sign({ id: customer._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+
+        res.json({
+            success: true,
+            message: 'Login Successfully !',
+            customer
+        });
+        //  console.log(token);
+
+
+    } catch (error) {
+        return res.json({ success: false, massage: error.massage });
+    }
+}
+
+//----------------get current customer data--------------//
+
+export const getCurrentCustomerData = async (req, res) => {
+    const customerId = req.customerId;
+
+    try {
+        const customer = await CustomerModel.findById(customerId).select('customerName  customerEmail customerPhone role createdAt');
+        if (!customer) {
+            return res.json({ success: false, message: "no user found" });
+        }
+        return res.json({ success: true, message: 'user Found', customer });
+    } catch (error) {
+        return res.json({ success: false, message: error.massage });
+    }
+
+}
+
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+
+        });
+        return res.json({ success: true, massage: 'logged out successfully' });
+
+    } catch (error) {
+        return res.json({ success: false, massage: error.massage });
+
+    }
+
+}
+//----------------send forgot password otp--------------//
+
+export const sendForgotPwOtp = async (req, res) => {
+
+    const { customerEmail } = req.body;
+
+    if (!customerEmail) {
+        return res.json({ success: false, message: 'Email required' });
+    }
+
+    try {
+
+        const customer = await CustomerModel.findOne({ customerEmail });
+
+        if (!customer) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        customer.resetotp = otp;
+        customer.resetotpExpireAt = Date.now() + 10 * 60 * 1000;
+        await customer.save();
+
+        // call email template function
+        const emailTemplate = callresetPwTemplate(otp, customer.customerName);
+
+        //send mail
+        await transporter.sendMail({
+            from: "Quick Hire Support",
+            to: customer.customerEmail,
+            subject: 'Password Reset OTP',
+            html: emailTemplate
+        });
+
+
+        return res.json({ success: true, message: 'OTP sent to your email' });
+
+    } catch (error) {
+
+        return res.json({ success: false, message: error.message });
+    }
+}
+
+//------------verify forgot password otp------------------//
+export const verifyForgotPWOtp = async (req, res) => {
+
+    const { resetotp, customerEmail } = req.body;
+
+
+    if (!resetotp || !customerEmail) {
+        return res.json({ success: false, message: 'Missing Details' });
+    }
+    try {
+        const customer = await CustomerModel.findOne({ customerEmail });
+        if (!customer) {
+            return res.json({ success: false, message: 'no user found' });
+        }
+
+        if (customer.resetotpExpireAt < Date.now()) {
+            return res.json({ success: false, massage: ' otp expired' });
+        }
+        if (customer.resetotp === resetotp) {
+            return res.json({ success: true, message: 'verify success!' });
+            customer.resetotpExpireAt = 0;
+            customer.resetotp = '';
+            await customer.save();
+        } else {
+            return res.json({ success: false, message: 'wrong otp please check again!' });
+        }
+
+
+    } catch (error) {
+        return res.json({ success: false, massage: error.message });
+    }
+}
+
+//------------add new password ------------------//
+
+export const addNewPassword = async (req, res) => {
+
+    const { customerEmail, customerPassword } = req.body;
+    if (!customerEmail || !customerPassword) {
+        return res.json({ success: false, message: "Missing Details!" })
+    }
+
+    try {
+        const customer = await CustomerModel.findOne({ customerEmail });
+        if (!customer) {
+            return res.json({ success: false, message: 'user not found' });
+        }
+        const hashedPassword = await bcrypt.hash(customerPassword, 10);
+        customer.customerPassword = hashedPassword;
+        await customer.save()
+        return res.json({ success: true, message: 'password has been reset successfully ! ' });
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+
+
+}
+
+//------------customer becomes worker function----------//
+
+export const becomeWorker = async (req, res) => {
+    const customerId = req.customerId;
+
+    try {
+        const customer = await CustomerModel.findById(customerId);
+        if (!customer) {
+            return res.json({ success: false, message: "no user found!" });
+        }
+        const name = customer.customerName;
+
+        const otp = String(Math.floor(10000 + Math.random() * 90000));
+        customer.verifyotp = otp;
+        customer.verifyotpExpireAt = Date.now() + 10 * 60 * 1000;
+        await customer.save();
+
+        // call email template function
+        const emailTemplate = workerRegistrationTemplate(otp, name);
+
+
+        await transporter.sendMail({
+            from: "Quick Hire Support",
+            to: customer.customerEmail,
+            subject: 'Become Worker!',
+            html: emailTemplate
+        });
+
+
+        return res.json({ success: true, message: 'OTP sent to your email' });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+
+    }
+
+}
+//------------customer becomes worker verify otp function----------//
+export const verifybecomeWorkerOTP = async (req, res) => {
+    const customerId = req.customerId;
+    const { verifyotp } = req.body;
+
+    try {
+        const customer = await CustomerModel.findById(customerId);
+        if (!customer) {
+            return res.json({ success: false, message: "no user found!" });
+        }
+        if (customer.verifyotpExpireAt < Date.now()) {
+            return res.json({ success: false, message: ' otp expired!' });
+        }
+        if (customer.verifyotp === verifyotp) {
+            customer.verifyotpExpireAt = 0;
+            customer.verifyotp = '';
+            await customer.save();
+            return res.json({ success: true, message: 'Verify successfull!' });
+        } else {
+            return res.json({ success: false, message: 'wrong otp please check again!' });
+        }
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+}
+
+//-------------------------create worker function------------//
+
+export const createWorker = async (req, res) => {
+    const customerId = req.customerId;
+    const { profile, address, nic, description } = req.body;
+
+    try {
+        const customer = await CustomerModel.findById(customerId);
+        if (!customer) {
+            return res.json({ success: false, message: "no user found!" });
+        }
+
+        const newWorker = new WorkerModel({
+            customerId,
+            profile,
+            address,
+            nic,
+            description
+        });
+
+        await newWorker.save();
+        customer.role = 'worker';
+        await customer.save();
+
+        res.json({
+            success: true,
+            message: 'You become worker Successfully!',
+            worker: newWorker,
+        });
+
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+}
+
+//------------ Add Comment aND  Rating to Service ------------//
+
+export const addComment = async (req, res) => {
+    const customerId = req.customerId;
+    const { serviceId, comment, rating, reservationId } = req.body;
+
+
+    if (!customerId || !serviceId || !comment || !rating || !reservationId) {
+
+        return res.json({ success: false, message: "Missing details!", });
+    }
+
+    try {
+
+        const service = await ServiceModel.findById(serviceId);
+        const reservation = await ReservationModel.findById(reservationId);
+
+        if (!service) {
+            return res.json({ success: false, message: "Service not found!", });
+        }
+        if (!reservation) {
+            return res.json({ success: false, message: "reservation not found!", });
+        }
+
+
+        reservation.isComment = true;
+        await reservation.save();
+
+
+        const newComment = new CommentModel({
+            customerId,
+            serviceId,
+            comment,
+            rating,
+            isComment: true
+        });
+
+        await newComment.save();
+
+        // Get all ratings for this service 
+        const comments = await CommentModel.find({ serviceId });
+
+
+        const totalRating = comments.reduce((sum, item) => {
+            return sum + item.rating;
+        }, 0);
+
+        const averageRating = totalRating / comments.length;
+
+
+        service.rating = Number(averageRating.toFixed(1));
+        await service.save();
+
+
+        return res.json({ success: true, message: "Comment added successfully!", comment: newComment, averageRating: service.rating, });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message, });
+    }
+};
+
+//----------------------add reservation ---------------//
+
+export const addReservation = async (req, res) => {
+    const customerId = req.customerId;
+    const { serviceId, workerId, customerName, customerEmail, customerPhone, customerAddress, date, description, status } = req.body;
+    if (!customerId || !serviceId || !workerId || !customerName || !customerEmail || !customerPhone || !customerAddress || !date || !description || !status) {
+        return res.json({ success: false, message: "Missing details!" });
+    }
+
+    try {
+        const newReservation = new ReservationModel({
+            customerId,
+            serviceId,
+            workerId,
+            customerName,
+            customerEmail,
+            customerPhone,
+            customerAddress,
+            date,
+            description,
+            status,
+        });
+
+        await newReservation.save();
+         res.json({success: true,message: 'Reservation added succesfully!',reservation: newReservation,});
+
+        const worker = await WorkerModel.findById(workerId).populate('customerId');
+        const service = await ServiceModel.findById(serviceId);
+
+        const emailTemplate = workerReservationTemplate(worker.customerId.customerName, service.serviceName, customerName, date, customerAddress);
+
+        await transporter.sendMail({
+            from: "Quick Hire Support",
+            to: worker.customerId.customerEmail,
+            subject: 'Reservation Confirmed!',
+            html: emailTemplate
+        });
+
+       
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+//------------------get current cusromer reservations------------------//
+export const getCurrentCustomerReservations = async (req, res) => {
+    const customerId = req.customerId;
+    if (!customerId) {
+        return res.json({ success: false, message: "Not Authorized. Please log in again!" });
+    }
+    try {
+        const reservations = await ReservationModel.find({ customerId }).populate({
+            path: "serviceId", populate: { path: "workerId", populate: { path: "customerId", }, },
+        });
+        res.json({ success: true, message: "Reservations retrieved successfully!", reservations });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+//------------------------update customer Profile----------------//
+
+export const updateProfile = async (req, res) => {
+    const customerId = req.customerId;
+    const { customerName, customerPhone } = req.body;
+
+    if (!customerName || !customerPhone) {
+        return res.json({ success: false, message: "Missing details!" });
+    }
+    try {
+        const customer = await CustomerModel.findById(customerId);
+        if (!customer) {
+            return res.json({ success: false, message: "No user Found!" });
+        }
+        customer.customerName = customerName;
+        customer.customerPhone = customerPhone;
+        await customer.save();
+        return res.json({
+            success: true, message: "Profile updated successfully!", customer
+        });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+}
+
+
+//--------------cancel current booking-----//
+
+export const cancellbooking = async (req, res) => {
+    const { reservationId } = req.body;
+
+    if (!reservationId) {
+        return res.json({ success: false, message: "Missing details!" });
+    }
+
+    try {
+        const reservation = await ReservationModel.findByIdAndDelete(reservationId);
+
+        if (!reservation) {
+            return res.json({ success: false, message: "No reservation found!" });
+        }
+        return res.json({ success: true, message: "Booking cancelled successfully!", reservation });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+};

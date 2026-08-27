@@ -8,7 +8,7 @@ function ThemContext({ children }) {
     localStorage.getItem("theme") || "light"
   );
 
-  // ✅ apply theme on load + change
+
   useEffect(() => {
     localStorage.setItem("theme", theme);
 
