@@ -189,6 +189,7 @@ function VerifyOtp() {
         setcurrentCustomerData(workerResponse.data.worker);
 
         navigate('/worker/dashbord/workerReservation');
+        window.location.reload();
       } else {
         toast.error(response.data.message);
       }

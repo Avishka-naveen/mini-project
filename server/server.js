@@ -25,7 +25,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// // ✅ ADD THIS TEST ROUTE FIRST
+//  TEST ROUTE 
 app.get('/test', (req, res) => {
   res.json({ success: true, message: "Server is working!" });
 });

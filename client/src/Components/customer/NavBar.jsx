@@ -7,6 +7,7 @@ import ProfileCard from './ProfileCard';
 import { useState } from 'react';
 import { AppContext } from '../../Context/Appcontext';
 import axios from 'axios';
+import { RxDashboard } from "react-icons/rx";
 
 
 
@@ -23,8 +24,8 @@ function NavBar() {
     const hiddenUserIcon = location.pathname === '/register' || location.pathname === '/';
     const hiddenSignInButton = location.pathname === '/';
     const hiddenLinks = location.pathname === '/';
-    const hiddenBecomeWorker=location.pathname ==='/';
-    const hiddenGoToDashbord=location.pathname==='/';
+    const hiddenBecomeWorker = location.pathname === '/';
+    const hiddenGoToDashbord = location.pathname === '/';
 
     const [openProfileCard, setOpenProfileCard] = useState(false);
 
@@ -54,26 +55,29 @@ function NavBar() {
         }
     }
 
-  
-const fetchWorkerData = async () => {
-    try {
-      const response = await axios.get(backendUrl + '/api/worker/getCurrentWorkerData');
-      if (response.data.success) {
-        setcurrentWorkerData(response.data.worker);
-      } else {
-        setcurrentWorkerData(null);
-      }
-    } catch (error) {
-      console.error("Failed to fetch worker data on refresh:", error);
-      setcurrentWorkerData(null);
-    }
-};
 
-    
+    const fetchWorkerData = async () => {
+        try {
+            const response = await axios.get(backendUrl + '/api/worker/getCurrentWorkerData');
+            if (response.data.success) {
+                setcurrentWorkerData(response.data.worker);
+            } else {
+                setcurrentWorkerData(null);
+            }
+        } catch (error) {
+            console.error("Failed to fetch worker data on refresh:", error);
+            setcurrentWorkerData(null);
+        }
+    };
+
+
     return (
         <div className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  border-b-3 px-3 py-3 border-blue-600 dark:border-purple-600  flex items-center justify-between   text-black dark:text-white`}>
-            <div>
+            <div className='flex items-center gap-2 justify-center '>
                 <img src={logo} alt='logo' className='w-15 h-15 lg:w-18 lg:h-15' />
+                <h1 className='font-bold sm:text-3xl text-sms text-blue-600 dark:text-purple-500'>
+                    <span className='sm:text-4xl text-xl text-orange-500 dark:text-orange-400'>Q</span>uick<span className='sm:text-4xl text-xl text-orange-500 dark:text-orange-400'>H</span>ire
+                </h1>
             </div>
             <div className='flex items-center justify-center lg:gap-6 gap-1'>
 
@@ -113,17 +117,17 @@ const fetchWorkerData = async () => {
                                     </h1>
                                 </div>
                             )}
-                            <p className='flex items-center gap-1'>
-                                Hi <span className="text-blue-600 hidden sm:block capitalize dark:text-purple-600">{currentCustomerData.customerName}</span>!
+                            <p className='flex items-center gap-1 '>
+                                 <p className=" hidden sm:block capitalize">Hi <span className=' dark:text-purple-600 text-blue-600'>{currentCustomerData.customerName}</span> !</p>
                             </p>
                         </div>
 
 
                         {/* profile card section */}
                         {
-                            openProfileCard && <div onClick={()=>setOpenProfileCard(false)} className='fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in'><ProfileCard /></div>
+                            openProfileCard && <div onClick={() => setOpenProfileCard(false)} className='fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in'><ProfileCard /></div>
                         }
-                        
+
 
 
                     </div>
@@ -133,23 +137,24 @@ const fetchWorkerData = async () => {
 
                 {/* become worker button section */}
                 {
-                    isLogged &&  !hiddenGoToDashbord &&(
+                    isLogged && !hiddenGoToDashbord && (
                         currentCustomerData.role === "worker" ? (
                             <button
                                 onClick={handleGetWorkerData}
                                 className="bg-green-600 hover:bg-green-800 scale-[0.8] sm:scale-[1] cursor-pointer text-white text-sm p-2 rounded-md"
                             >
-                                Go to Dashboard
+                                <p className='sm:hidden block'><RxDashboard /></p>
+                                <p className='hidden sm:block'>Go to Dashbord</p>
                             </button>
                         ) : (
                             <div>
                                 {!hiddenBecomeWorker && (
                                     <button
-                                    onClick={() => navigate("/customer/verifyOtp")}
-                                    className="bg-blue-600 dark:bg-purple-600 scale-[0.8] sm:scale-[1] cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
-                                >
-                                    Become Worker
-                                </button>
+                                        onClick={() => navigate("/customer/verifyOtp")}
+                                        className="bg-blue-600 dark:bg-purple-600 scale-[0.8] sm:scale-[1] cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
+                                    >
+                                        Become Worker
+                                    </button>
                                 )}
                             </div>
                         )
