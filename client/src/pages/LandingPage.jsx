@@ -20,7 +20,6 @@ function LandingPage() {
       className="min-h-screen bg-white dark:bg-[#1e1e1e] text-black dark:text-white relative overflow-hidden"
       
     >
-      
       <NavBar />
       <div className='lg:mx-15 mx-5 mt-5'>
         {/* landing page slideshow */}
