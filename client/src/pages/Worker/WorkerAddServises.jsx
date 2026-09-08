@@ -25,16 +25,16 @@ function WorkerAddServices() {
   };
 
   // Handle reset
-  const handleReset = () => {
-    setFormData({
-      serviceName: '',
-      price: '',
-      location: '',
-      description: '',
-      phone: '',
-      skill: '',
-    });
-  };
+  // const handleReset = () => {
+  //   setFormData({
+  //     serviceName: '',
+  //     price: '',
+  //     location: '',
+  //     description: '',
+  //     phone: '',
+  //     skill: '',
+  //   });
+  // };
 
   // Handle form submission
   const handleAddService = async (e) => {
@@ -189,7 +189,7 @@ function WorkerAddServices() {
                   name="skill"
                   value={formData.skill}
                   onChange={handleChange}
-                  placeholder="Plumber, Electrician"
+                  placeholder="qualifications"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
                              bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
                              focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
@@ -240,21 +240,21 @@ function WorkerAddServices() {
             >
               Add Service
             </button>
-            <button
+            {/* <button
               type="button"
               onClick={handleReset}
               className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600
                        text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-lg transition duration-300"
             >
               🔄 Reset Form
-            </button>
+            </button> */}
           </div>
         </form>
 
         {/* Preview Section */}
         <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700">
           <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2">
-            📋 Preview
+             Preview
           </h3>
           <div className="text-sm text-gray-500 dark:text-gray-400">
             {/* Fixed the typo from service_name to serviceName here */}
