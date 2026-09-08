@@ -14,7 +14,7 @@ function WorkerList() {
   const [location, setLocation] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const { allServicesData } = useContext(AppContext);
-  //console.log("from workerList" + allServicesData);
+ 
 
   const navigate = useNavigate();
 
