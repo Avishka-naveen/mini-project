@@ -17,6 +17,7 @@ import Bookings from './pages/Client/Bookings'
 import VerifyOtp from './pages/Client/VerifyOtp'
 import ForgotPassword from './pages/Client/ForgotPassword'
 import MyProfile from './pages/Worker/MyProfile'
+import AboutUs from './pages/Client/AboutUs'
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/customer/workerReservation" element={<Bookings />}/>
         <Route path="/customer/forgotPassword" element={<ForgotPassword />}/>
         <Route path="/customer/verifyOtp" element={<VerifyOtp/>}/>
+        <Route path="/aboutUs" element={<AboutUs/>} />
        
 
          {/* -------------------worker routes -------------------*/}
