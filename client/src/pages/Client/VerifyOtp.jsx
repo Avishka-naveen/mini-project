@@ -113,7 +113,7 @@ function VerifyOtp() {
 
 
 
-  // call get otp function || otp sent to email
+  // call get otp function  otp sent to email
   const getOTP = async (e) => {
     e.preventDefault();
     try {
