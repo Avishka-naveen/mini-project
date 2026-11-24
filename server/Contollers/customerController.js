@@ -411,7 +411,31 @@ export const addComment = async (req, res) => {
         return res.json({ success: false, message: error.message, });
     }
 };
+//---------------------edit ratinong and comment------------------//
 
+export const editComment = async (req, res) => {
+    
+  try {
+    const { commentId, comment } = req.body;
+
+    if (!commentId || !comment) {
+      return res.json({success: false,message: "Missing details!"});
+    }
+
+    const commentToEdit = await CommentModel.findById(commentId);
+
+    if (!commentToEdit) {
+      return res.json({success: false,message: "Comment not found!"});
+    }
+
+    await CommentModel.findByIdAndUpdate(commentId,{ comment: comment },{ new: true });
+
+    return res.json({success: true,message: "Comment updated successfully!"});
+
+  } catch (error) {
+    return res.json({success: false,message: error.message});
+  }
+};
 //----------------------add reservation ---------------//
 
 export const addReservation = async (req, res) => {

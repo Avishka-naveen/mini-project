@@ -92,7 +92,7 @@ function NavBar() {
                                     Services
                                 </li>
                                 <li
-                                    onClick={() => scrollToSection("about")}
+                                    onClick={() => navigate("/aboutUs")}
                                     className='cursor-pointer hover:text-blue-600 dark:hover:text-purple-600 duration-300'
                                 >
                                     About Us

@@ -54,6 +54,9 @@ export const addServices = async (req, res) => {
 //----------------get all services---------------//
 
 export const getAllServices = async (req, res) => {
+  const { customerId } = req.body;
+  // console.log(customerId)
+
   try {
     const services = await ServiceModel.find().populate({
       path: "workerId",
@@ -61,12 +64,22 @@ export const getAllServices = async (req, res) => {
         path: "customerId",
       },
     });
-    res.json({ success: true, services, });
 
+    const filteredServices = customerId
+      ? services.filter((service) => {
+          const serviceCustomerId = service.workerId?.customerId?._id
+            ? service.workerId.customerId._id.toString()
+            : service.workerId?.customerId?.toString();
+
+          return serviceCustomerId !== customerId.toString();
+        })
+      : services;
+
+    res.json({ success: true, services: filteredServices });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
-}
+};
 
 
 //---------------get each service details -----------------//

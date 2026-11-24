@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import serviseDummyData from "../../assets/dummyData";
 import { FaMoneyCheck, FaUser } from "react-icons/fa";
-import { MdOutlineDescription, MdEmail } from "react-icons/md";
+import { MdOutlineDescription, MdEmail, MdModeEdit } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
 import { FaPhone } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
@@ -18,6 +18,8 @@ import { useContext } from 'react';
 import { AppContext } from '../../Context/Appcontext';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useSearchParams } from "react-router-dom";
+
 
 
 
@@ -26,11 +28,81 @@ function WorkerDetails() {
   const navigate = useNavigate();
   const [showCommentes, setShowComments] = useState(false);
   const [showBooking, setShowBooking] = useState(false);
-  const { backendUrl } = useContext(AppContext);
+  const { backendUrl, currentCustomerId } = useContext(AppContext);
 
   const [serviceData, setServiceData] = useState('');
-  const [comments, SetComments] = useState('');
+  const [comments, SetComments] = useState([]);
+  const [searchParams] = useSearchParams();
+  const [highlightComment, setHighlightComment] = useState(null);
 
+
+  const openComment = searchParams.get("openComment");
+
+  const [addRatingModalVisible, setAddRatingModalVisible] = useState(false);
+  const [selectedComment, setSelectedComment] = useState('');
+  //const [cancelModalVisible, setcancelModalVisible] = useState(false);
+
+
+  const [comment, setComment] = useState('');
+
+  //console.log(currentCustomerId)
+  //console.log(selectedComment)
+
+  useEffect(() => {
+    if (openComment === "true") {
+      setShowComments(true);
+    }
+  }, [openComment]);
+
+  useEffect(() => {
+    if (openComment === "true") {
+      setShowComments(true);
+
+      setTimeout(() => {
+        document.getElementById("comments-section")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 300);
+    }
+  }, [openComment]);
+
+  const myComment = comments.find(
+    (comment) =>
+      String(comment.customerId?._id) === String(currentCustomerId)
+  );
+  useEffect(() => {
+    if (myComment) {
+      if (openComment === "true") {
+        setShowComments(true);
+      }
+
+      setHighlightComment(myComment._id);
+
+      const timer = setTimeout(() => {
+        const commentElement = document.getElementById(
+          `comment-${myComment._id}`
+        );
+
+        if (commentElement) {
+          commentElement.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }, 300);
+
+      const highlightTimer = setTimeout(() => {
+        setHighlightComment(null);
+      }, 1500);
+
+      return () => {
+        clearTimeout(highlightTimer);
+        clearTimeout(timer);
+      };
+    }
+  }, [openComment, showCommentes, comments, currentCustomerId]);
+  //console.log(myComment)
 
   //-----------------fetch services detalis------------------------//
   const getEachServiceDetails = async () => {
@@ -42,7 +114,7 @@ function WorkerDetails() {
 
       if (response.data.success) {
         setServiceData(response.data.service);
-        console.log("4. SUCCESS! Service Data:", response.data.service);
+        //console.log("4. SUCCESS! Service Data:", response.data.service);
         //console.log(serviceData.workerId._id)
 
       } else {
@@ -52,7 +124,7 @@ function WorkerDetails() {
       console.error("ERROR (Network/CORS/Code):", error);
     }
   };
-
+  //console.log(currentCustomerId)
 
   // ---------------------------fetch comment details--------------------------//
   const getAllComments = async () => {
@@ -125,6 +197,27 @@ function WorkerDetails() {
     }
 
   }
+  const handleSubmitRating = async (e) => {
+
+
+    try {
+      const response = await axios.post(backendUrl + '/api/customer/editComment', { commentId: selectedComment, comment: comment }, { withCredentials: true });
+
+      if (response.data.success) {
+        toast.success("Comment updated successfully!");
+
+        setAddRatingModalVisible(false);
+        setComment('');
+        setSelectedComment(null);
+      } else {
+        toast.error(response.data.message);
+      }
+
+    } catch (error) {
+      console.error("Update comment error:", error.response?.data || error);
+      toast.error("Error updating comment.");
+    }
+  };
 
   if (!serviceData) {
     return (
@@ -388,7 +481,11 @@ function WorkerDetails() {
 
 
 
-        <div className='flex gap-1 mt-10 items-center border-t-2 border-t-blue-500 dark:border-t-purple-500 pt-4' onClick={() => setShowComments(!showCommentes)}>
+        <div
+          id="comments-section"
+          className='flex gap-1 mt-10 items-center border-t-2 border-t-blue-500 dark:border-t-purple-500 pt-4'
+          onClick={() => setShowComments(!showCommentes)}
+        >
           <p className={`${showCommentes ? "rotate-180" : "rotate-0"} duration-300`}><AiOutlineCaretDown /></p>
           <div className='cursor-pointer text-xl' > comments({comments.length}) </div>
         </div>
@@ -398,12 +495,17 @@ function WorkerDetails() {
 
 
 
-              <div className='max-h-72  border border-gray-200 dark:border-gray-700 p-4 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 dark:scrollbar-track-gray-700'>
+              <div className='max-h-72 border border-gray-200 dark:border-gray-700 p-4 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200 dark:scrollbar-track-gray-700'>
                 {comments?.length > 0 ? (
                   comments.map((comment, index) => (
                     <div
-                      key={index}
-                      className='border-b border-gray-200 dark:border-gray-700 pb-3 last:border-b-0'
+                      key={comment._id}
+                      id={`comment-${comment._id}`}
+                      className={`border-b pb-3 last:border-b-0 rounded-lg p-3 transition-colors duration-500
+          ${highlightComment === comment._id
+                          ? "bg-yellow-100 text-black border-yellow-400"
+                          : "border-gray-200 dark:border-gray-700"
+                        }`}
                     >
                       <div className='flex items-center gap-3'>
                         <span className='bg-blue-600 text-white dark:bg-purple-600 p-2 rounded-full'>{comment.customerId?.customerName?.split(" ").map(name => name[0]).join("").toUpperCase()}</span>
@@ -423,6 +525,17 @@ function WorkerDetails() {
                             {comment.comment}
                           </p>
                         </div>
+                        {
+                          comment.customerId?._id === currentCustomerId && (
+                            <button onClick={() => {
+                              setAddRatingModalVisible(true)
+                              setSelectedComment(comment._id)
+
+                            }} className="text-white  bg-blue-600 p-1 rounded-md cursor-pointer hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 transition-colors">
+                              <MdModeEdit />
+                            </button>
+                          )
+                        }
                       </div>
                     </div>
                   ))
@@ -631,7 +744,98 @@ function WorkerDetails() {
 
         </>
       </div>
+      {
+        addRatingModalVisible && (
+          <div>
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 animate-fade-in p-4">
 
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
+
+                {/* Modal Header */}
+                <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                        Edit Review
+                      </h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Update your  comment
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setAddRatingModalVisible(false)}
+                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Modal Body */}
+                <div className="p-6 space-y-5">
+
+
+
+                  {/* Comment */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Your Comment <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <textarea
+                        rows="4"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        placeholder="Share your experience with this service..."
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl
+                   bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                   focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 focus:border-transparent
+                   outline-none transition duration-200 resize-none"
+                        maxLength={500}
+                      />
+                      <span className="absolute bottom-3 right-3 text-xs text-gray-400 dark:text-gray-500">
+                        {comment.length}/500
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-700/30 rounded-b-2xl">
+                  <div className="flex flex-col sm:flex-row justify-end gap-3">
+                    <button
+                      onClick={() => {
+                        setAddRatingModalVisible(false);
+                        setRating(0);
+                        setComment('');
+                      }}
+                      className="px-6 py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 
+                 text-gray-700 dark:text-gray-200 font-medium transition duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSubmitRating}
+                      disabled={!comment.trim()}
+                      className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 
+                 hover:from-blue-700 hover:to-purple-700 text-white font-medium 
+                 transition duration-200 shadow-md hover:shadow-lg
+                 disabled:opacity-50 disabled:cursor-not-allowed
+                 flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Update Review
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>)
+      }
       <Footer />
     </>
   );

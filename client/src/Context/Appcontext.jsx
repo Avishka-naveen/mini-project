@@ -12,10 +12,11 @@ export const AppContextProvider = (props) => {
   const [isLogged, setIsLogged] = useState(localStorage.getItem('isLogged') === 'true');
   const [currentCustomerData, setcurrentCustomerData] = useState('');
   const [currentWorkerData, setcurrentWorkerData] = useState('');
+  const [currentCustomerId, setcurrentCustomerId] = useState('');
   const [allServicesData, setAllServicesData] = useState([]);
   const navigate = useNavigate();
 
-  //  Fetch Customer Data
+  // Fetch Customer Data
   const fetchCustomerData = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/customer/currentCustomerData');
@@ -24,15 +25,20 @@ export const AppContextProvider = (props) => {
         setIsLogged(true);
         localStorage.setItem('isLogged', 'true');
         setcurrentCustomerData(response.data.customer);
+        setcurrentCustomerId(response.data.customer._id);
+        return response.data.customer;
       } else {
         setIsLogged(false);
         localStorage.removeItem('isLogged');
         setcurrentCustomerData('');
+        setcurrentCustomerId('');
+        return null;
       }
     } catch (error) {
       console.error("Auth check failed:", error);
       setIsLogged(false);
       localStorage.removeItem('isLogged');
+      return null;
     }
   };
 
@@ -42,6 +48,7 @@ export const AppContextProvider = (props) => {
   const fetchWorkerData = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/worker/getCurrentWorkerData');
+
 
       if (response.data.success) {
         setcurrentWorkerData(response.data.worker);
@@ -54,29 +61,30 @@ export const AppContextProvider = (props) => {
     }
   };
 
-  // fetch allServices data
-  const fetchAllServises = async () => {
+  // Fetch allServices data
+  const fetchAllServises = async (customerId = currentCustomerId) => {
     try {
-      const response = await axios.get(backendUrl + "/api/worker/getAllServices");
-
+      const response = await axios.post(backendUrl + "/api/worker/getAllServices",{ customerId });
       if (response.data.success) {
         setAllServicesData(response.data.services);
-        //console.log(response.data.services);
+        //console.log("Customer ID:", customerId);
       }
     } catch (error) {
       console.error("Services fetch failed:", error);
     }
   };
 
-  //  Run when refresh
+  // Run when refresh
   useEffect(() => {
     if (localStorage.getItem("isLogged") === "true") {
-      fetchCustomerData();
-      fetchWorkerData();
-      fetchAllServises();
+      const initData = async () => {
+        const customer = await fetchCustomerData();
+        await fetchWorkerData();
+        await fetchAllServises(customer?._id);
+      };
+      initData();
     }
   }, [backendUrl]);
-
 
   const value = {
     backendUrl,
@@ -89,7 +97,8 @@ export const AppContextProvider = (props) => {
     setcurrentWorkerData,
     fetchWorkerData,
     allServicesData,
-    fetchAllServises
+    fetchAllServises,
+    currentCustomerId,
   };
 
   return (
