@@ -7,7 +7,7 @@ import { BanknoteArrowDown } from 'lucide-react';
 import SubBanner from '../Components/customer/SubBanner';
 import Footer from '../Components/customer/Footer';
 import Services from '../Components/customer/Services';
-import About from '../Components/customer/About';
+// import About from '../Components/customer/About';
 import Reviews from '../Components/customer/Reviews';
 
 function LandingPage() {
@@ -25,9 +25,9 @@ function LandingPage() {
         {/* landing page slideshow */}
         <Banner />
         {/* about section */}
-        <div id='about'>
+        {/* <div id='about'>
           <About />
-        </div>
+        </div> */}
         {/* subbanner section */}
         <SubBanner />
         {/* services section */}

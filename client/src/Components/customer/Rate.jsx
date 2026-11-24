@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useContext } from 'react';
 import { AppContext } from '../../Context/Appcontext';
 
-function Rate({ addRatingModalVisible, setAddRatingModalVisible, selectedReservation,fetchReservations }) {
+function Rate({ addRatingModalVisible, setAddRatingModalVisible, selectedReservation,fetchReservations, }) {
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [comment, setComment] = useState('');

@@ -8,7 +8,7 @@ const WorkerRoute= express.Router();
 
 WorkerRoute.post('/addServise',addServices);
 WorkerRoute.get('/getCurrentWorkerData',userAuth,getCurrentWorkerData);
-WorkerRoute.get('/getAllServices',getAllServices);
+WorkerRoute.post("/getAllServices", getAllServices);
 WorkerRoute.get('/getServiseData/:serviceId',getServiceData);
 WorkerRoute.get('/getAllCommets/:serviceId',getAllComment);
 WorkerRoute.get('/getMyReservations',userAuth,getMyReservations);

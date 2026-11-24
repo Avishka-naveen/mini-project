@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 function Register() {
   const navigate = useNavigate();
   const { backendUrl, isLogged, setIsLogged, setcurrentCustomerData, fetchCustomerData, fetchAllServises } = useContext(AppContext);
+
   const [isSignIn, setIsSignIn] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +27,12 @@ function Register() {
   });
 
 
- const [loginData, setLoginData] = useState({
+  const [loginData, setLoginData] = useState({
     email: '',
     password: '',
   });
 
+  // Handle Input Change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -69,6 +71,7 @@ function Register() {
 
       if (response.data.success) {
         toast.success(response.data.message);
+
 
         setFormData({
           name: '',

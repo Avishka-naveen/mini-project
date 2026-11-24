@@ -19,7 +19,7 @@ function Bookings() {
   const [cancelModalVisible, setcancelModalVisible] = useState(false);
 
   //console.log(selectedReservation);
-//console.log(reservations)
+  //console.log(reservations)
 
   // Status color mapping
   const getStatusColor = (status) => {
@@ -42,7 +42,7 @@ function Bookings() {
       if (response.data.success) {
         setReservations(response.data.reservations);
       }
-      console.log(response.data.reservations);
+      //console.log(response.data.reservations);
     } catch (error) {
       console.error("Error fetching reservations:", error);
     }
@@ -84,8 +84,8 @@ function Bookings() {
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
               My Bookings
             </h1>
-            
-            <p className=' text-gray-700 dark:text-gray-400 mt-1'> <span className='cursor-pointer hover:text-blue-500 dark:hover:text-purple-500' onClick={()=>navigate('/customer/workerList')}>WorkerList </span>/MyBookings</p>
+
+            <p className=' text-gray-700 dark:text-gray-400 mt-1'> <span className='cursor-pointer hover:text-blue-500 dark:hover:text-purple-500' onClick={() => navigate('/customer/workerList')}>WorkerList </span>/MyBookings</p>
           </div>
           <div className="flex items-center gap-3">
             <span className=" text-gray-500 dark:text-gray-400">
@@ -141,7 +141,7 @@ function Bookings() {
                           <span className="text-gray-700 dark:text-gray-300">
                             {/* {booking.serviceId || 'Unknown Worker'} */}
                             <button onClick={() => navigate(`/customer/workerDetails/${booking.serviceId?._id}`)} className="cursor-pointer scale-[.8] sm:scale-[1] flex items-center gap-1 bg-blue-600 dark:bg-purple-600 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm">
-                             <p> View</p> <p className='hidden sm:block'>Profile</p>
+                              <p> View</p> <p className='hidden sm:block'>Profile</p>
                             </button>
                           </span>
                         </div>
@@ -158,9 +158,22 @@ function Bookings() {
                           )
                         }
                         {
-                          booking.status === 'completed' && booking.isComment ===false &&(
+                          booking.status === 'completed' && booking.isComment === false && (
                             <button onClick={() => { setAddRatingModalVisible(true); setSelectedReservation(booking) }} className="ml-2 bg-slate-200 mt-2 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 px-2 py-1 rounded-md text-xs cursor-pointer">
                               Add Rate
+                            </button>
+                          )
+                        }{
+                          booking.status === 'completed' && booking.isComment === true && (
+                            <button
+                              onClick={() =>
+                                navigate(
+                                  `/customer/workerDetails/${booking.serviceId?._id}?openComment=true`
+                                )
+                              }
+                              className="ml-2 bg-gray-400 text-white px-2 py-1 rounded-md text-xs cursor-pointer"
+                            >
+                              Edit Rating
                             </button>
                           )
                         }
@@ -197,7 +210,7 @@ function Bookings() {
 
       {/* add reating and comment model */}
       {addRatingModalVisible && (
-        <Rate addRatingModalVisible={addRatingModalVisible} setAddRatingModalVisible={setAddRatingModalVisible} selectedReservation={selectedReservation} fetchReservations={fetchReservations}/>
+        <Rate addRatingModalVisible={addRatingModalVisible} setAddRatingModalVisible={setAddRatingModalVisible} selectedReservation={selectedReservation} fetchReservations={fetchReservations} />
       )}
       +
       {/* Cancel Booking Modal */}
