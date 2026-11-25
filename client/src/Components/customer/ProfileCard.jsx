@@ -23,7 +23,8 @@ function ProfileCard() {
     setShowProfile, 
     backendUrl, 
     setIsLogged ,
-    fetchCustomerData
+    fetchCustomerData,
+    setAllServicesData,
   } = useContext(AppContext);
   const navigate = useNavigate();
 
@@ -93,6 +94,7 @@ function ProfileCard() {
       const response = await axios.post(backendUrl + '/api/customer/logout');
       if (response.data.success) {
         setIsLogged(false);
+        setAllServicesData([]);
         toast.success(response.data.massage || 'Logged out successfully');
         localStorage.removeItem('isLogged');
         navigate('/');

@@ -117,9 +117,9 @@ function NavBar() {
                                     </h1>
                                 </div>
                             )}
-                            <p className='flex items-center gap-1 '>
+                            <div className='flex items-center gap-1 '>
                                  <p className=" hidden sm:block capitalize">Hi <span className=' dark:text-purple-600 text-blue-600'>{currentCustomerData.customerName}</span> !</p>
-                            </p>
+                            </div>
                         </div>
 
 

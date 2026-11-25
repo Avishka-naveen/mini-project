@@ -4,8 +4,8 @@ import Footer from '../../Components/customer/Footer'
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import serviseDummyData from "../../assets/dummyData";
-import { FaMoneyCheck, FaUser } from "react-icons/fa";
-import { MdOutlineDescription, MdEmail, MdModeEdit } from "react-icons/md";
+import { FaMoneyCheck, FaUser, FaTrashAlt } from "react-icons/fa";
+import { MdOutlineDescription, MdEmail, MdModeEdit, MdVerified } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
 import { FaPhone } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
@@ -34,6 +34,7 @@ function WorkerDetails() {
   const [comments, SetComments] = useState([]);
   const [searchParams] = useSearchParams();
   const [highlightComment, setHighlightComment] = useState(null);
+  const [deleteCommentModalVisible, setDeleteCommentModalVisible] = useState(false);
 
 
   const openComment = searchParams.get("openComment");
@@ -133,7 +134,7 @@ function WorkerDetails() {
       const response = await axios.get(backendUrl + `/api/worker/getAllCommets/${serviceId}`);
       if (response.data.success) {
         SetComments(response.data.comments);
-        //console.log(response.data.comments);
+        // console.log(response.data.comments);
       } else {
         toast.error("comment loading error!")
       }
@@ -197,6 +198,7 @@ function WorkerDetails() {
     }
 
   }
+  //-------------- edit comment function----------------------------------------
   const handleSubmitRating = async (e) => {
 
 
@@ -205,7 +207,7 @@ function WorkerDetails() {
 
       if (response.data.success) {
         toast.success("Comment updated successfully!");
-
+        getAllComments();
         setAddRatingModalVisible(false);
         setComment('');
         setSelectedComment(null);
@@ -219,7 +221,28 @@ function WorkerDetails() {
     }
   };
 
-  if (!serviceData) {
+//-------------------------------------------------- delete comment function-----------------//
+const handleDeleteComment = async (e) => {
+  e.preventDefault();
+  console.log(selectedComment)
+  try{
+    const response = await axios.post(backendUrl + '/api/customer/deleteComment', { commentId: selectedComment }, { withCredentials: true });
+    if (response.data.success) {
+      toast.success("Comment deleted successfully!");
+      getAllComments();
+      setDeleteCommentModalVisible(false);
+      setComment('');
+      setSelectedComment(null);
+    } else {
+      toast.error(response.data.message);
+    }
+  }catch(error){
+    console.error("Delete comment error:", error.response?.data || error);
+    toast.error("Error deleting comment.");
+  }
+}
+
+  if (!serviceData){
     return (
       <>
         <NavBar />
@@ -501,43 +524,82 @@ function WorkerDetails() {
                     <div
                       key={comment._id}
                       id={`comment-${comment._id}`}
-                      className={`border-b pb-3 last:border-b-0 rounded-lg p-3 transition-colors duration-500
-          ${highlightComment === comment._id
-                          ? "bg-yellow-100 text-black border-yellow-400"
-                          : "border-gray-200 dark:border-gray-700"
+                      className={`rounded-xl p-4 border transition-colors duration-500 mb-3 last:mb-0
+    ${highlightComment === comment._id
+                          ? "bg-yellow-100 border-yellow-400 text-black"
+                          : "bg-white dark:bg-gray-800/60 border-gray-200 dark:border-gray-700"
                         }`}
                     >
-                      <div className='flex items-center gap-3'>
-                        <span className='bg-blue-600 text-white dark:bg-purple-600 p-2 rounded-full'>{comment.customerId?.customerName?.split(" ").map(name => name[0]).join("").toUpperCase()}</span>
-                        <div className='flex-1'>
-                          <div className='flex items-center gap-2 flex-wrap'>
-                            <span className='font-semibold text-gray-800 dark:text-white text-sm'>
-                              {comment.customerId?.customerName || 'Anonymous'}
+                      <div className="flex items-start gap-3">
+                        {/* Avatar */}
+                        <span className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 dark:bg-purple-600 text-white flex items-center justify-center text-sm font-semibold">
+                          {comment.customerId?.customerName
+                            ?.split(" ")
+                            .map((name) => name[0])
+                            .join("")
+                            .toUpperCase() || "A"}
+                        </span>
+
+                        <div className="flex-1 min-w-0">
+                          {/* Name + date row */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-gray-800 dark:text-white text-sm">
+                              {comment.customerId?.customerName || "Anonymous"}
                             </span>
-                            <span className='text-xs text-gray-400 dark:text-gray-500'>
-                              •
-                            </span>
-                            <span className='text-xs text-gray-400 dark:text-gray-500'>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">•</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
                               📅 {new Date(comment.createdAt).toLocaleDateString()}
                             </span>
                           </div>
-                          <p className='text-gray-700 dark:text-gray-300 text-sm mt-1'>
+
+
+                          <p className="text-gray-700 dark:text-gray-300 text-sm mt-1 break-words">
                             {comment.comment}
                           </p>
-                        </div>
-                        {
-                          comment.customerId?._id === currentCustomerId && (
-                            <button onClick={() => {
-                              setAddRatingModalVisible(true)
-                              setSelectedComment(comment._id)
 
-                            }} className="text-white  bg-blue-600 p-1 rounded-md cursor-pointer hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 transition-colors">
+                          {comment.reply && (
+                            <div className="mt-2 ml-1 pl-3 border-l-2 border-blue-500 dark:border-purple-500 bg-gray-100 dark:bg-gray-700/40 rounded-r-lg py-1.5 pr-2">
+                              <p className="text-xs flex items-center gap-1  font-semibold text-blue-600 dark:text-purple-400 mb-0.5">
+                                <p className="text-green-600 text-lg"><MdVerified /></p> <p>Reply from Worker</p>
+                              </p>
+                              <p className="text-gray-600 dark:text-gray-300 text-sm break-words">
+                                {comment.reply}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Edit button */}
+                        {comment.customerId?._id === currentCustomerId && (
+                          <>
+                            <button onClick={() => {
+                              
+                             
+                              setDeleteCommentModalVisible(true);
+                              setSelectedComment(comment._id);
+                            }} className="flex-shrink-0 text-white bg-red-600 p-1.5 rounded-md cursor-pointer
+                   hover:bg-red-700  
+                   transition-colors self-start">
+                              <FaTrashAlt />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setAddRatingModalVisible(true);
+                                setSelectedComment(comment._id);
+                              }}
+                              className="flex-shrink-0 text-white bg-blue-600 p-1.5 rounded-md cursor-pointer
+                   hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700
+                   transition-colors self-start"
+
+                            >
                               <MdModeEdit />
                             </button>
-                          )
-                        }
+                          </>
+
+                        )}
                       </div>
                     </div>
+
                   ))
                 ) : (
                   <div className='flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500'>
@@ -836,6 +898,57 @@ function WorkerDetails() {
             </div>
           </div>)
       }
+      {/* -------------------------------------------------delete comment modal----------------------------------------- */}
+      {deleteCommentModalVisible && (
+        <div>
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 animate-fade-in p-4">
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in">
+
+              {/* Modal Header */}
+              <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                      Delete Comment
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Are you sure you want to delete this review?
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+
+
+
+              {/* Modal Footer */}
+              <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-700/30 rounded-b-2xl">
+                <div className="flex flex-col sm:flex-row justify-end gap-3">
+                  <button
+                    onClick={() => {
+                      setDeleteCommentModalVisible(false);
+
+                    }}
+                    className="px-6 py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 
+                 text-gray-700 dark:text-gray-200 font-medium transition duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+
+                    onClick={handleDeleteComment}
+                    className="px-6 py-2.5 rounded-xl bg-red-500 text-white"
+                  >
+
+                    Delete Comment
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <Footer />
     </>
   );

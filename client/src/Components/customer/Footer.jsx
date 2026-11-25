@@ -36,15 +36,15 @@ function Footer() {
             </p>
 
             <div className="mt-4 space-y-2 text-sm">
-              <p className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <p className="text-red-600"><FontAwesomeIcon icon={faMapMarkerAlt} /></p> Sri Lanka
-              </p>
-              <p className="flex items-center gap-2">
+              </div>
+              <div className="flex items-center gap-2">
                 <p className="text-green-500"><FontAwesomeIcon icon={faPhone} /></p> +94 000 000 000
-              </p>
-              <p className="flex items-center gap-2">
+              </div>
+              <div className="flex items-center gap-2">
                 <p className="text-yellow-500"><FontAwesomeIcon icon={faEnvelope} /> </p>support@quickhire.com
-              </p>
+              </div>
             </div>
           </div>
 
