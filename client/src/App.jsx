@@ -1,8 +1,8 @@
 import React from 'react'
 import {Routes,Route} from 'react-router-dom'
 import WorkerList from './pages/client/WorkerList'
-import WorkerDetails from './pages/client/WorkerDetails'
-import WorkerDashboard from './pages/worker/WorkerDashboard'
+import WorkerDetails from './pages/Client/WorkerDetails'
+import WorkerDashboard from './pages/Worker/WorkerDashboard'
 import Register from './pages/client/Register'
 import WorkerMyBookings from './pages/worker/WorkerMyBookings'
 import WorkerMyServises from './pages/worker/WorkerMyServises'
@@ -18,6 +18,7 @@ import VerifyOtp from './pages/Client/VerifyOtp'
 import ForgotPassword from './pages/Client/ForgotPassword'
 import MyProfile from './pages/Worker/MyProfile'
 import AboutUs from './pages/Client/AboutUs'
+import WorkerComments from './pages/Worker/WorkerComments'
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path='workerServises' element={<WorkerMyServises />} />
           <Route path='workerAddServises' element={<WorkerAddServises />} />
           <Route path='myProfile' element={<MyProfile/>} />
+          <Route path='workerComments' element={<WorkerComments/>} />
         </Route>
 
            {/* -------------------admin routes -------------------*/}

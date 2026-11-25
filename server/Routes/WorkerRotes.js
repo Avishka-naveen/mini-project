@@ -1,6 +1,6 @@
 import express from 'express'
 import userAuth from '../middleWare/userAuth.js';
-import {completeUserBooking,deleteUserBooking,acceptUserBooking,updateWorkerProfile,editService, addServices, getAllComment, getCurrentWorkerData, getServiceData,getMyReservations,getMyServices,deleteService } from '../Contollers/workerController.js';
+import {replyToComment,getWorkerComments,completeUserBooking,deleteUserBooking,acceptUserBooking,updateWorkerProfile,editService, addServices, getAllComment, getCurrentWorkerData, getServiceData,getMyReservations,getMyServices,deleteService } from '../Contollers/workerController.js';
 import { getAllServices } from '../Contollers/workerController.js';
 
 
@@ -18,7 +18,9 @@ WorkerRoute.post('/updateService',editService);
 WorkerRoute.post('/updateWorkerProfile',userAuth,updateWorkerProfile);
 WorkerRoute.post('/acceptUserBooking',acceptUserBooking);
 WorkerRoute.post('/deleteUserBooking',deleteUserBooking);
-WorkerRoute.post('/completeUserBooking',completeUserBooking)
+WorkerRoute.post('/completeUserBooking',completeUserBooking);
+WorkerRoute.post('/getWorkerComments',userAuth,getWorkerComments);
+WorkerRoute.post('/replyToComment',replyToComment);
 
 
 // customerRoute.get('/getAllServices',getAllServices);

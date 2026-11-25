@@ -436,6 +436,26 @@ export const editComment = async (req, res) => {
     return res.json({success: false,message: error.message});
   }
 };
+
+//-------------delete comment-----------------
+
+export const deleteComment = async (req, res) => {
+    const { commentId } = req.body;
+
+    if (!commentId) {
+        return res.json({ success: false, message: "Missing details!" });
+    }
+    try{
+        const commentToDelete = await CommentModel.findById(commentId);
+        if (!commentToDelete) {
+            return res.json({ success: false, message: "Comment not found!" });
+        }
+        await CommentModel.findByIdAndDelete(commentId);
+        return res.json({ success: true, message: "Comment deleted successfully!" });
+    }catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+}
 //----------------------add reservation ---------------//
 
 export const addReservation = async (req, res) => {

@@ -67,12 +67,12 @@ export const getAllServices = async (req, res) => {
 
     const filteredServices = customerId
       ? services.filter((service) => {
-          const serviceCustomerId = service.workerId?.customerId?._id
-            ? service.workerId.customerId._id.toString()
-            : service.workerId?.customerId?.toString();
+        const serviceCustomerId = service.workerId?.customerId?._id
+          ? service.workerId.customerId._id.toString()
+          : service.workerId?.customerId?.toString();
 
-          return serviceCustomerId !== customerId.toString();
-        })
+        return serviceCustomerId !== customerId.toString();
+      })
       : services;
 
     res.json({ success: true, services: filteredServices });
@@ -384,6 +384,48 @@ export const completeUserBooking = async (req, res) => {
     });
 
 
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+}
+
+//---------------------------get worker comments---------------------//
+export const getWorkerComments = async (req, res) => {
+  const customerId = req.customerId;
+  try {
+    const worker = await WorkerModel.findOne({ customerId });
+    if (!worker) {
+      return res.json({ success: false, message: "no worker found" });
+    }
+
+    const services = await ServiceModel.find({ workerId: worker._id });
+    const serviceIds = services.map((service) => service._id);
+
+    const comments = await CommentModel.find({ serviceId: { $in: serviceIds } })
+      .populate("customerId")
+      .populate("serviceId");
+
+    res.json({ success: true, services, comments });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//---------------------------reply to comment---------------------//
+export const replyToComment = async (req, res) => {
+  const { commentId, reply } = req.body;
+
+  if (!commentId || !reply) {
+    return res.json({ success: false, message: "Missing details" });
+  }
+  try {
+    const comment = await CommentModel.findById(commentId);
+    if (!comment) {
+      return res.json({ success: false, message: "Comment not found" });
+    }
+    comment.reply = reply;
+    await comment.save();
+    res.json({ success: true, message: "Reply added successfully", comment });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

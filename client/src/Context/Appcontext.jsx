@@ -62,17 +62,19 @@ export const AppContextProvider = (props) => {
   };
 
   // Fetch allServices data
-  const fetchAllServises = async (customerId = currentCustomerId) => {
-    try {
-      const response = await axios.post(backendUrl + "/api/worker/getAllServices",{ customerId });
-      if (response.data.success) {
-        setAllServicesData(response.data.services);
-        //console.log("Customer ID:", customerId);
-      }
-    } catch (error) {
-      console.error("Services fetch failed:", error);
+const fetchAllServises = async (customerId = currentCustomerId) => {
+  try {
+    const response = await axios.post(
+      backendUrl + "/api/worker/getAllServices",
+      { customerId }
+    );
+    if (response.data.success) {
+      setAllServicesData(response.data.services);
     }
-  };
+  } catch (error) {
+    console.error("Services fetch failed:", error);
+  }
+};
 
   // Run when refresh
   useEffect(() => {
@@ -99,6 +101,8 @@ export const AppContextProvider = (props) => {
     allServicesData,
     fetchAllServises,
     currentCustomerId,
+    allServicesData,
+    setAllServicesData,
   };
 
   return (

@@ -123,9 +123,10 @@ function Register() {
           setIsLogged(true);
           localStorage.setItem('isLogged', 'true');
           toast.success(response.data.message);
-          fetchCustomerData();
+          await fetchCustomerData();
+          await fetchAllServises(response.data.customer._id);
           navigate('/customer/workerList');
-          fetchAllServises();
+          
         }
 
 
