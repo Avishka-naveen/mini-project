@@ -101,7 +101,6 @@ const fetchAllServises = async (customerId = currentCustomerId) => {
     allServicesData,
     fetchAllServises,
     currentCustomerId,
-    allServicesData,
     setAllServicesData,
   };
 
