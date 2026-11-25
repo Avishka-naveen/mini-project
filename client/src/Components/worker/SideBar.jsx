@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { FaBookmark, FaUserCog, FaSignOutAlt, FaTimes } from 'react-icons/fa';
+import { FaBookmark, FaUserCog, FaSignOutAlt, FaTimes,FaComment } from 'react-icons/fa';
 import { RiUser3Fill } from "react-icons/ri";
 import { NavLink, useNavigate } from 'react-router-dom';
 import ToggleBtn from '../customer/ToggleBtn';
@@ -30,6 +30,12 @@ function SideBar() {
             label: 'Add Services',
             icon: <MdLibraryAdd />,
             path: '/worker/dashbord/workerAddServises'
+        },
+        {
+            id: 'comments',
+            label: 'Comments',
+            icon: <FaComment />,
+            path: '/worker/dashbord/workerComments'
         },
         {
             id: 'myProfile',
