@@ -73,12 +73,13 @@ function Bookings() {
       toast.error('Please describe the issue before submitting.');
       return;
     }
+    console.log("workerID----",selectedReservation.workerId)
+    console.log("services id----",selectedReservation.serviceId._id)
+    console.log(reportReason)
     try {
-      const response = await axios.post(
-        backendUrl + '/api/customer/reportWorker',
-        {
-          workerId: selectedReservation?.serviceId?.workerId,
-          reservationId: selectedReservation?._id,
+      const response = await axios.post(backendUrl + '/api/customer/reportWorker',{
+          workerId: selectedReservation.workerId,
+          serviceId: selectedReservation.serviceId._id,
           reason: reportReason,
         },
         { withCredentials: true }

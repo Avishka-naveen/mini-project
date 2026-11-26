@@ -7,6 +7,7 @@ import transporter from '../config/nodeMail.js'
 import { acceptBookingTemplate } from '../EmailTemplate/acceptBooking.js'
 import { rejectBookingTemplate } from '../EmailTemplate/rejectBooking.js'
 import { completeWorkTemplate } from '../EmailTemplate/completedWork.js'
+import ReportModel from '../DB_Models/ReportModel.js'
 
 
 //-------------------get current worker data------//
@@ -423,7 +424,7 @@ export const completeUserBooking = async (req, res) => {
     reservation.status = 'completed';
     await reservation.save();
 
-      const notification = new NotificationModel({
+    const notification = new NotificationModel({
       recipient: reservation.customerId._id,
       sender: reservation.workerId.customerId._id,
       senderRole: "worker",
@@ -495,3 +496,4 @@ export const replyToComment = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 }
+

@@ -1,5 +1,5 @@
 import express from 'express'
-import {readNotifications,deleteNotifications,getCustomerNotifications,deleteComment,cancellbooking,updateProfile,getCurrentCustomerReservations,editComment, getCurrentCustomerData, addNewPassword ,login, logout, register, sendForgotPwOtp, verifyForgotPWOtp, becomeWorker, verifybecomeWorkerOTP, createWorker, addComment, addReservation } from '../Contollers/customerController.js';
+import {reportWorker ,readNotifications,deleteNotifications,getCustomerNotifications,deleteComment,cancellbooking,updateProfile,getCurrentCustomerReservations,editComment, getCurrentCustomerData, addNewPassword ,login, logout, register, sendForgotPwOtp, verifyForgotPWOtp, becomeWorker, verifybecomeWorkerOTP, createWorker, addComment, addReservation } from '../Contollers/customerController.js';
 import userAuth from '../middleWare/userAuth.js';
 
 const customerRoute= express.Router();
@@ -24,4 +24,5 @@ customerRoute.post('/cancellbooking',cancellbooking);
 customerRoute.post('/getCustomerNotifications',userAuth, getCustomerNotifications);
 customerRoute.post('/deleteNotifications',deleteNotifications);
 customerRoute.post('/readNotifications',userAuth,readNotifications);
+customerRoute.post('/reportWorker',userAuth,reportWorker);
 export default customerRoute;

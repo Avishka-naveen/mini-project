@@ -3,6 +3,7 @@ import WorkerModel from '../DB_Models/WorkerModel.js'
 import ReservationModel from '../DB_Models/ReservationModel.js'
 import ServiceModel from '../DB_Models/ServiceModel.js'
 import CommentModel from '../DB_Models/CommentModel.js'
+import ReportModel from '../DB_Models/ReportModel.js'
 
 
 
@@ -323,4 +324,27 @@ export const deleteService = async (req, res) => {
         return res.json({ success: false, message: error.message });
     }
 
+}
+
+//-------------------get all reports from customers----------------//
+
+export const getAllReports = async (req, res) => {
+    try {
+        const reports = await ReportModel.find()
+            .populate({
+                path: "workerId",
+                populate: {
+                    path: "customerId",
+                    model: "Customer"
+                }
+            })
+            .populate("serviceId")
+            .populate("reportedBy")
+            .sort({ createdAt: -1 });
+
+        return res.json({ success: true, reports });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
 }

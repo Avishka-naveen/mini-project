@@ -10,6 +10,7 @@ import transporter from '../config/nodeMail.js';
 import { callresetPwTemplate } from '../EmailTemplate/resetPasswordOtp.js';
 import { workerRegistrationTemplate } from '../EmailTemplate/becomWorker.js';
 import { workerReservationTemplate } from '../EmailTemplate/workerReservation.js'
+import ReportModel from '../DB_Models/ReportModel.js';
 
 //--------------user registration controller------------//
 
@@ -647,3 +648,26 @@ export const readNotifications = async (req, res) => {
 
     }
 };
+//-----------------------------report worker --------------------//
+
+export const reportWorker = async (req, res) => {
+  const customerId = req.customerId;
+  const { workerId, serviceId, reason } = req.body;
+  if (!customerId || !workerId || !serviceId || !reason) {
+    return res.json({ success: false, message: "Missing details" });
+
+  }
+  try {
+    const newReport=new ReportModel({
+      workerId,
+      serviceId,
+      reportedBy:customerId,
+      reason,
+    })
+    
+    await newReport.save();
+    return res.json({ success: true, message: "Report Sent successfully",newReport });
+  } catch (error) {
+     res.json({ success: false, message: error.message });
+  }
+}

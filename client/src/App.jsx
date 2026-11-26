@@ -19,6 +19,7 @@ import ForgotPassword from './pages/Client/ForgotPassword'
 import MyProfile from './pages/Worker/MyProfile'
 import AboutUs from './pages/Client/AboutUs'
 import WorkerComments from './pages/Worker/WorkerComments'
+import AdminManageReport from './pages/Admin/AdminManageReport'
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
             <Route path='manageServises' element= {<AdminManageServises/>}/>
             <Route path='manageUsers' element= {<AdminManageUsers/>}/>
             <Route path='manageWorkers' element= {<AdminManageWorker/>}/>
+            <Route path='manageReports'  element={<AdminManageReport />}/>
           </Route>
        
 
