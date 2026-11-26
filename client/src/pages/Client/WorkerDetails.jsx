@@ -149,7 +149,7 @@ function WorkerDetails() {
     }
   }, [serviceId]);
 
-  // ------------------reservation formhandle --------------------//
+  // ------------------reservation form handle --------------------//
 
 
   const [formData, setFormData] = useState({

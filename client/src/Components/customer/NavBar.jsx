@@ -18,7 +18,7 @@ function NavBar() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { currentCustomerData, currentWorkerData, setcurrentWorkerData, backendUrl } = useContext(AppContext);
+    const { currentCustomerData, currentWorkerData, setcurrentWorkerData, backendUrl, fetchCustomerNotifications, customerNotifications } = useContext(AppContext);
     const { isLogged } = useContext(AppContext);
     //  console.log(currentCustomerData);
 
@@ -72,6 +72,27 @@ function NavBar() {
         }
     };
 
+    //-----------------------execute  notifi seen function------------//
+    const handleSeenMsg = async () => {
+        try {
+            const response = await axios.post(
+                backendUrl + '/api/customer/readNotifications',
+                {},
+                { withCredentials: true }
+            );
+
+            if (response.data.success) {
+               await fetchCustomerNotifications();
+            }
+        } catch (error) {
+            console.error("Failed to mark notifications as read:", error);
+        }
+    };
+    //count unseen msg
+    const unseenCount = customerNotifications.filter(
+        (notification) => !notification.isRead
+    ).length;
+    //console.log(unseenCount)
 
     return (
         <div className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  border-b-3 px-3 py-3 border-blue-600 dark:border-purple-600  flex items-center justify-between   text-black dark:text-white`}>
@@ -142,8 +163,23 @@ function NavBar() {
                     isLogged && !hiddenGoToDashbord && (
                         <div className="flex gap-4 items-center">
 
-                            <div onClick={() => setOpenNotificationBar(true)} className='text-2xl  text-gray-600 cursor-pointer hover:text-blue-600 dark:hover:text-purple-600 duration-300'>
+                            <div
+                                onClick={() => {
+                                    setOpenNotificationBar(true);
+                                    handleSeenMsg();
+                                    fetchCustomerNotifications();
+                                }}
+                                className='relative text-2xl text-gray-600 cursor-pointer hover:text-blue-600 dark:hover:text-purple-600 duration-300'
+                            >
                                 <FaBell />
+
+                                {unseenCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 flex items-center justify-center 
+                         min-w-[18px] h-[18px] px-1 bg-red-500 text-white 
+                         text-[10px] font-bold rounded-full">
+                                        {unseenCount > 99 ? "99+" : unseenCount}
+                                    </span>
+                                )}
                             </div>
 
                             {currentCustomerData.role === "worker" ? (
@@ -178,16 +214,18 @@ function NavBar() {
                                         {/* Backdrop — click to close */}
                                         <div
                                             className="absolute inset-0 bg-black/40"
-                                            onClick={() => setOpenNotificationBar(false)}
-                                        />
+                                            onClick={() => {
+                                                setOpenNotificationBar(false);
 
+                                            }}
+                                        />
                                         {/* Panel */}
                                         <div
                                             className="absolute right-0 top-0 h-full w-[350px] max-w-[85vw]
                bg-white dark:bg-gray-900 shadow-xl animate-slide-in
                flex flex-col overflow-hidden"
                                         >
-                                            <NotificationBar setOpenNotificationBar />
+                                            <NotificationBar unseenCount={unseenCount} setOpenNotificationBar={setOpenNotificationBar} />
                                         </div>
                                     </div>
                                 )

@@ -14,6 +14,7 @@ export const AppContextProvider = (props) => {
   const [currentWorkerData, setcurrentWorkerData] = useState('');
   const [currentCustomerId, setcurrentCustomerId] = useState('');
   const [allServicesData, setAllServicesData] = useState([]);
+  const [customerNotifications, setCustomerNotifications] = useState([]);
   const navigate = useNavigate();
 
   // Fetch Customer Data
@@ -76,6 +77,22 @@ const fetchAllServises = async (customerId = currentCustomerId) => {
   }
 };
 
+//fetch allnotifications for customer
+
+const fetchCustomerNotifications = async () => {
+  try {
+    const response = await axios.post(backendUrl + "/api/customer/getCustomerNotifications");
+    if (response.data.success) {
+      setCustomerNotifications(response.data.notifications);
+      
+    }
+  } catch (error) {
+    console.error("Notifications fetch failed:", error);
+  }
+};
+
+
+ //console.log(customerNotifications)
   // Run when refresh
   useEffect(() => {
     if (localStorage.getItem("isLogged") === "true") {
@@ -83,6 +100,7 @@ const fetchAllServises = async (customerId = currentCustomerId) => {
         const customer = await fetchCustomerData();
         await fetchWorkerData();
         await fetchAllServises(customer?._id);
+        await fetchCustomerNotifications();
       };
       initData();
     }
@@ -102,6 +120,10 @@ const fetchAllServises = async (customerId = currentCustomerId) => {
     fetchAllServises,
     currentCustomerId,
     setAllServicesData,
+    customerNotifications,
+    setCustomerNotifications,
+    fetchCustomerNotifications,
+   
   };
 
   return (

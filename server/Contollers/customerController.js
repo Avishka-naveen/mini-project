@@ -4,6 +4,7 @@ import CustomerModel from '../DB_Models/CustomerModel.js';
 import WorkerModel from '../DB_Models/WorkerModel.js'
 import ServiceModel from '../DB_Models/ServiceModel.js'
 import CommentModel from '../DB_Models/CommentModel.js'
+import NotificationModel from '../DB_Models/NotificationModel.js'
 import ReservationModel from '../DB_Models/ReservationModel.js'
 import transporter from '../config/nodeMail.js';
 import { callresetPwTemplate } from '../EmailTemplate/resetPasswordOtp.js';
@@ -414,27 +415,27 @@ export const addComment = async (req, res) => {
 //---------------------edit ratinong and comment------------------//
 
 export const editComment = async (req, res) => {
-    
-  try {
-    const { commentId, comment } = req.body;
 
-    if (!commentId || !comment) {
-      return res.json({success: false,message: "Missing details!"});
+    try {
+        const { commentId, comment } = req.body;
+
+        if (!commentId || !comment) {
+            return res.json({ success: false, message: "Missing details!" });
+        }
+
+        const commentToEdit = await CommentModel.findById(commentId);
+
+        if (!commentToEdit) {
+            return res.json({ success: false, message: "Comment not found!" });
+        }
+
+        await CommentModel.findByIdAndUpdate(commentId, { comment: comment }, { new: true });
+
+        return res.json({ success: true, message: "Comment updated successfully!" });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
     }
-
-    const commentToEdit = await CommentModel.findById(commentId);
-
-    if (!commentToEdit) {
-      return res.json({success: false,message: "Comment not found!"});
-    }
-
-    await CommentModel.findByIdAndUpdate(commentId,{ comment: comment },{ new: true });
-
-    return res.json({success: true,message: "Comment updated successfully!"});
-
-  } catch (error) {
-    return res.json({success: false,message: error.message});
-  }
 };
 
 //-------------delete comment-----------------
@@ -445,14 +446,14 @@ export const deleteComment = async (req, res) => {
     if (!commentId) {
         return res.json({ success: false, message: "Missing details!" });
     }
-    try{
+    try {
         const commentToDelete = await CommentModel.findById(commentId);
         if (!commentToDelete) {
             return res.json({ success: false, message: "Comment not found!" });
         }
         await CommentModel.findByIdAndDelete(commentId);
         return res.json({ success: true, message: "Comment deleted successfully!" });
-    }catch (error) {
+    } catch (error) {
         return res.json({ success: false, message: error.message });
     }
 }
@@ -480,7 +481,7 @@ export const addReservation = async (req, res) => {
         });
 
         await newReservation.save();
-         res.json({success: true,message: 'Reservation added succesfully!',reservation: newReservation,});
+        res.json({ success: true, message: 'Reservation added succesfully!', reservation: newReservation, });
 
         const worker = await WorkerModel.findById(workerId).populate('customerId');
         const service = await ServiceModel.findById(serviceId);
@@ -494,7 +495,7 @@ export const addReservation = async (req, res) => {
             html: emailTemplate
         });
 
-       
+
 
     } catch (error) {
         res.json({ success: false, message: error.message });
@@ -562,5 +563,86 @@ export const cancellbooking = async (req, res) => {
 
     } catch (error) {
         return res.json({ success: false, message: error.message });
+    }
+};
+
+
+//-------------get customer notifications----------------//
+
+export const getCustomerNotifications = async (req, res) => {
+    const customerId = req.customerId;
+    try {
+        if (!customerId) {
+            return res.json({ success: false, message: "Not Authorized. Please log in again!" });
+        }
+        const notifications = await NotificationModel.find({
+            recipient: customerId
+        }).sort({ createdAt: -1 });
+        return res.json({ success: true, message: "Notifications retrieved successfully!", notifications });
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+
+
+}
+
+//-------------delete notifications-------------//
+
+
+
+export const deleteNotifications = async (req, res) => {
+
+    const { notificationId } = req.body;
+    try {
+
+        if (!notificationId) {
+            return res.json({ success: false, message: "Missing details!" });
+        }
+
+
+        const notification = await NotificationModel.findById(notificationId);
+
+        if (!notification) {
+            return res.json({ success: false, message: "Notification not found!" });
+        }
+        await NotificationModel.findByIdAndDelete(notificationId);
+
+        return res.json({ success: true, message: "Notification deleted successfully!" });
+
+    } catch (error) {
+
+        return res.json({ success: false, message: error.message });
+
+    }
+};
+
+
+
+//--------------- Read All Notifications ------------------//
+
+export const readNotifications = async (req, res) => {
+
+    const customerId = req.customerId;
+
+    try {
+        if (!customerId) {
+            return res.json({success: false,message: "Not Authorized. Please log in again!"});
+        }
+
+        const result = await NotificationModel.updateMany(
+            {
+                recipient: customerId,
+                isRead: false
+            },
+            {
+                $set: { isRead: true }
+            }
+        );
+
+        return res.json({success: true,message: "All notifications marked as read!"});
+
+    } catch (error) {
+         return res.json({success: false,message: error.message});
+
     }
 };

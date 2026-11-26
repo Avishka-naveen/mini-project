@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 
 function Register() {
   const navigate = useNavigate();
-  const { backendUrl, isLogged, setIsLogged, setcurrentCustomerData, fetchCustomerData, fetchAllServises } = useContext(AppContext);
+  const { fetchCustomerNotifications,backendUrl, isLogged, setIsLogged, setcurrentCustomerData, fetchCustomerData, fetchAllServises } = useContext(AppContext);
 
   const [isSignIn, setIsSignIn] = useState(true);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -125,6 +125,7 @@ function Register() {
           toast.success(response.data.message);
           await fetchCustomerData();
           await fetchAllServises(response.data.customer._id);
+          await fetchCustomerNotifications();
           navigate('/customer/workerList');
           
         }
