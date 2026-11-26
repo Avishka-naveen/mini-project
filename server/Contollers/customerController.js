@@ -327,13 +327,14 @@ export const createWorker = async (req, res) => {
         if (!customer) {
             return res.json({ success: false, message: "no user found!" });
         }
-
+        const workerCode ="QH-" + Math.random().toString(36).substring(2, 8).toUpperCase();
         const newWorker = new WorkerModel({
             customerId,
             profile,
             address,
             nic,
-            description
+            description,
+            workerCode
         });
 
         await newWorker.save();

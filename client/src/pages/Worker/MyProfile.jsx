@@ -166,7 +166,7 @@ function MyProfile() {
                                  text-blue-700 dark:text-purple-300 
                                  text-xs font-semibold px-3 py-1 rounded-full 
                                  border border-blue-200 dark:border-purple-700/30">
-                                    {currentWorkerData?.customerId?.role || 'Worker'}
+                                    {currentWorkerData?.workerCode}
                                 </span>
                             </div>
                         </div>
