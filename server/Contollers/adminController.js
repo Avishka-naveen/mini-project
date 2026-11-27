@@ -4,6 +4,7 @@ import ReservationModel from '../DB_Models/ReservationModel.js'
 import ServiceModel from '../DB_Models/ServiceModel.js'
 import CommentModel from '../DB_Models/CommentModel.js'
 import ReportModel from '../DB_Models/ReportModel.js'
+import Notification from '../DB_Models/NotificationModel.js'
 
 
 
@@ -335,16 +336,89 @@ export const getAllReports = async (req, res) => {
                 path: "workerId",
                 populate: {
                     path: "customerId",
-                    model: "Customer"
+                    model: "Customer",
+                    select: "-customerPassword"
                 }
             })
             .populate("serviceId")
-            .populate("reportedBy")
+            .populate({
+                path: "reportedBy",
+                select: "-customerPassword"
+            })
             .sort({ createdAt: -1 });
 
-        return res.json({ success: true, reports });
+        return res.json({success: true,reports});
+
+    } catch (error) {
+        return res.json({success: false, message: error.message});
+    }
+};
+//---------------------delete report -----------------------------//
+export const deleteReport = async (req, res) => {
+    const { reportId } = req.body;
+    if (!reportId) {
+        return res.json({ success: false, message: "missing details!" })
+    }
+    try {
+        const report = await ReportModel.findById(reportId);
+        if (!report) {
+            return res.json({ success: false, message: "no report found!" })
+
+        }
+        await ReportModel.findByIdAndDelete(reportId);
+        return res.json({ success: true, message: "Report deleted successfully", report });
+
 
     } catch (error) {
         return res.json({ success: false, message: error.message });
+
     }
 }
+//-----------------------resolved report--------------------------//
+
+export const resolveReport = async (req, res) => {
+    const { reportId } = req.body;
+
+    if (!reportId) {
+        return res.json({
+            success: false,
+            message: "Missing report ID!"
+        });
+    }
+
+    try {
+        const report = await ReportModel.findById(reportId)
+            .populate("workerId")
+            .populate("serviceId")
+            .populate({
+                path: "reportedBy",
+                model: "Customer",
+                select: "-customerPassword"
+            });
+
+        if (!report) {
+            return res.json({
+                success: false,
+                message: "No report found!"
+            });
+        }
+
+        // Update report status
+        report.status = "resolved";
+        await report.save();
+
+        // Create notification for customer
+        const newNotification = await Notification.create({
+            recipient: report.reportedBy._id,
+            senderRole: "admin",
+            recipientRole: "customer",
+            type: "report",
+            message: `Thank you, **${report.reportedBy.customerName}**, for reporting **${report.serviceId.serviceName}** provided by worker **${report.workerId.workerCode}**. Your report has been resolved.`
+        });
+
+        return res.json({success: true,message: "Report resolved successfully!",report,notification: newNotification});
+
+    } catch (error) {
+        return res.json({success: false,message: error.message});
+    }
+};

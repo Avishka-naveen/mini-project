@@ -17,7 +17,7 @@ function AdminManageReport() {
     const [filterStatus, setFilterStatus] = useState('all');
     const [selectedReport, setSelectedReport] = useState(null);
     const [detailsVisible, setDetailsVisible] = useState(false);
-    const [actionModal, setActionModal] = useState({ open: false, type: null, report: null });
+    // const [actionModal, setActionModal] = useState(false);
 
     // ---------- Fetch reports ----------
     const fetchReports = async () => {
@@ -83,42 +83,36 @@ function AdminManageReport() {
         };
     }, [reports]);
 
-    // ---------- Actions ----------
-    const handleAction = async () => {
-        const { type, report } = actionModal;
-        if (!report) return;
-
+    //------------------delete selected report--------------//
+    const handleDeleteReport = async (reportId) => {
         try {
-            if (type === 'delete') {
-                const response = await axios.post(
-                    backendUrl + '/api/admin/deleteReport',
-                    { reportId: report._id },
-                    { withCredentials: true }
-                );
-                if (response.data.success) {
-                    toast.success('Report deleted.');
-                    setReports((prev) => prev.filter((r) => r._id !== report._id));
-                }
-            } else {
-                // 'resolve' or 'dismiss' → update status
-                const newStatus = type === 'resolve' ? 'resolved' : 'dismissed';
-                const response = await axios.post(
-                    backendUrl + '/api/admin/updateReportStatus',
-                    { reportId: report._id, status: newStatus },
-                    { withCredentials: true }
-                );
-                if (response.data.success) {
-                    toast.success(`Report ${newStatus}.`);
-                    setReports((prev) =>
-                        prev.map((r) => (r._id === report._id ? { ...r, status: newStatus } : r))
-                    );
-                }
+            //console.log(reportId)
+            const response = await axios.post(backendUrl + "/api/admin/deleteReport", { reportId });
+            if (response.data.success) {
+                toast.success(response.data.message);
+                fetchReports()
             }
-            setActionModal({ open: false, type: null, report: null });
         } catch (error) {
             toast.error(error.message || 'Action failed.');
         }
-    };
+    }
+
+    //----------------resolved selected report--------------//
+
+    const handleResolved = async (reportId) => {
+        //console.log(reportId)
+        try {
+            //console.log(reportId)
+            const response = await axios.post(backendUrl + "/api/admin/resolveReport", { reportId });
+            if (response.data.success) {
+                toast.success(response.data.message);
+                fetchReports()
+            }
+        } catch (error) {
+            toast.error(error.message || 'Action failed.');
+        }
+
+    }
 
     return (
         <div className="p-4 sm:p-6 dark:text-white max-w-7xl mx-auto">
@@ -197,7 +191,7 @@ function AdminManageReport() {
                         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6"></div>
                         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-4/6"></div>
                     </div>
-                   
+
                 </div>
             ) : filteredReports.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400">
@@ -268,24 +262,17 @@ function AdminManageReport() {
                                         {report.status === 'pending' && (
                                             <>
                                                 <button
-                                                    onClick={() => setActionModal({ open: true, type: 'resolve', report })}
+                                                    onClick={() => { handleResolved(report._id) }}
                                                     className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-white
                                      bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
                                                 >
                                                     <FaCheck /> Resolve
                                                 </button>
-                                                <button
-                                                    onClick={() => setActionModal({ open: true, type: 'dismiss', report })}
-                                                    className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-700
-                                     dark:text-gray-300 bg-gray-200 dark:bg-gray-700
-                                     hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                                                >
-                                                    <FaTimes /> Dismiss
-                                                </button>
+
                                             </>
                                         )}
                                         <button
-                                            onClick={() => setActionModal({ open: true, type: 'delete', report })}
+                                            onClick={() => handleDeleteReport(report._id)}
                                             className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600
                                  dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                         >
@@ -438,80 +425,7 @@ function AdminManageReport() {
                 </>
             )}
 
-            {/* ---------- Action Confirm Modal ---------- */}
-            {actionModal.open && actionModal.report && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in overflow-hidden">
-                        <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center
-                    ${actionModal.type === 'delete'
-                                            ? 'bg-red-100 dark:bg-red-900/30'
-                                            : actionModal.type === 'resolve'
-                                                ? 'bg-green-100 dark:bg-green-900/30'
-                                                : 'bg-gray-100 dark:bg-gray-700'}`}>
-                                        {actionModal.type === 'delete' && <FaTrash className="text-red-600 dark:text-red-400" />}
-                                        {actionModal.type === 'resolve' && <FaCheck className="text-green-600 dark:text-green-400" />}
-                                        {actionModal.type === 'dismiss' && <FaTimes className="text-gray-600 dark:text-gray-400" />}
-                                    </div>
-                                    <div>
-                                        <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-                                            {actionModal.type === 'delete' && 'Delete Report'}
-                                            {actionModal.type === 'resolve' && 'Resolve Report'}
-                                            {actionModal.type === 'dismiss' && 'Dismiss Report'}
-                                        </h2>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            {actionModal.type === 'delete' && 'This cannot be undone'}
-                                            {actionModal.type === 'resolve' && 'Mark as resolved'}
-                                            {actionModal.type === 'dismiss' && 'Mark as dismissed'}
-                                        </p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => setActionModal({ open: false, type: null, report: null })}
-                                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                >
-                                    <FaTimes className="w-5 h-5 text-gray-500" />
-                                </button>
-                            </div>
-                        </div>
 
-                        <div className="p-6">
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                Are you sure you want to{' '}
-                                <strong>
-                                    {actionModal.type === 'delete' ? 'delete' : actionModal.type}
-                                </strong>{' '}
-                                the report against{' '}
-                                <strong>{actionModal.report.workerId?.customerId?.customerName}</strong>?
-                            </p>
-
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <button
-                                    onClick={() => setActionModal({ open: false, type: null, report: null })}
-                                    className="flex-1 px-4 py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300
-                             dark:bg-gray-700 dark:hover:bg-gray-600
-                             text-gray-700 dark:text-gray-200 font-medium transition"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleAction}
-                                    className={`flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition shadow-md hover:shadow-lg
-                    ${actionModal.type === 'delete'
-                                            ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800'
-                                            : actionModal.type === 'resolve'
-                                                ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
-                                                : 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800'}`}
-                                >
-                                    Yes, {actionModal.type === 'delete' ? 'Delete' : actionModal.type === 'resolve' ? 'Resolve' : 'Dismiss'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
