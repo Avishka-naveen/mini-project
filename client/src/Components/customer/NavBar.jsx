@@ -225,7 +225,7 @@ function NavBar() {
                bg-white dark:bg-gray-900 shadow-xl animate-slide-in
                flex flex-col overflow-hidden"
                                         >
-                                            <NotificationBar unseenCount={unseenCount} setOpenNotificationBar={setOpenNotificationBar} />
+                                            <NotificationBar unseenCount={unseenCount} handleSeenMsg={handleSeenMsg} setOpenNotificationBar={setOpenNotificationBar} />
                                         </div>
                                     </div>
                                 )

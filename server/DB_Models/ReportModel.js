@@ -5,7 +5,7 @@ const reportSchema = new mongoose.Schema({
     serviceId: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true, },
     reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Customer", required: true },
     reason: { type: String, required: true },
-    status: { type: String, enum: ["pending", "reviewing", "resolved", "rejected"], default: "pending" }
+    status: { type: String, enum: ["pending", "resolved"], default: "pending" }
 
 }, { timestamps: true });
 

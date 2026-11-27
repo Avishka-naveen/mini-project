@@ -1,5 +1,5 @@
 import express from 'express'
-import {getAllReports,deleteService,getAllComment,getAllServices ,deleteReservation,enableWorker,disableWorker, getAllUsersData ,deleteCustomer,getAllWorkers,deleteWorker ,getAllReservations} from '../Contollers/adminController.js';
+import {resolveReport,deleteReport,getAllReports,deleteService,getAllComment,getAllServices ,deleteReservation,enableWorker,disableWorker, getAllUsersData ,deleteCustomer,getAllWorkers,deleteWorker ,getAllReservations} from '../Contollers/adminController.js';
 
 const adminRoute=express.Router();
 
@@ -15,6 +15,8 @@ adminRoute.get('/getAllServices',getAllServices);
 adminRoute.post('/getAllComment', getAllComment);
 adminRoute.post('/deleteService',deleteService);
 adminRoute.get('/getAllReports',getAllReports);
+adminRoute.post('/deleteReport',deleteReport);
+adminRoute.post('/resolveReport',resolveReport);
 
 
 

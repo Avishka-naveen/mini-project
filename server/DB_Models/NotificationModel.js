@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 const notificationSchema = new mongoose.Schema({
     recipient: {type: mongoose.Schema.Types.ObjectId,ref: "Customer",required: true},
     sender: {type: mongoose.Schema.Types.ObjectId,ref: "Customer"},
-    senderRole: {type: String,enum: ["customer", "worker"]},
+    senderRole: {type: String,enum: ["customer", "worker","admin"]},
     recipientRole: {type: String,enum: ["customer", "worker"]},
-    type: {type: String,enum: [ "reply", "job", "application", "message", "reservation"]},
+    type: {type: String,enum: [ "reply", "job", "report", "message", "reservation"]},
     message: {type: String,required: true},
     relatedId: {type: mongoose.Schema.Types.ObjectId},
     isRead: {type: Boolean,default: false}
