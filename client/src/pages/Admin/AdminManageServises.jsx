@@ -16,13 +16,18 @@ function AdminManageServices() {
   const [comments, setComments] = useState([]);
   const [collapsed, setCollapsed] = useState({});
   const { backendUrl } = useContext(AppContext);
+  const [loading, setLoading] = useState(false);
 
+  //-------------fetch services----------------------
   const fetchServices = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(backendUrl + '/api/admin/getAllServices');
       if (response.data.success) setServices(response.data.services);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -224,93 +229,125 @@ function AdminManageServices() {
         </div>
       </div>
 
-      {/* Worker chips */}
-      {workers.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6">
-          <button
-            onClick={() => setActiveWorker('all')}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors
-              ${activeWorker === 'all'
-                ? 'bg-blue-600 text-white dark:bg-purple-600'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
-          >
-            All ({services.length})
-          </button>
-          {workers.map((w) => (
-            <button
-              key={w.name}
-              onClick={() => setActiveWorker(w.name)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors
-                ${activeWorker === w.name
-                  ? 'bg-blue-600 text-white dark:bg-purple-600'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
-            >
-              {w.name} ({w.count})
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Grouped by worker */}
-      {filteredServices.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">
-          <span className="text-6xl mb-4">📭</span>
-          <p className="text-xl font-medium">No services found</p>
-          <p className="text-sm mt-1">Try adjusting your search or worker filter.</p>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 w-full max-w-sm px-6">
+          <div className="w-full space-y-3 mb-4">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-full"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-4/6"></div>
+          </div>
         </div>
       ) : (
-        <div className="space-y-8">
-          {Object.entries(groupedServices).map(([workerName, items]) => {
-            const isCollapsed = collapsed[workerName];
-            const firstService = items[0];
-            const workerRole = firstService?.workerId?.customerId?.role;
-            return (
-              <section key={workerName}>
-                {/* Worker section header */}
-                <button
-                  onClick={() => toggleWorker(workerName)}
-                  className="w-full flex items-center justify-between mb-3 group
-                             p-3 rounded-xl bg-gradient-to-r from-blue-50 to-transparent
-                             dark:from-gray-800 dark:to-transparent border border-gray-200 dark:border-gray-700"
-                >
-                  <div className="flex items-center gap-3">
-                    {/* Worker avatar */}
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600
-                                    text-white flex items-center justify-center font-semibold text-sm uppercase flex-shrink-0">
-                      {workerName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                    </div>
-                    <div className="text-left">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="text-base font-semibold text-gray-800 dark:text-white">
-                          {workerName}
-                        </h2>
-                        {workerRole && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full uppercase
-                                           bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                            {workerRole}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {items.length} service{items.length > 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-gray-400 group-hover:text-blue-600 dark:group-hover:text-purple-400 transition-colors">
-                    {isCollapsed ? <FaChevronDown /> : <FaChevronUp />}
-                  </span>
-                </button>
+        <>
+          {workers.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              <button
+                onClick={() => setActiveWorker('all')}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors
+            ${activeWorker === 'all'
+                    ? 'bg-blue-600 text-white dark:bg-purple-600'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+              >
+                All ({services.length})
+              </button>
 
-                {!isCollapsed && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {items.map(renderServiceCard)}
-                  </div>
-                )}
-              </section>
-            );
-          })}
-        </div>
+              {workers.map((w) => (
+                <button
+                  key={w.name}
+                  onClick={() => setActiveWorker(w.name)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors
+              ${activeWorker === w.name
+                      ? 'bg-blue-600 text-white dark:bg-purple-600'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                >
+                  {w.name} ({w.count})
+                </button>
+              ))}
+            </div>
+          )}
+
+          {filteredServices.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">
+              <span className="text-6xl mb-4">📭</span>
+              <p className="text-xl font-medium">No services found</p>
+              <p className="text-sm mt-1">
+                Try adjusting your search or worker filter.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {Object.entries(groupedServices).map(([workerName, items]) => {
+                const isCollapsed = collapsed[workerName];
+                const firstService = items[0];
+                const workerRole = firstService?.workerId?.customerId?.role;
+
+                return (
+                  <section key={workerName}>
+                    <button
+                      onClick={() => toggleWorker(workerName)}
+                      className="w-full flex items-center justify-between mb-3 group
+                           p-3 rounded-xl bg-gradient-to-r from-blue-50 to-transparent
+                           dark:from-gray-800 dark:to-transparent border border-gray-200 dark:border-gray-700"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600
+                               text-white flex items-center justify-center font-semibold text-sm
+                               uppercase flex-shrink-0"
+                        >
+                          {workerName
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .slice(0, 2)}
+                        </div>
+
+                        <div className="text-left">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h2 className="text-base font-semibold text-gray-800 dark:text-white">
+                              {workerName}
+                            </h2>
+
+                            {workerRole && (
+                              <span
+                                className="text-[10px] px-1.5 py-0.5 rounded-full uppercase
+                                     bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                              >
+                                {workerRole}
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {items.length} service{items.length > 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      <span
+                        className="text-gray-400 group-hover:text-blue-600
+                             dark:group-hover:text-purple-400 transition-colors"
+                      >
+                        {isCollapsed ? <FaChevronDown /> : <FaChevronUp />}
+                      </span>
+                    </button>
+
+                    {!isCollapsed && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {items.map(renderServiceCard)}
+                      </div>
+                    )}
+                  </section>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
+
+
 
       {/* Footer summary */}
       <div className="mt-6 px-4 py-3 bg-gray-100 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -357,8 +394,8 @@ function AdminManageServices() {
                   ['Worker', getWorkerName(selectedService)],
                   ['Created At', selectedService.createdAt
                     ? new Date(selectedService.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric', month: 'long', day: 'numeric'
-                      })
+                      year: 'numeric', month: 'long', day: 'numeric'
+                    })
                     : 'N/A'],
                 ].map(([label, value]) => (
                   <div key={label} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3">

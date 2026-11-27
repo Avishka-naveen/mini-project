@@ -17,20 +17,24 @@ function AdminManageWorker() {
   const [selectedWorker, setSelectedWorker] = useState(null);
   const [deleteModelVisible, setdeleteModelVisible] = useState(false);
   const { backendUrl } = useContext(AppContext);
+  const [loading, setLoading] = useState(true);
 
   // ---------- Fetch ----------
   const fetchworkers = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(backendUrl + '/api/admin/getAllWorkers');
       if (response.data.success) setWorkers(response.data.workers);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => { fetchworkers(); }, []);
 
- 
+
 
   // ---------- Filter: name / email / workerCode ----------
   const filteredWorkers = useMemo(() => {
@@ -127,7 +131,7 @@ function AdminManageWorker() {
           />
         </div>
 
-       
+
       </div>
 
       {/* Active filter chips */}
@@ -157,7 +161,15 @@ function AdminManageWorker() {
       {/* Table */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 w-full max-w-sm px-6">
+              <div className="w-full space-y-3 mb-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-4/6"></div>
+              </div>  
+            </div>
+          ) : (<table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">No.</th>
@@ -206,7 +218,7 @@ function AdminManageWorker() {
                       </div>
                     </td>
 
-                  
+
                     <td className="px-4 py-3 hidden sm:table-cell">
                       <span className="inline-block px-2.5 py-1 rounded-md text-xs font-mono font-semibold
                                        bg-blue-100 dark:bg-purple-900/40 text-blue-700 dark:text-purple-300
@@ -256,7 +268,9 @@ function AdminManageWorker() {
                 </tr>
               )}
             </tbody>
-          </table>
+          </table>)
+          }
+
         </div>
 
         <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-600">

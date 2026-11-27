@@ -244,13 +244,41 @@ function WorkerDetails() {
 
   if (!serviceData) {
     return (
-      <>
-        <NavBar />
-        <div className="flex items-center justify-center min-h-screen bg-white dark:bg-[#1e1e1e]">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Loding.....</h1>
+
+      <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400">
+        <div className="flex items-end space-x-1.5 mb-6 h-16">
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-8 [animation-delay:-0.9s]"></div>
+
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-12 [animation-delay:-0.75s]"></div>
+
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-16 [animation-delay:-0.6s]"></div>
+
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-10 [animation-delay:-0.45s]"></div>
+
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-14 [animation-delay:-0.3s]"></div>
         </div>
-        <Footer />
-      </>
+
+        <p className="text-sm font-medium tracking-wide">
+          Loading Services...
+        </p>
+
+        <p className="text-xs mt-1 opacity-70">
+          Fetching your latest data
+        </p>
+
+        <style>{`
+              @keyframes wave {
+                0%, 100% {
+                  transform: scaleY(0.4);
+                  opacity: 0.6;
+                }
+                50% {
+                  transform: scaleY(1);
+                  opacity: 1;
+                }
+              }
+            `}</style>
+      </div>
     );
   }
 

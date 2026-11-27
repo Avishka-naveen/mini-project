@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 // import { dummybookingData } from '../../assets/dummyData'; 
-import { FaSearch, FaTrash, FaCalendarCheck,FaUserCircle, FaIdCard, FaEnvelope, FaPhone, FaMapMarkerAlt, FaTimes, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaSearch, FaTrash, FaCalendarCheck, FaUserCircle, FaIdCard, FaEnvelope, FaPhone, FaMapMarkerAlt, FaTimes, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import axios from 'axios';
 import { AppContext } from '../../Context/Appcontext';
 import { toast } from 'react-toastify';
@@ -18,9 +18,11 @@ function AdminManageBookings() {
   const [customerDetailsVisible, setCustomerDetailsVisible] = useState('');
   const [deleteModelVisible, setdeleteModelVisible] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState('');
+  const [loading, setLoading] = useState(false);
 
-
+  //--------------------fetch reservations-------------------//
   const getReservations = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(backendUrl + '/api/admin/getAllReservations');
       if (response.data.success) {
@@ -28,6 +30,8 @@ function AdminManageBookings() {
       }
     } catch (error) {
       console.log(error);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -68,7 +72,7 @@ function AdminManageBookings() {
 
     const matchesStatus = filterStatus === 'all' || status.toLowerCase() === filterStatus.toLowerCase();
 
-    return  matchesStatus;
+    return matchesStatus;
   }
 
 
@@ -126,203 +130,214 @@ function AdminManageBookings() {
 
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                <th className="px-4 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                  No.
-                </th>
-                <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                  Worker
-                </th>
-                <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                  Customer
-                </th>
-                <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                  Service
-                </th>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 w-full max-w-sm px-6">
+              <div className="w-full space-y-3 mb-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-4/6"></div>
+              </div>
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                  <th className="px-4 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                    No.
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                    Worker
+                  </th>
+                  <th className="px-2 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                    Customer
+                  </th>
+                  <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                    Service
+                  </th>
 
-                <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                  Booking Date
-                </th>
-                <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                  Status
-                </th>
-                <th className="px-2 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-                  Actions
-                </th>
+                  <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                    Booking Date
+                  </th>
+                  <th className="px-2 py-3 hidden sm:table-cell text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="px-2 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
+                    Actions
+                  </th>
 
-              </tr>
-            </thead>
+                </tr>
+              </thead>
 
-            <tbody>
+              <tbody>
 
-              {filteredBookings.length > 0 ? (
+                {filteredBookings.length > 0 ? (
 
-                filteredBookings.map((booking, index) => (
-                  
-                  <tr
-                    key={booking._id || booking.id || index}
-                    className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
-                  >
+                  filteredBookings.map((booking, index) => (
 
-                    {/* No. */}
-                    <td className="px-4 py-3 hidden sm:table-cell text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap">
-                      {String(index + 1).padStart(2, "0")}
-                    </td>
+                    <tr
+                      key={booking._id || booking.id || index}
+                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                    >
 
-                    {/* Worker */}
-                    <td className="px-2 py-3">
-                      <div className="flex items-center gap-2">
+                      {/* No. */}
+                      <td className="px-4 py-3 hidden sm:table-cell text-gray-800 dark:text-gray-200 font-medium whitespace-nowrap">
+                        {String(index + 1).padStart(2, "0")}
+                      </td>
 
-                        <div
-                          onClick={() => {
-                            setSelectedWorker(booking);
-                            setWorkerDetailsVisible(true);
-                          }}
-                          className="w-8 h-8 min-w-8 rounded-full bg-blue-100
+                      {/* Worker */}
+                      <td className="px-2 py-3">
+                        <div className="flex items-center gap-2">
+
+                          <div
+                            onClick={() => {
+                              setSelectedWorker(booking);
+                              setWorkerDetailsVisible(true);
+                            }}
+                            className="w-8 h-8 min-w-8 rounded-full bg-blue-100
                     dark:bg-blue-900 flex items-center justify-center
                     text-blue-600 dark:text-blue-400 text-xs font-bold
                     cursor-pointer overflow-hidden"
-                        >
+                          >
 
-                          <img
-                            src={booking.workerId?.profile}
-                            alt="Worker"
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
+                            <img
+                              src={booking.workerId?.profile}
+                              alt="Worker"
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+
+                          </div>
+
+                          <span className="hidden sm:inline text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {booking.workerId?.customerId?.customerName || "Unknown"}
+                          </span>
 
                         </div>
+                      </td>
 
-                        <span className="hidden sm:inline text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                          {booking.workerId?.customerId?.customerName || "Unknown"}
-                        </span>
+                      {/* Customer */}
+                      <td className="px-2 py-3">
+                        <div className="flex items-center gap-2">
 
-                      </div>
-                    </td>
-
-                    {/* Customer */}
-                    <td className="px-2 py-3">
-                      <div className="flex items-center gap-2">
-
-                        <div
-                          onClick={() => {
-                            setSelectedCustomer(booking);
-                            setCustomerDetailsVisible(true);
-                          }}
-                          className="w-8 h-8 min-w-8 rounded-full bg-green-100
+                          <div
+                            onClick={() => {
+                              setSelectedCustomer(booking);
+                              setCustomerDetailsVisible(true);
+                            }}
+                            className="w-8 h-8 min-w-8 rounded-full bg-green-100
                     dark:bg-green-900 flex items-center justify-center
                     text-green-600 dark:text-green-400 text-xs font-bold
                     cursor-pointer"
-                        >
-                          {booking.customerName?.charAt(0) || "C"}
+                          >
+                            {booking.customerName?.charAt(0) || "C"}
+                          </div>
+
+                          <span className="hidden sm:inline text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {booking.customerName || "Unknown"}
+                          </span>
+
+                        </div>
+                      </td>
+
+                      {/* Service */}
+                      <td className="px-2 py-3 hidden sm:table-cell text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                        {booking.serviceId?.serviceName || "N/A"}
+                      </td>
+
+                      {/* Booking Date */}
+                      <td className="px-2 py-3 hidden sm:table-cell whitespace-nowrap">
+
+                        <div className="flex items-center gap-2">
+
+                          <span className="text-gray-700 dark:text-gray-300 text-xs">
+                            {booking.date
+                              ? new Date(booking.date).toLocaleDateString()
+                              : "N/A"}
+                          </span>
+
                         </div>
 
-                        <span className="hidden sm:inline text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                          {booking.customerName || "Unknown"}
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-2 py-3 hidden sm:table-cell whitespace-nowrap">
+
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
+                            booking.status
+                          )}`}
+                        >
+                          {booking.status || "Pending"}
                         </span>
 
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Service */}
-                    <td className="px-2 py-3 hidden sm:table-cell text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                      {booking.serviceId?.serviceName || "N/A"}
-                    </td>
+                      {/* Actions */}
+                      <td className="px-2 py-3 whitespace-nowrap">
 
-                    {/* Booking Date */}
-                    <td className="px-2 py-3 hidden sm:table-cell whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-1.5">
 
-                      <div className="flex items-center gap-2">
-
-                        <span className="text-gray-700 dark:text-gray-300 text-xs">
-                          {booking.date
-                            ? new Date(booking.date).toLocaleDateString()
-                            : "N/A"}
-                        </span>
-
-                      </div>
-
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-2 py-3 hidden sm:table-cell whitespace-nowrap">
-
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
-                          booking.status
-                        )}`}
-                      >
-                        {booking.status || "Pending"}
-                      </span>
-
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-2 py-3 whitespace-nowrap">
-
-                      <div className="flex items-center justify-center gap-1.5">
-
-                        {/* Delete Button */}
-                        <button
-                          onClick={() => {
-                            setdeleteModelVisible(true);
-                            setSelectedReservation(booking);
-                          }}
-                          className="p-1.5 text-red-500 hover:text-red-700
+                          {/* Delete Button */}
+                          <button
+                            onClick={() => {
+                              setdeleteModelVisible(true);
+                              setSelectedReservation(booking);
+                            }}
+                            className="p-1.5 text-red-500 hover:text-red-700
                     dark:text-red-400 dark:hover:text-red-300
                     hover:bg-red-50 dark:hover:bg-red-900/20
                     rounded-lg transition-colors"
-                          title="Delete Booking"
-                        >
-                          <FaTrash size={14} />
-                        </button>
+                            title="Delete Booking"
+                          >
+                            <FaTrash size={14} />
+                          </button>
+
+                        </div>
+
+                      </td>
+
+
+                    </tr>
+
+
+
+                  ))
+
+                ) : (
+
+
+                  <tr>
+
+                    <td
+                      colSpan="7"
+                      className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
+                    >
+
+                      <div className="flex flex-col items-center gap-2">
+
+                        <span className="text-4xl">
+                          📭
+                        </span>
+
+                        <p className="font-medium">
+                          No bookings found
+                        </p>
+
+                        <p className="text-sm">
+                          Try adjusting your search or filter.
+                        </p>
 
                       </div>
 
                     </td>
-                   
 
                   </tr>
-                  
-                  
 
-                ))
+                )}
 
-              ) : (
+              </tbody>
+            </table>
+          )}
 
-             
-                <tr>
-
-                  <td
-                    colSpan="7"
-                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
-                  >
-
-                    <div className="flex flex-col items-center gap-2">
-
-                      <span className="text-4xl">
-                        📭
-                      </span>
-
-                      <p className="font-medium">
-                        No bookings found
-                      </p>
-
-                      <p className="text-sm">
-                        Try adjusting your search or filter.
-                      </p>
-
-                    </div>
-
-                  </td>
-
-                </tr>
-
-              )}
-
-            </tbody>
-          </table>
         </div>
 
         {/* Table Footer */}

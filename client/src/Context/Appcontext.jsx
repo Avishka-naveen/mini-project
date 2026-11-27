@@ -15,10 +15,12 @@ export const AppContextProvider = (props) => {
   const [currentCustomerId, setcurrentCustomerId] = useState('');
   const [allServicesData, setAllServicesData] = useState([]);
   const [customerNotifications, setCustomerNotifications] = useState([]);
+    const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Fetch Customer Data
   const fetchCustomerData = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(backendUrl + '/api/customer/currentCustomerData');
 
@@ -40,6 +42,8 @@ export const AppContextProvider = (props) => {
       setIsLogged(false);
       localStorage.removeItem('isLogged');
       return null;
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -123,6 +127,7 @@ const fetchCustomerNotifications = async () => {
     customerNotifications,
     setCustomerNotifications,
     fetchCustomerNotifications,
+    loading, setLoading,
    
   };
 
