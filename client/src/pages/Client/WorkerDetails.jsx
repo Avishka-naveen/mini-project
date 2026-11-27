@@ -149,7 +149,7 @@ function WorkerDetails() {
     }
   }, [serviceId]);
 
-  // ------------------reservation formhandle --------------------//
+  // ------------------reservation form handle --------------------//
 
 
   const [formData, setFormData] = useState({
@@ -221,36 +221,64 @@ function WorkerDetails() {
     }
   };
 
-//-------------------------------------------------- delete comment function-----------------//
-const handleDeleteComment = async (e) => {
-  e.preventDefault();
-  console.log(selectedComment)
-  try{
-    const response = await axios.post(backendUrl + '/api/customer/deleteComment', { commentId: selectedComment }, { withCredentials: true });
-    if (response.data.success) {
-      toast.success("Comment deleted successfully!");
-      getAllComments();
-      setDeleteCommentModalVisible(false);
-      setComment('');
-      setSelectedComment(null);
-    } else {
-      toast.error(response.data.message);
+  //-------------------------------------------------- delete comment function-----------------//
+  const handleDeleteComment = async (e) => {
+    e.preventDefault();
+    console.log(selectedComment)
+    try {
+      const response = await axios.post(backendUrl + '/api/customer/deleteComment', { commentId: selectedComment }, { withCredentials: true });
+      if (response.data.success) {
+        toast.success("Comment deleted successfully!");
+        getAllComments();
+        setDeleteCommentModalVisible(false);
+        setComment('');
+        setSelectedComment(null);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Delete comment error:", error.response?.data || error);
+      toast.error("Error deleting comment.");
     }
-  }catch(error){
-    console.error("Delete comment error:", error.response?.data || error);
-    toast.error("Error deleting comment.");
   }
-}
 
-  if (!serviceData){
+  if (!serviceData) {
     return (
-      <>
-        <NavBar />
-        <div className="flex items-center justify-center min-h-screen bg-white dark:bg-[#1e1e1e]">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Loding.....</h1>
+
+      <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400">
+        <div className="flex items-end space-x-1.5 mb-6 h-16">
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-8 [animation-delay:-0.9s]"></div>
+
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-12 [animation-delay:-0.75s]"></div>
+
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-16 [animation-delay:-0.6s]"></div>
+
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-10 [animation-delay:-0.45s]"></div>
+
+          <div className="w-2.5 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full animate-[wave_1.2s_ease-in-out_infinite] h-14 [animation-delay:-0.3s]"></div>
         </div>
-        <Footer />
-      </>
+
+        <p className="text-sm font-medium tracking-wide">
+          Loading Services...
+        </p>
+
+        <p className="text-xs mt-1 opacity-70">
+          Fetching your latest data
+        </p>
+
+        <style>{`
+              @keyframes wave {
+                0%, 100% {
+                  transform: scaleY(0.4);
+                  opacity: 0.6;
+                }
+                50% {
+                  transform: scaleY(1);
+                  opacity: 1;
+                }
+              }
+            `}</style>
+      </div>
     );
   }
 
@@ -325,9 +353,18 @@ const handleDeleteComment = async (e) => {
                 className='w-full max-w-[250px] h-auto  border-3 border-blue-600 dark:border-purple-600 aspect-square object-cover rounded-full mx-auto shadow-lg'
 
               />
-              <h2 className='text-center font-bold text-xl sm:text-2xl mt-4 text-gray-800 dark:text-white'>
-                {serviceData?.workerId?.customerId?.customerName}
-              </h2>
+              <div className="flex flex-col items-center justify-center text-center gap-1 mt-4">
+                <h2 className="font-bold text-xl sm:text-2xl text-gray-800 dark:text-white">
+                  {serviceData?.workerId?.customerId?.customerName || 'Unknown Worker'}
+                </h2>
+                {serviceData?.workerId?.workerCode && (
+                  <p className="text-xs sm:text-sm font-medium text-blue-600 dark:text-purple-400
+                  bg-blue-50 dark:bg-purple-900/30
+                  px-3 py-0.5 rounded-full">
+                    {serviceData.workerId.workerCode}
+                  </p>
+                )}
+              </div>
               <p className='text-center text-gray-500 dark:text-gray-400 text-sm'>
                 {serviceData.serviceName}
               </p>
@@ -573,8 +610,8 @@ const handleDeleteComment = async (e) => {
                         {comment.customerId?._id === currentCustomerId && (
                           <>
                             <button onClick={() => {
-                              
-                             
+
+
                               setDeleteCommentModalVisible(true);
                               setSelectedComment(comment._id);
                             }} className="flex-shrink-0 text-white bg-red-600 p-1.5 rounded-md cursor-pointer

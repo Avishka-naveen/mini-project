@@ -9,6 +9,7 @@ const workerSchema = new mongoose.Schema(
         description: { type: String, default: "", trim: true, },
         nic: { type: String, default: "", trim: true, },
         isActive: {type: Boolean,default: true,},
+        workerCode: {type: String,unique: true, required: true}
     },
     { timestamps: true }
 );

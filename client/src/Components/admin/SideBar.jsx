@@ -12,6 +12,7 @@ import {
   FaBell,
   FaMoneyBillWave
 } from 'react-icons/fa';
+import { MdReportProblem } from "react-icons/md";
 import { NavLink, useNavigate } from 'react-router-dom';
 import ToggleBtn from '../customer/ToggleBtn';
 import { MdOutlineWork } from "react-icons/md";
@@ -45,6 +46,12 @@ function AdminSideBar() {
       label: 'Manage Services',
       icon: <FaClipboardList />,
       path: '/admin/dashbord/manageServises'
+    }
+    , {
+      id: 'Reports',
+      label: 'Manage Reports',
+      icon: <MdReportProblem />,
+      path: '/admin/dashbord/manageReports'
     }
   ];
   const navigate = useNavigate();

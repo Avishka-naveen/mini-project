@@ -2,112 +2,148 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../../Components/customer/NavBar';
 import Footer from '../../Components/customer/Footer';
-import { bookingDummyData } from '../../assets/dummyData';
 import { AppContext } from '../../Context/Appcontext';
 import axios from 'axios';
 import Rate from '../../Components/customer/Rate';
-import { FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import {
+  FaTimes, FaExclamationTriangle, FaEye, FaStar, FaEdit,
+  FaCalendarAlt, FaClipboardList, FaFlag,FaCopy
+} from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 function Bookings() {
-
-  const { backendUrl } = useContext(AppContext)
+  const { backendUrl } = useContext(AppContext);
   const navigate = useNavigate();
-  const [reservations, setReservations] = useState('');
+
+  const [reservations, setReservations] = useState([]);
   const [addRatingModalVisible, setAddRatingModalVisible] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState('');
+  const [selectedReservation, setSelectedReservation] = useState(null);
   const [cancelModalVisible, setcancelModalVisible] = useState(false);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportReason, setReportReason] = useState('');
 
-  //console.log(selectedReservation);
-  //console.log(reservations)
-
-  // Status color mapping
+  // ---------- Status color ----------
   const getStatusColor = (status) => {
-    const statusMap = {
-      'pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      'confirmed': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-      'completed': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      'cancelled': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      'rejected': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    const map = {
+      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      confirmed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
     };
-    return statusMap[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    return map[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
-  //----------call get reservation function --------------------//
-
+  // ---------- Fetch ----------
   const fetchReservations = async () => {
     try {
-      let response;
-      response = await axios.get(backendUrl + '/api/customer/myReservations', { withCredentials: true });
-      if (response.data.success) {
-        setReservations(response.data.reservations);
-      }
-      //console.log(response.data.reservations);
+      const response = await axios.get(backendUrl + '/api/customer/myReservations', { withCredentials: true });
+      if (response.data.success) setReservations(response.data.reservations);
     } catch (error) {
-      console.error("Error fetching reservations:", error);
+      console.error('Error fetching reservations:', error);
     }
-  }
+  };
 
-  useEffect(() => {
-    fetchReservations();
-  }, []);
+  useEffect(() => { fetchReservations(); }, []);
 
-
-  //------------------call delete booking function------------//
-
+  // ---------- Cancel ----------
   const handleDeleteBooking = async (e) => {
     e.preventDefault();
     try {
-      let response;
-      response = await axios.post(backendUrl + "/api/customer/cancellbooking", { reservationId: selectedReservation._id }, { withCredentials: true });
+      const response = await axios.post(
+        backendUrl + '/api/customer/cancellbooking',
+        { reservationId: selectedReservation._id },
+        { withCredentials: true }
+      );
       if (response.data.success) {
-        setSelectedReservation('');
+        setSelectedReservation(null);
         toast.success(response.data.message);
         fetchReservations();
         setcancelModalVisible(false);
       }
-
     } catch (error) {
       toast.error(error.message);
     }
+  };
 
-  }
+  // ---------- Report ----------
+  const handleReport = async (e) => {
+    e.preventDefault();
+    if (!reportReason.trim()) {
+      toast.error('Please describe the issue before submitting.');
+      return;
+    }
+    console.log("workerID----",selectedReservation.workerId)
+    console.log("services id----",selectedReservation.serviceId._id)
+    console.log(reportReason)
+    try {
+      const response = await axios.post(backendUrl + '/api/customer/reportWorker',{
+          workerId: selectedReservation.workerId,
+          serviceId: selectedReservation.serviceId._id,
+          reason: reportReason,
+        },
+        { withCredentials: true }
+      );
+      if (response.data.success) {
+        toast.success('Report submitted. Our team will review it.');
+        setReportModalVisible(false);
+        setReportReason('');
+      } else {
+        toast.error(response.data.message || 'Failed to submit report.');
+      }
+    } catch (error) {
+      toast.error(error.message || 'Error submitting report.');
+    }
+  };
+  //console.log(selectedReservation)
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-[#1e1e1e] text-black dark:text-white">
       <NavBar />
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">
-        {/* Header */}
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        {/* ---------- Header ---------- */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
-              My Bookings
-            </h1>
-
-            <p className=' text-gray-700 dark:text-gray-400 mt-1'> <span className='cursor-pointer hover:text-blue-500 dark:hover:text-purple-500' onClick={() => navigate('/customer/workerList')}>WorkerList </span>/MyBookings</p>
+            <div className="flex items-center gap-2">
+              <FaClipboardList className="text-2xl text-blue-600 dark:text-purple-500" />
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
+                My Bookings
+              </h1>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <span
+                className="cursor-pointer hover:text-blue-500 dark:hover:text-purple-500"
+                onClick={() => navigate('/customer/workerList')}
+              >
+                Worker List
+              </span>{' '}
+              / My Bookings
+            </p>
           </div>
+
           <div className="flex items-center gap-3">
-            <span className=" text-gray-500 dark:text-gray-400">
-              Total: <span className="font-semibold  text-gray-800 dark:text-white">{reservations.length}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Total: <span className="font-semibold text-gray-800 dark:text-white">{reservations.length}</span>
             </span>
-            <button onClick={() => navigate('/customer/workerList')} className="bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700 
-                             text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300 scale-[.8] sm:scale-[1]
-                             shadow-md hover:shadow-lg">
+            <button
+              onClick={() => navigate('/customer/workerList')}
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-purple-600 dark:hover:bg-purple-700
+                         text-white px-4 py-2 rounded-lg text-sm font-medium
+                         transition duration-300 shadow-md hover:shadow-lg"
+            >
               + New Booking
             </button>
           </div>
         </div>
 
-        {/* Table Container */}
+        {/* ---------- Table ---------- */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-
-          {/* Responsive Table Wrapper */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase hidden sm:block tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
                     No.
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
@@ -119,76 +155,114 @@ function Bookings() {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                     Status
                   </th>
-
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
+
               <tbody>
                 {reservations.length > 0 ? (
                   reservations.map((booking, index) => (
                     <tr
-                      key={index}
-                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                      key={booking._id || index}
+                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
-                      <td className="px-4 py-3 hidden sm:block  text-gray-800 dark:text-gray-200 font-medium">
-                        {String(index + 1)}
+                      <td className="px-4 py-3 hidden sm:table-cell text-gray-800 dark:text-gray-200 font-medium">
+                        {String(index + 1).padStart(2, '0')}
                       </td>
-                      <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                        {new Date(booking.date).toLocaleDateString()}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
 
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {/* {booking.serviceId || 'Unknown Worker'} */}
-                            <button onClick={() => navigate(`/customer/workerDetails/${booking.serviceId?._id}`)} className="cursor-pointer scale-[.8] sm:scale-[1] flex items-center gap-1 bg-blue-600 dark:bg-purple-600 hover:bg-blue-600 text-white py-1 px-3 rounded-md text-sm">
-                              <p> View</p> <p className='hidden sm:block'>Profile</p>
-                            </button>
-                          </span>
-                        </div>
+                      <td className="px-4 py-3 text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                        {new Date(booking.date).toLocaleDateString('en-GB')}
                       </td>
+
                       <td className="px-4 py-3">
-                        <span className={`px-3 py-2 rounded-md text-xs  cursor-pointer font-medium ${getStatusColor(booking.status)}`}>
+                        <button
+                          onClick={() => navigate(`/customer/workerDetails/${booking.serviceId?._id}`)}
+                          className="flex items-center gap-1.5 bg-blue-600 dark:bg-purple-600
+                                     hover:bg-blue-700 dark:hover:bg-purple-700
+                                     text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+                        >
+                          <FaEye /> View Profile
+                        </button>
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <span className={`inline-block px-3 py-1 rounded-md text-xs font-medium ${getStatusColor(booking.status)}`}>
                           {booking.status}
                         </span>
-                        {
-                          booking.status === 'pending' && (
-                            <button onClick={() => { setSelectedReservation(booking); setcancelModalVisible(true) }} className="ml-2 bg-red-600 cursor-pointer hover:bg-red-700 text-white px-2 py-1 rounded-md text-xs">
-                              Cancel
-                            </button>
-                          )
-                        }
-                        {
-                          booking.status === 'completed' && booking.isComment === false && (
-                            <button onClick={() => { setAddRatingModalVisible(true); setSelectedReservation(booking) }} className="ml-2 bg-slate-200 mt-2 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-100 px-2 py-1 rounded-md text-xs cursor-pointer">
-                              Add Rate
-                            </button>
-                          )
-                        }{
-                          booking.status === 'completed' && booking.isComment === true && (
-                            <button
-                              onClick={() =>
-                                navigate(
-                                  `/customer/workerDetails/${booking.serviceId?._id}?openComment=true`
-                                )
-                              }
-                              className="ml-2 bg-gray-400 text-white px-2 py-1 rounded-md text-xs cursor-pointer"
-                            >
-                              Edit Rating
-                            </button>
-                          )
-                        }
                       </td>
 
+                      {/* Actions column — one consistent place for all buttons */}
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {booking.status === 'pending' && (
+                            <button
+                              onClick={() => {
+                                setSelectedReservation(booking);
+                                setcancelModalVisible(true);
+                              }}
+                              className="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          )}
+
+                          {booking.status === 'completed' && booking.isComment === false && (
+                            <button
+                              onClick={() => {
+                                setAddRatingModalVisible(true);
+                                setSelectedReservation(booking);
+                              }}
+                              className="flex items-center gap-1 bg-slate-200 hover:bg-slate-300
+                                         dark:bg-slate-700 dark:hover:bg-slate-600
+                                         text-slate-700 dark:text-slate-100 px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+                            >
+                              <FaStar className="text-yellow-500" /> Add Rate
+                            </button>
+                          )}
+
+                          {booking.status === 'completed' && booking.isComment === true && (
+                            <button
+                              onClick={() => navigate(`/customer/workerDetails/${booking.serviceId?._id}?openComment=true`)}
+                              className="flex items-center gap-1 bg-gray-400 hover:bg-gray-500 text-white
+                                         px-2.5 py-1 rounded-md text-xs font-medium transition-colors"
+                            >
+                              <FaEdit /> Edit Rating
+                            </button>
+                          )}
+
+                          {/* Report — available for confirmed/completed bookings */}
+                          {(booking.status === 'confirmed' || booking.status === 'completed') && (
+                            <button
+                              onClick={() => {
+                                setSelectedReservation(booking);
+                                setReportModalVisible(true);
+                              }}
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium
+                                         text-red-600 dark:text-red-400
+                                         bg-red-50 dark:bg-red-900/20
+                                         border border-red-200 dark:border-red-800/40
+                                         hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+                            >
+                              <FaFlag /> Report
+                            </button>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                      <div className="flex flex-col items-center gap-2">
-                        <span className="text-4xl">📭</span>
-                        <p className="font-medium">No bookings found</p>
+                    <td colSpan="5" className="px-4 py-12 text-center text-gray-500 dark:text-gray-400">
+                      <div className="flex flex-col items-center gap-3">
+                        <FaCalendarAlt className="text-5xl opacity-30" />
+                        <p className="font-medium text-lg">No bookings found</p>
                         <p className="text-sm">You haven't made any bookings yet.</p>
-                        <button className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                        <button
+                          onClick={() => navigate('/customer/workerList')}
+                          className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                        >
                           Browse Workers
                         </button>
                       </div>
@@ -208,18 +282,20 @@ function Bookings() {
         </div>
       </main>
 
-      {/* add reating and comment model */}
+      {/* ---------- Rate modal ---------- */}
       {addRatingModalVisible && (
-        <Rate addRatingModalVisible={addRatingModalVisible} setAddRatingModalVisible={setAddRatingModalVisible} selectedReservation={selectedReservation} fetchReservations={fetchReservations} />
+        <Rate
+          addRatingModalVisible={addRatingModalVisible}
+          setAddRatingModalVisible={setAddRatingModalVisible}
+          selectedReservation={selectedReservation}
+          fetchReservations={fetchReservations}
+        />
       )}
-      +
-      {/* Cancel Booking Modal */}
-      {cancelModalVisible && (
+
+      {/* ---------- Cancel modal ---------- */}
+      {cancelModalVisible && selectedReservation && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in">
-
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in overflow-hidden">
-
-            {/* Modal Header */}
             <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -227,19 +303,12 @@ function Bookings() {
                     <FaExclamationTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                      Cancel Booking
-                    </h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Are you sure you want to cancel?
-                    </p>
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">Cancel Booking</h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Are you sure you want to cancel?</p>
                   </div>
                 </div>
                 <button
-                  onClick={() => {
-                    setcancelModalVisible(false);
-
-                  }}
+                  onClick={() => setcancelModalVisible(false)}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                   <FaTimes className="w-5 h-5 text-gray-500 dark:text-gray-400" />
@@ -247,7 +316,6 @@ function Bookings() {
               </div>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6">
               <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
                 <div className="space-y-2 text-sm">
@@ -259,8 +327,7 @@ function Bookings() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500 dark:text-gray-400">Status</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium  ${getStatusColor(selectedReservation.status)}`}>
-
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedReservation.status)}`}>
                       {selectedReservation.status}
                     </span>
                   </div>
@@ -274,23 +341,17 @@ function Bookings() {
                 </p>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={() => {
-                    setcancelModalVisible(false);
-
-                  }}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 
-                           text-gray-700 dark:text-gray-200 font-medium transition duration-200"
+                  onClick={() => setcancelModalVisible(false)}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium transition"
                 >
                   Keep Booking
                 </button>
-                <button onClick={handleDeleteBooking} className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 
-                           hover:from-red-700 hover:to-red-800 text-white font-medium 
-                           transition duration-200 shadow-md hover:shadow-lg
-                           flex items-center justify-center gap-2
-                           disabled:opacity-50 disabled:cursor-not-allowed">
+                <button
+                  onClick={handleDeleteBooking}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-medium transition shadow-md hover:shadow-lg"
+                >
                   Yes, Cancel Booking
                 </button>
               </div>
@@ -298,6 +359,85 @@ function Bookings() {
           </div>
         </div>
       )}
+
+      {/* ---------- Report modal ---------- */}
+      {reportModalVisible && selectedReservation && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4 animate-fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-scale-in overflow-hidden">
+            <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <FaFlag className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white">Report Worker</h2>
+                    <h2
+                      onClick={() => {{
+                        navigator.clipboard.writeText(
+                          selectedReservation.serviceId.workerId.workerCode
+                        );
+                        toast.success("copy code");
+                       } }}
+                      
+                      className="bg-red-500 text-center flex items-center justify-center text-white text-sm rounded-2xl cursor-pointer hover:bg-red-600 px-3 py-1"
+                    >
+                      {selectedReservation.serviceId.workerId.workerCode}
+                      <span className="ml-2 "><FaCopy /></span>
+                    </h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Let us know what went wrong</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setReportModalVisible(false); setReportReason(''); }}
+                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <FaTimes className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Reason for report <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows="4"
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  placeholder="Describe the issue (e.g. no-show, poor quality, unprofessional behaviour)..."
+                  maxLength={500}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl
+                             bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-red-500 focus:border-transparent
+                             outline-none transition resize-none"
+                />
+                <p className="text-xs text-right text-gray-400 mt-1">{reportReason.length}/500</p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => { setReportModalVisible(false); setReportReason(''); }}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleReport}
+                  disabled={!reportReason.trim()}
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700
+                             hover:from-red-700 hover:to-red-800 text-white font-medium transition
+                             shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Submit Report
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

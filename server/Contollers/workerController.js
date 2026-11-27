@@ -2,10 +2,12 @@ import WorkerModel from '../DB_Models/WorkerModel.js'
 import ServiceModel from '../DB_Models/ServiceModel.js'
 import CommentModel from '../DB_Models/CommentModel.js'
 import ReservationModel from '../DB_Models/ReservationModel.js'
+import NotificationModel from '../DB_Models/NotificationModel.js'
 import transporter from '../config/nodeMail.js'
 import { acceptBookingTemplate } from '../EmailTemplate/acceptBooking.js'
 import { rejectBookingTemplate } from '../EmailTemplate/rejectBooking.js'
 import { completeWorkTemplate } from '../EmailTemplate/completedWork.js'
+import ReportModel from '../DB_Models/ReportModel.js'
 
 
 //-------------------get current worker data------//
@@ -264,48 +266,89 @@ export const updateWorkerProfile = async (req, res) => {
   }
 }
 
-// --------------------accept customer booking----------------------------//
+
+// -------------------- Accept Customer Booking -------------------- //
+
 export const acceptUserBooking = async (req, res) => {
   const { reservationId } = req.body;
+
   if (!reservationId) {
-    return res.json({ success: false, message: "missing details" });
+    return res.json({ success: false, message: "Missing reservation ID" });
   }
 
   try {
+
     const reservation = await ReservationModel.findById(reservationId)
       .populate({
-        path: 'workerId',
+        path: "workerId",
         populate: {
-          path: 'customerId'
+          path: "customerId",
+          model: "Customer"
         }
       })
-      .populate('serviceId');
+      .populate("serviceId")
+      .populate("customerId");
+
     if (!reservation) {
-      return res.json({ success: false, message: "reservation not found!" });
+      return res.json({ success: false, message: "Reservation not found!" });
     }
-    reservation.status = 'confirmed';
+
+
+    if (!reservation.workerId || !reservation.workerId.customerId) {
+      return res.json({
+        success: false, message: "Worker or worker customer details not found!"
+      });
+    }
+
+    if (!reservation.customerId || !reservation.serviceId) {
+      return res.json({ success: false, message: "Customer or service details not found!" });
+    }
+
+
+    reservation.status = "confirmed";
     await reservation.save();
-    res.json({ success: true, message: " Booking confirmed succesfully!", reservation });
 
-    // call email template function
-    const emailTemplate = acceptBookingTemplate(reservation.customerName, reservation.workerId.customerId.customerName, reservation.serviceId.serviceName, reservation.date);
 
-    //send mail
+    const notification = new NotificationModel({
+      recipient: reservation.customerId._id,
+      sender: reservation.workerId.customerId._id,
+      senderRole: "worker",
+      recipientRole: "customer",
+      type: "reservation",
+      message: `Your booking for ${reservation.serviceId.serviceName} has been confirmed by ${reservation.workerId.customerId.customerName}.`,
+      relatedId: reservation._id
+    });
+
+    const savedNotification = await notification.save();
+
+    return res.json({ success: true, message: "Booking confirmed successfully!", reservation, notification: savedNotification });
+
+    console.log("Notification saved:", savedNotification._id);
+
+    const emailTemplate = acceptBookingTemplate(
+      reservation.customerName,
+      reservation.workerId.customerId.customerName,
+      reservation.serviceId.serviceName,
+      reservation.date
+    );
+
     await transporter.sendMail({
       from: "Quick Hire Support",
       to: reservation.customerEmail,
-      subject: 'Booking Accept!',
+      subject: "Booking Accepted!",
       html: emailTemplate
-
     });
 
 
 
 
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Accept booking error:", error);
+
+    return res.json({ success: false, message: error.message });
   }
-}
+};
+
 
 //---------------------------delete customer booking---------------------//
 
@@ -328,6 +371,17 @@ export const deleteUserBooking = async (req, res) => {
     }
     reservation.status = 'rejected';
     await reservation.save();
+    const notification = new NotificationModel({
+      recipient: reservation.customerId._id,
+      sender: reservation.workerId.customerId._id,
+      senderRole: "worker",
+      recipientRole: "customer",
+      type: "reservation",
+      message: `Your booking for ${reservation.serviceId.serviceName} has been rejected by ${reservation.workerId.customerId.customerName}.`,
+      relatedId: reservation._id
+    });
+
+    const savedNotification = await notification.save();
     res.json({ success: true, message: "Booking  rejected succesfully!", reservation });
 
     // call email template 
@@ -369,6 +423,18 @@ export const completeUserBooking = async (req, res) => {
     }
     reservation.status = 'completed';
     await reservation.save();
+
+    const notification = new NotificationModel({
+      recipient: reservation.customerId._id,
+      sender: reservation.workerId.customerId._id,
+      senderRole: "worker",
+      recipientRole: "customer",
+      type: "reservation",
+      message: `Congratulations! Your booking for ${reservation.serviceId.serviceName} has been successfully completed by ${reservation.workerId.customerId.customerName}. Please take a moment to rate the worker.`,
+      relatedId: reservation._id
+    });
+
+    const savedNotification = await notification.save();
     res.json({ success: true, message: "Booking  completed succesfully!", reservation });
 
     // call email template 
@@ -430,3 +496,4 @@ export const replyToComment = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 }
+

@@ -12,13 +12,17 @@ function AdminManageUsers() {
   const [selectedUser, setSelectedUser] = useState(false);
   const [detailsVisible, setdetailsVisible] = useState(false);
   const [deleteModelVisible, setdeleteModelVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   const { backendUrl } = useContext(AppContext);
 
 
   //console.log(selectedUser._id);
 
+  //--------------------fetch users------------------
   const fetchUsersData = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(
         backendUrl + "/api/admin/getAllUsersData"
@@ -29,6 +33,8 @@ function AdminManageUsers() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,99 +115,110 @@ function AdminManageUsers() {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         {/* Responsive Table Wrapper */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                {/* FIX: Changed sm:block to sm:table-cell */}
-                <th className="px-4 py-3 text-left text-xs font-semibold  text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  No.
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  User
-                </th>
-                {/* FIX: Changed sm:block to sm:table-cell */}
-                <th className="px-4 py-3 text-left text-xs hidden sm:table-cell font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Email
-                </th>
-                {/* FIX: Changed sm:block to sm:table-cell */}
-                <th className="px-4 py-3 text-left text-xs hidden sm:table-cell font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Joined At
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user, index) => (
-                  <tr
-                    key={user.id || index}
-                    className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
-                  >
-                    {/* FIX: Changed sm:block to sm:table-cell */}
-                    <td className="px-4 py-3  text-gray-800 dark:text-gray-200 font-medium">
-                      {String(index + 1).padStart(2, '0')}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 w-full max-w-sm px-6">
+              <div className="w-full space-y-3 mb-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-4/6"></div>
+              </div>
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                  {/* FIX: Changed sm:block to sm:table-cell */}
+                  <th className="px-4 py-3 text-left text-xs font-semibold  text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    No.
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    User
+                  </th>
+                  {/* FIX: Changed sm:block to sm:table-cell */}
+                  <th className="px-4 py-3 text-left text-xs hidden sm:table-cell font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    Email
+                  </th>
+                  {/* FIX: Changed sm:block to sm:table-cell */}
+                  <th className="px-4 py-3 text-left text-xs hidden sm:table-cell font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    Joined At
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((user, index) => (
+                    <tr
+                      key={user.id || index}
+                      className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                    >
+                      {/* FIX: Changed sm:block to sm:table-cell */}
+                      <td className="px-4 py-3  text-gray-800 dark:text-gray-200 font-medium">
+                        {String(index + 1).padStart(2, '0')}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
 
-                        <div
-                          onClick={() => { setdetailsVisible(true); setSelectedUser(user); }}
-                          className={`cursor-pointer flex items-center justify-center text-white h-8 w-8 rounded-full ${user.role === 'worker' ? "bg-green-500 dark:bg-green-600" : "bg-blue-500 dark:bg-purple-500"} ${user.role === 'admin' ? 'bg-red-500 dark:bg-red-600' : ''}`}
-                        >
-                          <p>{user.customerName ? user.customerName[0] : ''}</p>
+                          <div
+                            onClick={() => { setdetailsVisible(true); setSelectedUser(user); }}
+                            className={`cursor-pointer flex items-center justify-center text-white h-8 w-8 rounded-full ${user.role === 'worker' ? "bg-green-500 dark:bg-green-600" : "bg-blue-500 dark:bg-purple-500"} ${user.role === 'admin' ? 'bg-red-500 dark:bg-red-600' : ''}`}
+                          >
+                            <p>{user.customerName ? user.customerName[0] : ''}</p>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-800 dark:text-white">
+                              {user.customerName}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-800 dark:text-white">
-                            {user.customerName}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td className="px-4 py-3 hidden sm:table-cell text-gray-600 dark:text-gray-300">
-                      {user.customerEmail}
-                    </td>
-                    <td className="px-4 hidden sm:table-cell py-3 text-gray-700 dark:text-gray-300 text-xs">
-                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-2">
-                        {/* Delete Button */}
-                        {
-                          user.role !== 'admin' && (
-                            <button
-                              onClick={() => { setdeleteModelVisible(true); setSelectedUser(user) }}
-                              className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 
+                      <td className="px-4 py-3 hidden sm:table-cell text-gray-600 dark:text-gray-300">
+                        {user.customerEmail}
+                      </td>
+                      <td className="px-4 hidden sm:table-cell py-3 text-gray-700 dark:text-gray-300 text-xs">
+                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-center gap-2">
+                          {/* Delete Button */}
+                          {
+                            user.role !== 'admin' && (
+                              <button
+                                onClick={() => { setdeleteModelVisible(true); setSelectedUser(user) }}
+                                className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 
                                      hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                              title="Delete User"
-                            >
-                              <FaTrash />
-                            </button>
-                          )
-                        }
-                        {/* <button className="p-2 text-green-500 text-xl hover:text-green-700 dark:text-green-400 dark:hover:text-green-600 
+                                title="Delete User"
+                              >
+                                <FaTrash />
+                              </button>
+                            )
+                          }
+                          {/* <button className="p-2 text-green-500 text-xl hover:text-green-700 dark:text-green-400 dark:hover:text-green-600 
                                      hover:bg-green-50 dark:hover:bg-green-900/50 rounded-lg transition-colors">
                           <MdAdminPanelSettings />
                         </button> */}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-4xl">📭</span>
+                        <p className="font-medium">No users found</p>
+                        <p className="text-sm">Try adjusting your search or filter.</p>
                       </div>
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-4xl">📭</span>
-                      <p className="font-medium">No users found</p>
-                      <p className="text-sm">Try adjusting your search or filter.</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          )}
+
         </div>
 
         {/* Table Footer */}

@@ -25,6 +25,7 @@ function ProfileCard() {
     setIsLogged ,
     fetchCustomerData,
     setAllServicesData,
+    setCustomerNotifications,
   } = useContext(AppContext);
   const navigate = useNavigate();
 
@@ -95,6 +96,7 @@ function ProfileCard() {
       if (response.data.success) {
         setIsLogged(false);
         setAllServicesData([]);
+        setCustomerNotifications([]);
         toast.success(response.data.massage || 'Logged out successfully');
         localStorage.removeItem('isLogged');
         navigate('/');

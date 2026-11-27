@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import logo from '../../assets/logo.png'
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaBell } from "react-icons/fa";
 import { useLocation, useNavigate } from 'react-router-dom';
 import ToggleBtn from './ToggleBtn';
 import ProfileCard from './ProfileCard';
@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { AppContext } from '../../Context/Appcontext';
 import axios from 'axios';
 import { RxDashboard } from "react-icons/rx";
+import NotificationBar from './NotificationBar';
 
 
 
@@ -17,7 +18,7 @@ function NavBar() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { currentCustomerData, currentWorkerData, setcurrentWorkerData, backendUrl } = useContext(AppContext);
+    const { currentCustomerData, currentWorkerData, setcurrentWorkerData, backendUrl, fetchCustomerNotifications, customerNotifications } = useContext(AppContext);
     const { isLogged } = useContext(AppContext);
     //  console.log(currentCustomerData);
 
@@ -28,6 +29,7 @@ function NavBar() {
     const hiddenGoToDashbord = location.pathname === '/';
 
     const [openProfileCard, setOpenProfileCard] = useState(false);
+    const [openNotificationBar, setOpenNotificationBar] = useState(false);
 
     const scrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
@@ -70,6 +72,27 @@ function NavBar() {
         }
     };
 
+    //-----------------------execute  notifi seen function------------//
+    const handleSeenMsg = async () => {
+        try {
+            const response = await axios.post(
+                backendUrl + '/api/customer/readNotifications',
+                {},
+                { withCredentials: true }
+            );
+
+            if (response.data.success) {
+               await fetchCustomerNotifications();
+            }
+        } catch (error) {
+            console.error("Failed to mark notifications as read:", error);
+        }
+    };
+    //count unseen msg
+    const unseenCount = customerNotifications.filter(
+        (notification) => !notification.isRead
+    ).length;
+    //console.log(unseenCount)
 
     return (
         <div className={`${location.pathname !== "/" ? "bg-gray-100 dark:bg-[#0f172a]" : ""}  border-b-3 px-3 py-3 border-blue-600 dark:border-purple-600  flex items-center justify-between   text-black dark:text-white`}>
@@ -118,7 +141,7 @@ function NavBar() {
                                 </div>
                             )}
                             <div className='flex items-center gap-1 '>
-                                 <p className=" hidden sm:block capitalize">Hi <span className=' dark:text-purple-600 text-blue-600'>{currentCustomerData.customerName}</span> !</p>
+                                <p className=" hidden sm:block capitalize">Hi <span className=' dark:text-purple-600 text-blue-600'>{currentCustomerData.customerName}</span> !</p>
                             </div>
                         </div>
 
@@ -138,26 +161,77 @@ function NavBar() {
                 {/* become worker button section */}
                 {
                     isLogged && !hiddenGoToDashbord && (
-                        currentCustomerData.role === "worker" ? (
-                            <button
-                                onClick={handleGetWorkerData}
-                                className="bg-green-600 hover:bg-green-800 scale-[0.8] sm:scale-[1] cursor-pointer text-white text-sm p-2 rounded-md"
+                        <div className="flex gap-4 items-center">
+
+                            <div
+                                onClick={() => {
+                                    setOpenNotificationBar(true);
+                                    handleSeenMsg();
+                                    fetchCustomerNotifications();
+                                }}
+                                className='relative text-2xl text-gray-600 cursor-pointer hover:text-blue-600 dark:hover:text-purple-600 duration-300'
                             >
-                                <p className='sm:hidden block'><RxDashboard /></p>
-                                <p className='hidden sm:block'>Go to Dashbord</p>
-                            </button>
-                        ) : (
-                            <div>
-                                {!hiddenBecomeWorker && (
-                                    <button
-                                        onClick={() => navigate("/customer/verifyOtp")}
-                                        className="bg-blue-600 dark:bg-purple-600 scale-[0.8] sm:scale-[1] cursor-pointer scale-80 sm:scale-100 text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
-                                    >
-                                        Become Worker
-                                    </button>
+                                <FaBell />
+
+                                {unseenCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 flex items-center justify-center 
+                         min-w-[18px] h-[18px] px-1 bg-red-500 text-white 
+                         text-[10px] font-bold rounded-full">
+                                        {unseenCount > 99 ? "99+" : unseenCount}
+                                    </span>
                                 )}
                             </div>
-                        )
+
+                            {currentCustomerData.role === "worker" ? (
+                                <button
+                                    onClick={handleGetWorkerData}
+                                    className="bg-green-600 hover:bg-green-800 scale-[0.8] sm:scale-[1] cursor-pointer text-white text-sm p-2 rounded-md"
+                                >
+                                    <p className="sm:hidden block">
+                                        <RxDashboard />
+                                    </p>
+
+                                    <p className="hidden sm:block">
+                                        Go to Dashbord
+                                    </p>
+                                </button>
+                            ) : (
+                                <div>
+                                    {!hiddenBecomeWorker && (
+                                        <button
+                                            onClick={() => navigate("/customer/verifyOtp")}
+                                            className="bg-blue-600 dark:bg-purple-600 scale-[0.8] sm:scale-[1] cursor-pointer text-white text-sm p-2 rounded-md sm:mx-2 mx-0"
+                                        >
+                                            Become Worker
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
+                            {
+                                openNotificationBar && (
+                                    <div className="fixed inset-0 z-50 animate-fade-in">
+                                        {/* Backdrop — click to close */}
+                                        <div
+                                            className="absolute inset-0 bg-black/40"
+                                            onClick={() => {
+                                                setOpenNotificationBar(false);
+
+                                            }}
+                                        />
+                                        {/* Panel */}
+                                        <div
+                                            className="absolute right-0 top-0 h-full w-[350px] max-w-[85vw]
+               bg-white dark:bg-gray-900 shadow-xl animate-slide-in
+               flex flex-col overflow-hidden"
+                                        >
+                                            <NotificationBar unseenCount={unseenCount} setOpenNotificationBar={setOpenNotificationBar} />
+                                        </div>
+                                    </div>
+                                )
+                            }
+
+                        </div>
                     )
                 }
 
